@@ -1,0 +1,213 @@
+@page "/register"
+@using Nodus.Web.DTOs
+@using Nodus.Web.Services
+@inject NodusApiService Api
+@inject NavigationManager Nav
+
+<PageTitle>Registrar Proyecto — Nodus</PageTitle>
+
+@if (_loading)
+{
+    <div class="loading-inline">
+        <div class="s-sm"></div>
+        <span>Conectando con el evento…</span>
+    </div>
+}
+else if (_serverError)
+{
+    <div class="card">
+        <div class="alert alert-error">
+            <span class="alert-icon">⚠</span>
+            <div>
+                <strong>No se pudo conectar con el servidor del evento.</strong><br />
+                Asegúrate de estar conectado a la red Wi-Fi del evento y escanea el QR de registro de nuevo.
+                @if (!string.IsNullOrEmpty(_errorDetail))
+                { <div class="mt-12 hint">@_errorDetail</div> }
+            </div>
+        </div>
+    </div>
+}
+else if (_eventInfo is null)
+{
+    <div class="card">
+        <div class="alert alert-warning">
+            <span class="alert-icon">📡</span>
+            <div>No se encontró información del evento. Verifica que el servidor del organizador esté activo.</div>
+        </div>
+    </div>
+}
+else if (!_eventInfo.IsOpen)
+{
+    <div class="card">
+        <div class="alert alert-warning">
+            <span class="alert-icon">🔒</span>
+            <div><strong>El registro está cerrado.</strong> El organizador ya no acepta más proyectos.</div>
+        </div>
+    </div>
+}
+else if (_registrationClosed)
+{
+    <div class="card">
+        <div class="alert alert-warning">
+            <span class="alert-icon">🔒</span>
+            <div><strong>Registro completo.</strong> Se alcanzó el número máximo de proyectos para este evento.</div>
+        </div>
+    </div>
+}
+else if (_submitted && _response is not null)
+{
+    <!-- Inline boarding pass after successful submit -->
+    <BoardingPass Response="_response" ServerBase="_serverBase" />
+}
+else
+{
+    <div class="card">
+        <h1>Registra tu proyecto</h1>
+        <p class="subtitle">@_eventInfo.Name · @_eventInfo.Institution</p>
+
+        @if (!string.IsNullOrEmpty(_submitError))
+        {
+            <div class="alert alert-error">
+                <span class="alert-icon">⚠</span>
+                <div>@_submitError</div>
+            </div>
+        }
+
+        <!-- Project Name -->
+        <div class="field @(_nameError ? "field-invalid" : "")">
+            <div class="label">Nombre del proyecto *</div>
+            <input type="text" placeholder="EcoSpark Energy"
+                   value="@_name" @oninput="OnNameInput"
+                   maxlength="64" />
+            <div class="char-count @(_name.Length > 64 ? "char-over" : "")">@_name.Length / 64</div>
+            @if (_nameError) { <div class="validation-message">Requerido. Entre 3 y 64 caracteres.</div> }
+        </div>
+
+        <!-- Category -->
+        <div class="field @(_categoryError ? "field-invalid" : "")">
+            <div class="label">Categoría *</div>
+            <select @bind="_category">
+                <option value="">— Selecciona una categoría —</option>
+                @foreach (var cat in _eventInfo.Categories)
+                { <option value="@cat">@cat</option> }
+            </select>
+            @if (_categoryError) { <div class="validation-message">Selecciona una categoría.</div> }
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Description -->
+        <div class="field">
+            <div class="label">Descripción <span class="hint" style="text-transform:none">(opcional · max 140)</span></div>
+            <textarea placeholder="Un pitch de máximo 140 caracteres sobre tu proyecto."
+                      @bind="_description" @bind:event="oninput"
+                      maxlength="140"></textarea>
+            <div class="char-count @(_description.Length > 140 ? "char-over" : "")">@_description.Length / 140</div>
+        </div>
+
+        <!-- GitHub / Link -->
+        <div class="field">
+            <div class="label">GitHub u otro enlace <span class="hint" style="text-transform:none">(opcional)</span></div>
+            <input type="url" placeholder="https://github.com/equipo/proyecto"
+                   @bind="_github" maxlength="256" />
+        </div>
+
+        <!-- Team Members -->
+        <div class="field">
+            <div class="label">Integrantes <span class="hint" style="text-transform:none">(opcional · max 128)</span></div>
+            <input type="text" placeholder="Juan, María, Pedro"
+                   @bind="_members" maxlength="128" />
+        </div>
+
+        <button class="btn-primary" @onclick="SubmitAsync" disabled="@_submitting">
+            @if (_submitting) { <div class="s-sm"></div><span>Registrando…</span> }
+            else              { <span>✔ Registrar proyecto</span> }
+        </button>
+    </div>
+}
+
+@code {
+    // ── Query params ──────────────────────────────────────────────────────
+    [SupplyParameterFromQuery(Name = "event")]  public string? EventId    { get; set; }
+    [SupplyParameterFromQuery(Name = "server")] public string? ServerBase { get; set; }
+
+    // ── State ─────────────────────────────────────────────────────────────
+    private EventInfoDto?            _eventInfo;
+    private RegisterProjectResponse? _response;
+    private bool   _loading = true;
+    private bool   _serverError;
+    private bool   _registrationClosed;
+    private bool   _submitting;
+    private bool   _submitted;
+    private string _errorDetail = string.Empty;
+    private string _submitError = string.Empty;
+
+    // ── Form fields ───────────────────────────────────────────────────────
+    private string _name        = string.Empty;
+    private string _category    = string.Empty;
+    private string _description = string.Empty;
+    private string _github      = string.Empty;
+    private string _members     = string.Empty;
+
+    // ── Validation flags ──────────────────────────────────────────────────
+    private bool _nameError;
+    private bool _categoryError;
+
+    // ── Lifecycle ─────────────────────────────────────────────────────────
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrWhiteSpace(ServerBase))
+        {
+            _serverError = true;
+            _errorDetail = "El parámetro 'server' no está en la URL. Escanea el QR de registro generado por el organizador.";
+            _loading = false;
+            return;
+        }
+
+        _eventInfo = await Api.GetCurrentEventAsync(ServerBase);
+        if (_eventInfo is null)
+        {
+            _serverError = true;
+            _errorDetail = $"No se pudo obtener información del evento desde {ServerBase}.";
+        }
+        _loading = false;
+    }
+
+    private void OnNameInput(ChangeEventArgs e)
+    {
+        _name = e.Value?.ToString() ?? string.Empty;
+        _nameError = false;
+    }
+
+    private async Task SubmitAsync()
+    {
+        // Client-side validation
+        _nameError     = _name.Trim().Length < 3 || _name.Trim().Length > 64;
+        _categoryError = string.IsNullOrWhiteSpace(_category);
+        if (_nameError || _categoryError) return;
+
+        _submitting = true;
+        _submitError = string.Empty;
+
+        var request = new RegisterProjectRequest
+        {
+            EventId     = EventId ?? _eventInfo!.EventId,
+            Name        = _name.Trim(),
+            Category    = _category,
+            Description = string.IsNullOrWhiteSpace(_description) ? null : _description.Trim(),
+            GithubLink  = string.IsNullOrWhiteSpace(_github)      ? null : _github.Trim(),
+            TeamMembers = string.IsNullOrWhiteSpace(_members)     ? null : _members.Trim()
+        };
+
+        var (response, error) = await Api.RegisterProjectAsync(ServerBase!, request);
+
+        _submitting = false;
+
+        if (error == "registration_closed") { _registrationClosed = true; return; }
+        if (error is not null) { _submitError = error; return; }
+
+        _response  = response;
+        _submitted = true;
+    }
+}

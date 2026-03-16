@@ -1,0 +1,171 @@
+@page "/edit"
+@using Nodus.Web.DTOs
+@using Nodus.Web.Services
+@inject NodusApiService Api
+@inject NavigationManager Nav
+
+<PageTitle>Editar registro — Nodus</PageTitle>
+
+@if (_loading)
+{
+    <div class="loading-inline">
+        <div class="s-sm"></div>
+        <span>Cargando datos del proyecto…</span>
+    </div>
+}
+else if (_tokenInvalid)
+{
+    <div class="card">
+        <div class="alert alert-error">
+            <span class="alert-icon">🔒</span>
+            <div>
+                <strong>Enlace de edición no válido o expirado.</strong><br />
+                El organizador ya cerró el evento o el token es incorrecto.
+            </div>
+        </div>
+    </div>
+}
+else if (_eventClosed)
+{
+    <div class="card">
+        <div class="alert alert-warning">
+            <span class="alert-icon">🔒</span>
+            <div>
+                <strong>El evento ya cerró.</strong><br />
+                Los datos de registro ya no se pueden modificar.
+            </div>
+        </div>
+    </div>
+}
+else if (_saveSuccess)
+{
+    <div class="card">
+        <div class="alert alert-success">
+            <span class="alert-icon">✔</span>
+            <div>
+                <strong>¡Cambios guardados!</strong> Tu registro ha sido actualizado.
+            </div>
+        </div>
+        <button class="btn-ghost mt-12" @onclick='() => Nav.NavigateTo(Nav.Uri)'>
+            Volver
+        </button>
+    </div>
+}
+else if (_project is not null)
+{
+    <div class="card">
+        <h1>Editar registro</h1>
+        <p class="subtitle">Proyecto @_project.ProjectId · @_project.EventId</p>
+
+        @if (!string.IsNullOrEmpty(_submitError))
+        {
+            <div class="alert alert-error">
+                <span class="alert-icon">⚠</span>
+                <div>@_submitError</div>
+            </div>
+        }
+
+        <div class="field @(_nameError ? "field-invalid" : "")">
+            <div class="label">Nombre del proyecto *</div>
+            <input type="text" @bind="_name" @bind:event="oninput" maxlength="64" />
+            <div class="char-count @(_name.Length > 64 ? "char-over" : "")">@_name.Length / 64</div>
+            @if (_nameError) { <div class="validation-message">Entre 3 y 64 caracteres.</div> }
+        </div>
+
+        <div class="field @(_categoryError ? "field-invalid" : "")">
+            <div class="label">Categoría *</div>
+            <input type="text" @bind="_category" maxlength="64" />
+            @if (_categoryError) { <div class="validation-message">Requerido.</div> }
+        </div>
+
+        <hr class="divider" />
+
+        <div class="field">
+            <div class="label">Descripción <span class="hint" style="text-transform:none">(max 140)</span></div>
+            <textarea @bind="_description" maxlength="140"></textarea>
+            <div class="char-count">@(_description?.Length ?? 0) / 140</div>
+        </div>
+
+        <div class="field">
+            <div class="label">GitHub u otro enlace</div>
+            <input type="url" @bind="_github" maxlength="256" />
+        </div>
+
+        <div class="field">
+            <div class="label">Integrantes <span class="hint" style="text-transform:none">(max 128)</span></div>
+            <input type="text" @bind="_members" maxlength="128" />
+        </div>
+
+        <button class="btn-primary" @onclick="SaveAsync" disabled="@_saving">
+            @if (_saving) { <div class="s-sm"></div><span>Guardando…</span> }
+            else          { <span>Guardar cambios</span> }
+        </button>
+    </div>
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "token")]  public string? Token      { get; set; }
+    [SupplyParameterFromQuery(Name = "server")] public string? ServerBase { get; set; }
+
+    private ProjectEditDto? _project;
+    private bool _loading = true;
+    private bool _tokenInvalid;
+    private bool _eventClosed;
+    private bool _saveSuccess;
+    private bool _saving;
+    private string _submitError = string.Empty;
+
+    private string _name        = string.Empty;
+    private string _category    = string.Empty;
+    private string? _description;
+    private string? _github;
+    private string? _members;
+    private bool _nameError;
+    private bool _categoryError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Token) || string.IsNullOrWhiteSpace(ServerBase))
+        {
+            _tokenInvalid = true;
+            _loading = false;
+            return;
+        }
+
+        _project = await Api.GetProjectForEditAsync(ServerBase, Token);
+        if (_project is null) { _tokenInvalid = true; _loading = false; return; }
+        if (!_project.IsEventOpen) { _eventClosed = true; _loading = false; return; }
+
+        _name        = _project.Name;
+        _category    = _project.Category;
+        _description = _project.Description;
+        _github      = _project.GithubLink;
+        _members     = _project.TeamMembers;
+        _loading     = false;
+    }
+
+    private async Task SaveAsync()
+    {
+        _nameError     = _name.Trim().Length < 3 || _name.Trim().Length > 64;
+        _categoryError = string.IsNullOrWhiteSpace(_category);
+        if (_nameError || _categoryError) return;
+
+        _saving = true;
+        _submitError = string.Empty;
+
+        var (ok, error) = await Api.UpdateProjectAsync(ServerBase!, Token!, new UpdateProjectRequest
+        {
+            Name        = _name.Trim(),
+            Category    = _category.Trim(),
+            Description = string.IsNullOrWhiteSpace(_description) ? null : _description.Trim(),
+            GithubLink  = string.IsNullOrWhiteSpace(_github)      ? null : _github.Trim(),
+            TeamMembers = string.IsNullOrWhiteSpace(_members)     ? null : _members.Trim()
+        });
+
+        _saving = false;
+
+        if (error == "event_closed") { _eventClosed = true; return; }
+        if (error is not null)       { _submitError = error; return; }
+        _saveSuccess = true;
+    }
+}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="Nodus.Judge.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:Nodus.Judge.Presentation.Views"
+    Shell.NavBarIsVisible="True"
+    Shell.BackgroundColor="{AppThemeBinding Light={StaticResource NodusGroupedBackground}, Dark={StaticResource NodusGroupedBackgroundDark}}"
+    Shell.TitleColor="{StaticResource NodusLabel}">
+
+    <!-- Keep a single root item on Android to avoid OEM-specific Shell renderer crashes. -->
+    <ShellContent
+        Route="VotingPage"
+        Title="Votar"
+        ContentTemplate="{DataTemplate views:VotingPage}" />
+
+</Shell>

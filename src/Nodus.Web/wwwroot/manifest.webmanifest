@@ -1,0 +1,9 @@
+{
+  "name": "Nodus",
+  "short_name": "Nodus",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f0e17",
+  "theme_color": "#6c63ff",
+  "prefer_related_applications": false
+}

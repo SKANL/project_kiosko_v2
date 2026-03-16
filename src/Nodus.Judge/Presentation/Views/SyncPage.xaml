@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Nodus.Judge.Presentation.Views.SyncPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Nodus.Judge.Presentation.ViewModels"
+    xmlns:enums="clr-namespace:Nodus.Judge.Domain.Enums;assembly=Nodus.Judge"
+    x:DataType="vm:SyncViewModel"
+    Title="Ayuda de conexión"
+    BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24,32" Spacing="24">
+
+            <!-- ── State badge ── -->
+            <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
+
+                <!-- Coloured circle -->
+                <Grid
+                    HorizontalOptions="Center"
+                    WidthRequest="100"
+                    HeightRequest="100"
+                    SemanticProperties.Description="Indicador visual del estado actual de conexión entre equipos cercanos.">
+                    <Ellipse
+                        x:Name="StateDot"
+                        WidthRequest="100"
+                        HeightRequest="100"
+                        Fill="{StaticResource NodusInfo}">
+                        <Ellipse.Triggers>
+                            <DataTrigger TargetType="Ellipse"
+                                         Binding="{Binding CurrentState}"
+                                         Value="{x:Static enums:FireflyState.Candidate}">
+                                <Setter Property="Fill" Value="{StaticResource NodusWarning}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Ellipse"
+                                         Binding="{Binding CurrentState}"
+                                         Value="{x:Static enums:FireflyState.Link}">
+                                <Setter Property="Fill" Value="{StaticResource NodusSuccess}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Ellipse"
+                                         Binding="{Binding CurrentState}"
+                                         Value="{x:Static enums:FireflyState.Cooldown}">
+                                <Setter Property="Fill" Value="{StaticResource NodusSecondaryLabel}" />
+                            </DataTrigger>
+                        </Ellipse.Triggers>
+                    </Ellipse>
+
+                    <!-- Firefly icon text -->
+                    <Label
+                        Text="✦"
+                        FontSize="40"
+                        TextColor="White"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center" />
+                </Grid>
+
+                <Label
+                    HorizontalOptions="Center"
+                    Style="{StaticResource Title2}"
+                    Text="{Binding StateDisplayName}" />
+
+                <Label
+                    HorizontalOptions="Center"
+                    Style="{StaticResource Subhead}"
+                    TextColor="{StaticResource NodusSecondaryLabel}"
+                    Text="Todavía no hay una conexión activa">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label"
+                                     Binding="{Binding CurrentState}"
+                                     Value="{x:Static enums:FireflyState.Link}">
+                            <Setter Property="IsVisible" Value="False" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+
+                <Label
+                    HorizontalOptions="Center"
+                    Style="{StaticResource Subhead}"
+                    TextColor="{StaticResource NodusSuccess}">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Vinculado a " />
+                            <Span Text="{Binding LinkedPeerId}" FontAttributes="Bold" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label"
+                                     Binding="{Binding CurrentState}"
+                                     Value="{x:Static enums:FireflyState.Link}">
+                            <Setter Property="IsVisible" Value="True" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                    <Label.IsVisible>False</Label.IsVisible>
+                </Label>
+            </VerticalStackLayout>
+
+            <!-- ── Controls ── -->
+            <Button
+                HorizontalOptions="Fill"
+                Style="{StaticResource PrimaryButton}"
+                Command="{Binding ToggleSwarmCommand}"
+                SemanticProperties.Description="Inicia o detiene la búsqueda de una ruta cercana para mover evaluaciones.">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button"
+                                 Binding="{Binding CurrentState}"
+                                 Value="{x:Static enums:FireflyState.Seeker}">
+                        <Setter Property="Text" Value="Buscar una conexión" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Button"
+                                 Binding="{Binding CurrentState}"
+                                 Value="{x:Static enums:FireflyState.Candidate}">
+                        <Setter Property="Text" Value="Detener búsqueda" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Button"
+                                 Binding="{Binding CurrentState}"
+                                 Value="{x:Static enums:FireflyState.Link}">
+                        <Setter Property="Text" Value="Cerrar conexión" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Button"
+                                 Binding="{Binding CurrentState}"
+                                 Value="{x:Static enums:FireflyState.Cooldown}">
+                        <Setter Property="Text" Value="Esperando..." />
+                        <Setter Property="IsEnabled" Value="False" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+
+            <!-- Error -->
+            <Label
+                Style="{StaticResource Footnote}"
+                TextColor="{StaticResource NodusError}"
+                Text="{Binding ErrorMessage}"
+                IsVisible="{Binding HasError}" />
+
+            <!-- ── Stats card ── -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Style="{StaticResource SectionHeader}" Text="RESUMEN DE CONEXIÓN" />
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Style="{StaticResource Body}" Text="Último equipo cercano detectado" />
+                        <Label Grid.Column="1" Style="{StaticResource Footnote}"
+                               TextColor="{StaticResource NodusSecondaryLabel}"
+                               Text="{Binding LastPeerSeenAt}" />
+                    </Grid>
+                    <BoxView Style="{StaticResource HairlineSeparator}" />
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Style="{StaticResource Body}" Text="Equipos cercanos encontrados" />
+                        <Label Grid.Column="1" Style="{StaticResource Headline}"
+                               Text="{Binding DiscoveredPeers.Count}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ── Peers list ── -->
+            <VerticalStackLayout Spacing="8">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0"
+                           Style="{StaticResource SectionHeader}"
+                           Text="EQUIPOS CERCANOS" />
+                    <Button
+                        Grid.Column="1"
+                        Style="{StaticResource GhostButton}"
+                        Text="Limpiar lista"
+                        FontSize="13"
+                        Padding="12,12"
+                        MinimumHeightRequest="44"
+                        Command="{Binding ClearPeersCommand}"
+                        SemanticProperties.Description="Borra la lista visible de equipos cercanos encontrados." />
+                </Grid>
+
+                <Border Style="{StaticResource Card}" Padding="0">
+                    <CollectionView ItemsSource="{Binding DiscoveredPeers}">
+                        <CollectionView.EmptyView>
+                            <Label Padding="16,12" Style="{StaticResource Footnote}"
+                                   TextColor="{StaticResource NodusSecondaryLabel}"
+                                   Text="Todavía no se detectaron equipos cercanos." />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Grid Padding="16,12" ColumnDefinitions="Auto,*">
+                                    <Ellipse
+                                        Grid.Column="0"
+                                        Fill="{StaticResource NodusAccent}"
+                                        WidthRequest="8"
+                                        HeightRequest="8"
+                                        VerticalOptions="Center"
+                                        Margin="0,0,12,0" />
+                                    <Label
+                                        Grid.Column="1"
+                                        Style="{StaticResource Footnote}"
+                                        Text="{Binding .}"
+                                        LineBreakMode="MiddleTruncation"
+                                        SemanticProperties.Description="Identificador del equipo cercano detectado." />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Border>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

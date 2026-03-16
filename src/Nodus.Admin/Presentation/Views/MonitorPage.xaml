@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Nodus.Admin.Presentation.ViewModels"
+             xmlns:entities="clr-namespace:Nodus.Admin.Domain.Entities"
+             x:Class="Nodus.Admin.Presentation.Views.MonitorPage"
+             x:DataType="vm:MonitorViewModel"
+             Title="Centro de control"
+             BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- ── Status Bar ─────────────────────────────────────────── -->
+        <Border Grid.Row="0"
+                Style="{StaticResource Card}"
+                Margin="16,12,16,0"
+                Padding="16,12">
+            <Grid ColumnDefinitions="*,*,*,*,*,Auto">
+                <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="2">
+                    <Label Text="{Binding TotalVotes}"
+                           Style="{StaticResource StatValueLabel}" />
+                    <Label Text="Votos recibidos"
+                           Style="{StaticResource StatCaptionLabel}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="2">
+                    <Label Text="{Binding LastReceivedAt}"
+                           Style="{StaticResource StatValueLabel}"
+                           FontSize="17" />
+                    <Label Text="Último voto"
+                           Style="{StaticResource StatCaptionLabel}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="2">
+                    <Label Text="●" FontSize="24" HorizontalTextAlignment="Center">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label"
+                                         Binding="{Binding IsBleRunning}" Value="True">
+                                <Setter Property="TextColor" Value="{StaticResource NodusSuccess}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Label"
+                                         Binding="{Binding IsBleRunning}" Value="False">
+                                <Setter Property="TextColor" Value="{StaticResource NodusError}" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                    <Label Text="BLE" Style="{StaticResource StatCaptionLabel}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="3" HorizontalOptions="Center" Spacing="2">
+                    <Label Text="{Binding ActiveRelaysEstimated}"
+                           Style="{StaticResource StatValueLabel}" />
+                    <Label Text="Relays estimados"
+                           Style="{StaticResource StatCaptionLabel}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="4" HorizontalOptions="Center" Spacing="2">
+                    <Label Text="{Binding UnsyncedToCloud}"
+                           Style="{StaticResource StatValueLabel}" />
+                    <Label Text="Pendientes de nube"
+                           Style="{StaticResource StatCaptionLabel}" />
+                </VerticalStackLayout>
+                <Button Grid.Column="5"
+                        Text="Cerrar evento"
+                        Command="{Binding CloseEventCommand}"
+                        Style="{StaticResource GhostButton}"
+                        TextColor="{StaticResource NodusError}"
+                        IsEnabled="{Binding CanCloseEvent}"
+                        VerticalOptions="Center"
+                        Padding="12,8"
+                        SemanticProperties.Description="Cierra el evento y deja solo el tiempo de gracia para votos pendientes." />
+            </Grid>
+        </Border>
+
+        <RefreshView Grid.Row="1"
+                     Command="{Binding RefreshCommand}"
+                     IsRefreshing="{Binding IsBusy}">
+            <ScrollView>
+                <VerticalStackLayout Margin="16,8,16,24" Spacing="16">
+                    <Border Style="{StaticResource Card}">
+                        <VerticalStackLayout Spacing="12">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Grid.Column="0" Text="Cobertura por proyecto" Style="{StaticResource SectionHeader}" />
+                                <Label Grid.Column="1" Text="{Binding RegisteredJudges, StringFormat='Jueces: {0}'}" Style="{StaticResource Footnote}" />
+                            </Grid>
+
+                            <CollectionView ItemsSource="{Binding ProjectCoverage}" SelectionMode="None">
+                                <CollectionView.EmptyView>
+                                    <Label Text="Aún no hay proyectos visibles para este evento."
+                                           Style="{StaticResource Footnote}" />
+                                </CollectionView.EmptyView>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:ProjectMonitorItem">
+                                        <Border StrokeShape="RoundRectangle 12" StrokeThickness="1" Padding="12" Margin="0,4">
+                                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                                    <Label Text="{Binding ProjectName}" Style="{StaticResource Headline}" />
+                                                    <Label Text="{Binding ProjectCode}" Style="{StaticResource Footnote}" TextColor="{StaticResource NodusAccent}" />
+                                                </VerticalStackLayout>
+                                                <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="End">
+                                                    <Label Text="{Binding VotesLabel}" Style="{StaticResource Title3}" HorizontalTextAlignment="End" />
+                                                    <Label Text="{Binding StatusLabel}" Style="{StaticResource Caption1}" TextColor="{Binding StatusColor}" HorizontalTextAlignment="End" />
+                                                </VerticalStackLayout>
+                                                <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                                       Text="{Binding LastActivityLabel, StringFormat='Última actividad: {0}'}"
+                                                       Style="{StaticResource Footnote}"
+                                                       Margin="0,8,0,0" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <VerticalStackLayout Spacing="12">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Grid.Column="0" Text="Inspector de nodos" Style="{StaticResource SectionHeader}" />
+                                <Label Grid.Column="1" Text="{Binding ActiveJudges, StringFormat='Activos: {0}'}" Style="{StaticResource Footnote}" />
+                            </Grid>
+
+                            <CollectionView ItemsSource="{Binding NodeInspector}" SelectionMode="None">
+                                <CollectionView.EmptyView>
+                                    <Label Text="Todavía no hay actividad de jueces para inspeccionar."
+                                           Style="{StaticResource Footnote}" />
+                                </CollectionView.EmptyView>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:NodeInspectorItem">
+                                        <Border StrokeShape="RoundRectangle 12" StrokeThickness="1" Padding="12" Margin="0,4">
+                                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                                    <Label Text="{Binding JudgeName}" Style="{StaticResource Headline}" />
+                                                    <Label Text="{Binding LastSeenLabel, StringFormat='Última señal: {0}'}" Style="{StaticResource Footnote}" />
+                                                </VerticalStackLayout>
+                                                <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="End">
+                                                    <Label Text="{Binding EstimatedRole}" Style="{StaticResource Caption1}" TextColor="{Binding RoleColor}" HorizontalTextAlignment="End" />
+                                                    <Label Text="{Binding AccessLabel}" Style="{StaticResource Footnote}" HorizontalTextAlignment="End" />
+                                                </VerticalStackLayout>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Actividad reciente" Style="{StaticResource SectionHeader}" />
+                            <CollectionView ItemsSource="{Binding RecentVotes}" SelectionMode="None">
+                                <CollectionView.EmptyView>
+                                    <VerticalStackLayout HorizontalOptions="Center"
+                                                         VerticalOptions="Center"
+                                                         Spacing="8"
+                                                         Margin="0,12">
+                                        <Label Text="Aún no llegaron votos"
+                                               Style="{StaticResource Title3}"
+                                               HorizontalTextAlignment="Center"
+                                               TextColor="{AppThemeBinding Light={StaticResource NodusSecondaryLabel}, Dark={StaticResource NodusSecondaryLabelDark}}" />
+                                        <Label Text="El panel se actualizará solo cuando aparezca actividad cercana."
+                                               Style="{StaticResource Subhead}"
+                                               HorizontalTextAlignment="Center" />
+                                    </VerticalStackLayout>
+                                </CollectionView.EmptyView>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="entities:Vote">
+                                        <Border StrokeShape="RoundRectangle 12" StrokeThickness="1" Padding="12" Margin="0,4">
+                                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                                <Label Grid.Column="0"
+                                                       Text="{Binding ProjectId, StringFormat='Proyecto #{0}'}"
+                                                       Style="{StaticResource Headline}" />
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding WeightedScore, StringFormat='{0:F2}'}"
+                                                       TextColor="{StaticResource NodusAccent}"
+                                                       Style="{StaticResource Title3}"
+                                                       HorizontalTextAlignment="End" />
+                                                <Label Grid.Row="1" Grid.Column="0"
+                                                       Text="{Binding ReceivedAt, StringFormat='Recibido: {0}'}"
+                                                       Style="{StaticResource Footnote}"
+                                                       Margin="0,6,0,0" />
+                                                <Label Grid.Row="1" Grid.Column="1"
+                                                       Text="{Binding PacketId}"
+                                                       Style="{StaticResource Caption1}"
+                                                       HorizontalTextAlignment="End"
+                                                       Margin="0,6,0,0" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+
+    </Grid>
+
+</ContentPage>

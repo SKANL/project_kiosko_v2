@@ -1,0 +1,74 @@
+@* Boarding Pass component — shown inline after successful registration *@
+@using Nodus.Web.DTOs
+@using QRCoder
+
+<div class="card">
+    <div class="pass">
+
+        <div>
+            <h1 style="text-align:center;margin-bottom:4px">¡Registrado! 🎉</h1>
+            <p class="subtitle">Muestra este QR en tu mesa</p>
+        </div>
+
+        <!-- Large QR code -->
+        <div class="pass-qr">
+            <img src="@_qrDataUrl" alt="QR del proyecto @Response.ProjectId" width="200" height="200" />
+        </div>
+
+        <!-- Project ID -->
+        <div class="pass-id">@Response.ProjectId</div>
+
+        <!-- Project Name -->
+        <div style="font-size:1.05rem;font-weight:600">@Response.ProjectName</div>
+
+        <!-- Stand -->
+        <div class="pass-stand">
+            @if (string.IsNullOrEmpty(Response.StandNumber))
+            { <span>📍 Mesa: Pendiente de asignación</span> }
+            else
+            { <span>📍 Ve a la Mesa @Response.StandNumber</span> }
+        </div>
+
+        <!-- Instructions -->
+        <p class="pass-instruction">
+            Coloca tu teléfono con este QR visible en la mesa.<br />
+            Los jueces lo escanearán para evaluarte.
+        </p>
+
+        <hr class="divider" style="width:100%" />
+
+        <!-- Edit link -->
+        <div style="text-align:center;width:100%">
+            <div class="hint" style="margin-bottom:6px">
+                ¿Hay un error en tus datos? Corrígelo antes de que comience el evento:
+            </div>
+            <a class="edit-link" href="@Response.EditUrl" target="_self">
+                Editar registro →
+            </a>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public RegisterProjectResponse Response { get; set; } = default!;
+    [Parameter] public string? ServerBase { get; set; }
+
+    private string _qrDataUrl = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        // Generate QR client-side using QRCoder
+        try
+        {
+            using var qrGenerator = new QRCodeGenerator();
+            using var qrData = qrGenerator.CreateQrCode(Response.QrPayload, QRCodeGenerator.ECCLevel.M);
+            using var qrCode = new PngByteQRCode(qrData);
+            var pngBytes = qrCode.GetGraphic(8);  // 8 px per module → ~200x200
+            _qrDataUrl = $"data:image/png;base64,{Convert.ToBase64String(pngBytes)}";
+        }
+        catch
+        {
+            _qrDataUrl = string.Empty;
+        }
+    }
+}

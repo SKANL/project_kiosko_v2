@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Nodus.Judge.Presentation.Views.ProjectSelectionPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Nodus.Judge.Presentation.ViewModels"
+    x:DataType="vm:VotingViewModel"
+    Title="Seleccionar proyecto"
+    BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12,16,20" Spacing="10">
+            <Border Style="{StaticResource ElevatedCard}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Style="{StaticResource Headline}"
+                           Text="{Binding EventStateMessage}"
+                           LineBreakMode="WordWrap" />
+                    <Button Text="Escanear QR"
+                            Style="{StaticResource SecondaryButton}"
+                            HorizontalOptions="Start"
+                            Padding="14,10"
+                            Command="{Binding OpenProjectScannerCommand}" />
+                    <Label Style="{StaticResource Footnote}"
+                           Text="{Binding ProjectSelectionMessage}"
+                           TextColor="{StaticResource NodusSecondaryLabel}" />
+
+                    <Border Padding="12"
+                            BackgroundColor="{StaticResource NodusSurface}"
+                            StrokeShape="RoundRectangle 10">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                            <Label Grid.Column="0"
+                                   Text="{Binding SyncStateIcon}"
+                                   FontSize="18"
+                                   VerticalTextAlignment="Center" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label Style="{StaticResource Subhead}" Text="{Binding SyncStateLabel}" />
+                                <Label Style="{StaticResource Footnote}"
+                                       Text="{Binding SyncStateHint}"
+                                       TextColor="{StaticResource NodusSecondaryLabel}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                    <Border Padding="10"
+                            BackgroundColor="{StaticResource NodusSuccess}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 10"
+                            IsVisible="{Binding IsRelayAssistVisible}">
+                        <Label Text="{Binding RelayAssistMessage}"
+                               TextColor="White"
+                               Style="{StaticResource Footnote}" />
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource ElevatedCard}">
+                <Grid ColumnDefinitions="44,*,44" RowDefinitions="Auto,Auto">
+                    <Button Grid.Column="0" Grid.RowSpan="2"
+                            Text="‹"
+                            Style="{StaticResource IconNavButton}"
+                            Command="{Binding PreviousProjectCommand}" />
+
+                    <Label Grid.Column="1" Grid.Row="0"
+                           Style="{StaticResource Headline}"
+                           Text="{Binding CurrentProjectName}"
+                           HorizontalTextAlignment="Center" />
+                    <Label Grid.Column="1" Grid.Row="1"
+                           Style="{StaticResource Caption1}"
+                           TextColor="{StaticResource NodusAccent}"
+                           Text="{Binding CurrentProjectCategory}"
+                           HorizontalTextAlignment="Center" />
+
+                    <Button Grid.Column="2" Grid.RowSpan="2"
+                            Text="›"
+                            Style="{StaticResource IconNavButton}"
+                            Command="{Binding NextProjectCommand}" />
+                </Grid>
+            </Border>
+
+            <Border Style="{StaticResource Card}" IsVisible="{Binding HasCurrentProjectDescription}">
+                <Label Style="{StaticResource Subhead}"
+                       Text="{Binding CurrentProjectDescription}" />
+            </Border>
+
+            <Label Style="{StaticResource Footnote}"
+                   TextColor="{StaticResource NodusError}"
+                   Text="{Binding ErrorMessage}"
+                   IsVisible="{Binding HasError}" />
+
+            <Button Text="Evaluar este proyecto"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding CloseProjectSelectionCommand}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

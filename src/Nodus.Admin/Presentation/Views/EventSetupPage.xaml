@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Nodus.Admin.Presentation.ViewModels"
+             xmlns:entities="clr-namespace:Nodus.Admin.Domain.Entities"
+             x:Class="Nodus.Admin.Presentation.Views.EventSetupPage"
+             x:Name="PageRoot"
+             x:DataType="vm:EventSetupViewModel"
+             Title="Preparar evento"
+             BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="0,0,0,40" Spacing="0">
+
+                 <Label Text="Preparar evento"
+                   Style="{StaticResource LargeTitle}"
+                                     IsVisible="{Binding IsCreateMode}"
+                   Margin="20,24,20,4"
+                   SemanticProperties.HeadingLevel="Level1" />
+                                 <Label Text="QRs del evento"
+                                     Style="{StaticResource LargeTitle}"
+                                     IsVisible="{Binding IsReadOnlyQrMode}"
+                                     Margin="20,24,20,4"
+                                     SemanticProperties.HeadingLevel="Level1" />
+                 <Label Text="Configúralo una sola vez. Después la app guiará al jurado automáticamente."
+                   Style="{StaticResource Subhead}"
+                                     IsVisible="{Binding IsCreateMode}"
+                   Margin="20,0,20,20" />
+                                 <Label Text="Vista de solo lectura. Aquí puedes volver a mostrar los QRs sin alterar la configuración del evento."
+                                     Style="{StaticResource Subhead}"
+                                     IsVisible="{Binding IsReadOnlyQrMode}"
+                                     Margin="20,0,20,20" />
+
+                                 <Label Text="DATOS DEL EVENTO" Style="{StaticResource SectionHeader}" IsVisible="{Binding IsCreateMode}" />
+
+                        <Border Style="{StaticResource Card}" Margin="16,0" IsVisible="{Binding IsCreateMode}">
+                <VerticalStackLayout Spacing="12">
+                      <Label Text="Nombre del evento" Style="{StaticResource Footnote}" />
+                      <Entry Placeholder="Ej. Feria de Ciencia 2026"
+                           Text="{Binding EventName}"
+                           Style="{StaticResource FormEntry}"
+                          AutomationId="EventNameEntry"
+                          SemanticProperties.Description="Nombre visible del evento que verán jueces y organización." />
+                    <BoxView Style="{StaticResource HairlineSeparator}" />
+                      <Label Text="Descripción" Style="{StaticResource Footnote}" />
+                      <Entry Placeholder="Resumen corto del evento"
+                           Text="{Binding Description}"
+                          Style="{StaticResource FormEntry}"
+                          SemanticProperties.Description="Contexto breve para reconocer el evento." />
+                    <BoxView Style="{StaticResource HairlineSeparator}" />
+                      <Label Text="Institución o categoría" Style="{StaticResource Footnote}" />
+                      <Entry Placeholder="Ej. Ingeniería"
+                           Text="{Binding Category}"
+                          Style="{StaticResource FormEntry}"
+                          SemanticProperties.Description="Nombre de la institución o categoría principal del evento." />
+                    <BoxView Style="{StaticResource HairlineSeparator}" />
+                      <Label Text="Clave del evento" Style="{StaticResource Footnote}" />
+                      <Entry Placeholder="Mínimo 6 caracteres"
+                           Text="{Binding AccessPassword}"
+                           IsPassword="True"
+                           Style="{StaticResource FormEntry}"
+                           AutomationId="EventPasswordEntry"
+                          SemanticProperties.Hint="El jurado escribirá esta clave después de escanear el QR de acceso" />
+                </VerticalStackLayout>
+            </Border>
+
+                  <Label Text="PROYECTOS" Style="{StaticResource SectionHeader}" IsVisible="{Binding IsCreateMode}" />
+
+              <Border Style="{StaticResource Card}" Margin="16,0" IsVisible="{Binding IsCreateMode}">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto,90" ColumnSpacing="8">
+                        <Entry Grid.Column="0"
+                               Placeholder="Nombre del proyecto"
+                               Text="{Binding NewProjectName}"
+                               SemanticProperties.Description="Nombre del proyecto que quedará visible para el jurado." />
+                        <Entry Grid.Column="1"
+                               Placeholder="Categoría"
+                               Text="{Binding NewProjectCategory}"
+                               WidthRequest="130"
+                               SemanticProperties.Description="Categoría breve para agrupar el proyecto." />
+                        <Button Grid.Column="2"
+                                Text="Agregar"
+                                Command="{Binding AddProjectCommand}"
+                                Style="{StaticResource PrimaryButton}"
+                                Padding="0,10"
+                                SemanticProperties.Description="Agrega este proyecto a la lista del evento." />
+                    </Grid>
+                    <BoxView Style="{StaticResource HairlineSeparator}" />
+                    <CollectionView ItemsSource="{Binding Projects}" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="entities:Project">
+                                <Grid ColumnDefinitions="*,Auto" Padding="0,6">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                        <Label Text="{Binding Name}" Style="{StaticResource Body}" />
+                                        <Label Text="{Binding ProjectCode}" Style="{StaticResource Footnote}"
+                                               TextColor="{StaticResource NodusAccent}" />
+                                    </VerticalStackLayout>
+                                    <Button Grid.Column="1"
+                                            Text="Quitar"
+                                            Command="{Binding Source={x:Reference PageRoot}, Path=BindingContext.RemoveProjectCommand}"
+                                            CommandParameter="{Binding .}"
+                                            Style="{StaticResource GhostButton}"
+                                            TextColor="{StaticResource NodusError}"
+                                            Padding="12,12"
+                                            MinimumHeightRequest="44"
+                                            SemanticProperties.Description="Quitar este proyecto de la lista" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="RÚBRICA DE EVALUACIÓN" Style="{StaticResource SectionHeader}" IsVisible="{Binding IsCreateMode}" />
+
+            <Border Style="{StaticResource Card}" Margin="16,0" IsVisible="{Binding IsCreateMode}">
+                <VerticalStackLayout Spacing="8">
+
+                    <!-- Rubric Lock Warning (Decision #46) -->
+                    <Border BackgroundColor="{StaticResource NodusWarning}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 8"
+                            Padding="12,10"
+                            IsVisible="{Binding IsRubricLocked}">
+                        <Label TextColor="White"
+                               FontAttributes="Bold"
+                               FontSize="13"
+                               Text="⛔ La rúbrica ya no se puede editar porque ya existen votos. Modificarla haría los resultados incomparables (Decisión #46)."
+                               SemanticProperties.Description="La rúbrica está bloqueada porque el evento ya recibió evaluaciones." />
+                    </Border>
+
+                    <Label Text="Define los criterios una sola vez. La app creará los controles del jurado automáticamente."
+                           Style="{StaticResource Footnote}"
+                           IsVisible="{Binding IsRubricEditable}" />
+                    <CollectionView ItemsSource="{Binding RubricCriteria}" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:RubricCriterionEditorItem">
+                                <VerticalStackLayout Spacing="8" Padding="0,8">
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                        <Entry Grid.Column="0"
+                                               Placeholder="Nombre del criterio"
+                                               Text="{Binding Label}"
+                                               Completed="SyncRubricChanged"
+                                               FontSize="16"
+                                               SemanticProperties.Description="Nombre visible del criterio de evaluación." />
+                                        <Button Grid.Column="1"
+                                                Text="Quitar"
+                                                Command="{Binding Source={x:Reference PageRoot}, Path=BindingContext.RemoveCriterionCommand}"
+                                                CommandParameter="{Binding .}"
+                                                Style="{StaticResource GhostButton}"
+                                                TextColor="{StaticResource NodusError}"
+                                                Padding="12,12"
+                                                MinimumHeightRequest="44"
+                                                SemanticProperties.Description="Eliminar este criterio de evaluación" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                                        <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                            <Label Text="Min" Style="{StaticResource Caption1}" />
+                                            <Entry Text="{Binding Min}"
+                                                   Keyboard="Numeric"
+                                                   Completed="SyncRubricChanged"
+                                                   SemanticProperties.Description="Valor mínimo permitido para este criterio." />
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                            <Label Text="Max" Style="{StaticResource Caption1}" />
+                                            <Entry Text="{Binding Max}"
+                                                   Keyboard="Numeric"
+                                                   Completed="SyncRubricChanged"
+                                                   SemanticProperties.Description="Valor máximo permitido para este criterio." />
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="2" Spacing="4">
+                                            <Label Text="Step" Style="{StaticResource Caption1}" />
+                                            <Entry Text="{Binding Step}"
+                                                   Keyboard="Numeric"
+                                                   Completed="SyncRubricChanged"
+                                                   SemanticProperties.Description="Salto entre valores posibles del criterio." />
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                        <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                            <Label Text="ID interno" Style="{StaticResource Caption1}" />
+                                            <Entry Text="{Binding Id}"
+                                                   Placeholder="innovacion"
+                                                   Completed="SyncRubricChanged"
+                                                   SemanticProperties.Description="Identificador interno estable del criterio." />
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                            <Label Text="Peso" Style="{StaticResource Caption1}" />
+                                            <Entry Text="{Binding Weight}"
+                                                   Keyboard="Numeric"
+                                                   Completed="SyncRubricChanged"
+                                                   SemanticProperties.Description="Importancia relativa de este criterio en el promedio final." />
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                    <BoxView Style="{StaticResource HairlineSeparator}" />
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Button Text="Agregar criterio"
+                            Command="{Binding AddCriterionCommand}"
+                            Style="{StaticResource SecondaryButton}"
+                            SemanticProperties.Description="Agrega un nuevo criterio a la rúbrica." />
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="JURADO INICIAL" Style="{StaticResource SectionHeader}" IsVisible="{Binding IsCreateMode}" />
+
+            <Border Style="{StaticResource Card}" Margin="16,0" IsVisible="{Binding IsCreateMode}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Style="{StaticResource Footnote}"
+                           Text="Los jueces se registran solos escaneando el QR de acceso desde la app del jurado. No necesitas pre-cargar nombres." />
+                    <Label Style="{StaticResource Caption1}"
+                           TextColor="{StaticResource NodusSecondaryLabel}"
+                           Text="Verás a cada juez aparecer en el panel de monitoreo a medida que se conecten." />
+                </VerticalStackLayout>
+            </Border>
+
+            <VerticalStackLayout Margin="16,20" Spacing="10" IsVisible="{Binding IsCreateMode}">
+                <Button Text="Crear evento y empezar a emitir"
+                        Command="{Binding SaveEventCommand}"
+                        Style="{StaticResource PrimaryButton}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    SemanticProperties.Description="Guarda el evento, prepara los QR y deja listo el acceso del jurado." />
+                <Button Text="Limpiar formulario"
+                        Command="{Binding ResetCommand}"
+                    Style="{StaticResource GhostButton}"
+                    SemanticProperties.Description="Borra los datos capturados y vuelve al estado inicial." />
+            </VerticalStackLayout>
+
+                <Border IsVisible="{Binding SaveSucceeded}"
+                    BackgroundColor="{StaticResource NodusSuccess}"
+                    StrokeShape="RoundRectangle 10"
+                    StrokeThickness="0"
+                    Padding="14,12"
+                    Margin="16,0">
+                <Label Text="El evento quedó listo. Ya puedes mostrar el QR de acceso y los QR de proyectos."
+                       TextColor="White"
+                       Style="{StaticResource Body}" />
+            </Border>
+
+            <Border IsVisible="{Binding HasJudgeAccessQr}"
+                    Style="{StaticResource Card}"
+                    Margin="16,8,16,0">
+                <VerticalStackLayout Spacing="12">
+                          <Label Text="QR DE ACCESO PARA JUECES"
+                           Style="{StaticResource SectionHeader}"
+                           Margin="0" />
+                          <Label Text="Muéstralo en pantalla. El jurado lo escanea, escribe la clave del evento y la app completa el ingreso automáticamente."
+                           Style="{StaticResource Footnote}" />
+                    <Image Source="{Binding JudgeAccessQrSource}"
+                           WidthRequest="220"
+                           HeightRequest="220"
+                           HorizontalOptions="Center"
+                              SemanticProperties.Description="QR de acceso para registrar jueces en este evento" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border IsVisible="{Binding HasQrCodes}"
+                    Style="{StaticResource Card}"
+                    Margin="16,8,16,0">
+                <VerticalStackLayout Spacing="12">
+                          <Label Text="QR DE PROYECTOS"
+                           Style="{StaticResource SectionHeader}"
+                           Margin="0" />
+                          <Label Text="Imprímelos o muéstralos en cada mesa de proyecto para que el jurado los escanee."
+                           Style="{StaticResource Footnote}" />
+                    <CollectionView ItemsSource="{Binding ProjectQrItems}" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ProjectQrItem">
+                                <VerticalStackLayout Spacing="4" Padding="0,8">
+                                    <Label Text="{Binding ProjectCode}"
+                                           Style="{StaticResource Caption1}"
+                                           TextColor="{StaticResource NodusAccent}"
+                                           HorizontalTextAlignment="Center" />
+                                    <Label Text="{Binding ProjectName}"
+                                           Style="{StaticResource Headline}"
+                                           HorizontalTextAlignment="Center" />
+                                    <Label Text="{Binding QrPayload}"
+                                           Style="{StaticResource Footnote}"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="{StaticResource NodusSecondaryLabel}" />
+                                    <Image Source="{Binding QrSource}"
+                                           WidthRequest="180"
+                                           HeightRequest="180"
+                                           HorizontalOptions="Center"
+                                           SemanticProperties.Description="QR para abrir directamente este proyecto en la app del jurado" />
+                                    <BoxView Style="{StaticResource HairlineSeparator}" />
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Button Text="Terminar"
+                            Command="{Binding DoneCommand}"
+                            Style="{StaticResource PrimaryButton}"
+                            SemanticProperties.Description="Cierra la preparación y vuelve al panel principal." />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border IsVisible="{Binding HasError}"
+                    BackgroundColor="{StaticResource NodusError}"
+                    StrokeShape="RoundRectangle 10"
+                    StrokeThickness="0"
+                    Padding="14,10"
+                    Margin="16,8,16,0">
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="White"
+                       Style="{StaticResource Footnote}" />
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Nodus.Admin.Presentation.ViewModels"
+             xmlns:dto="clr-namespace:Nodus.Admin.Application.DTOs"
+             x:Class="Nodus.Admin.Presentation.Views.ResultsPage"
+             x:DataType="vm:ResultsViewModel"
+             Title="Results"
+             BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- ── Event Header ───────────────────────────────────────── -->
+        <VerticalStackLayout Grid.Row="0" Padding="20,16,20,0" Spacing="2">
+            <Label Text="{Binding EventName}"
+                   Style="{StaticResource LargeTitle}" />
+            <Label Text="Final Rankings"
+                   Style="{StaticResource Subhead}" />
+        </VerticalStackLayout>
+
+        <!-- ── Rankings List ─────────────────────────────────────── -->
+        <RefreshView Grid.Row="1"
+                     Command="{Binding RefreshCommand}"
+                     IsRefreshing="{Binding IsBusy}">
+            <CollectionView ItemsSource="{Binding Rankings}"
+                            Margin="16,8">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout HorizontalOptions="Center"
+                                         VerticalOptions="Center"
+                                         Spacing="8"
+                                         Margin="0,48">
+                        <Label Text="No results yet"
+                               Style="{StaticResource Title3}"
+                               HorizontalTextAlignment="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource NodusSecondaryLabel}, Dark={StaticResource NodusSecondaryLabelDark}}" />
+                        <Label Text="Results appear after votes are received."
+                               Style="{StaticResource Subhead}"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="dto:ProjectScoreDto">
+                        <Border Style="{StaticResource Card}" Margin="0,4">
+                            <Grid ColumnDefinitions="44,*,Auto" RowDefinitions="Auto,Auto">
+                                <!-- Rank badge -->
+                                <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
+                                        BackgroundColor="{StaticResource NodusAccent}"
+                                        StrokeShape="Ellipse"
+                                        StrokeThickness="0"
+                                        WidthRequest="36" HeightRequest="36"
+                                        HorizontalOptions="Start"
+                                        VerticalOptions="Center">
+                                    <Label Text="{Binding ProjectId}"
+                                           TextColor="White"
+                                           FontSize="15"
+                                           FontAttributes="Bold"
+                                           HorizontalTextAlignment="Center"
+                                           VerticalTextAlignment="Center" />
+                                </Border>
+
+                                <!-- Project info -->
+                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                    <Label Text="{Binding ProjectName}"
+                                           Style="{StaticResource Headline}" />
+                                    <Label Text="{Binding Category}"
+                                           Style="{StaticResource Footnote}" />
+                                </VerticalStackLayout>
+
+                                <!-- Score -->
+                                <VerticalStackLayout Grid.Column="2" HorizontalOptions="End" Spacing="0">
+                                    <Label Text="{Binding MeanScore, StringFormat='{0:F2}'}"
+                                           Style="{StaticResource StatValueLabel}"
+                                           FontSize="22" />
+                                    <Label Text="{Binding VoteCount, StringFormat='{0} votes'}"
+                                           Style="{StaticResource Caption1}"
+                                           HorizontalTextAlignment="End" />
+                                </VerticalStackLayout>
+
+                                <!-- Range -->
+                                <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                                       Style="{StaticResource Caption2}"
+                                       Margin="0,4,0,0">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="Min " />
+                                            <Span Text="{Binding MinScore, StringFormat='{0:F1}'}"
+                                                  TextColor="{StaticResource NodusError}" />
+                                            <Span Text="  Max " />
+                                            <Span Text="{Binding MaxScore, StringFormat='{0:F1}'}"
+                                                  TextColor="{StaticResource NodusSuccess}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- ── Export Button ─────────────────────────────────────── -->
+        <VerticalStackLayout Grid.Row="2" Margin="16,8,16,20" Spacing="10">
+            <Button Text="Export to Excel"
+                    Command="{Binding ExportToExcelCommand}"
+                    Style="{StaticResource PrimaryButton}"
+                    IsEnabled="{Binding HasResults}" />
+            <Label IsVisible="{Binding ExportSucceeded}"
+                   Text="{Binding ExportedFilePath, StringFormat='Saved: {0}'}"
+                   Style="{StaticResource Footnote}"
+                   HorizontalTextAlignment="Center"
+                   TextColor="{StaticResource NodusSuccess}" />
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>

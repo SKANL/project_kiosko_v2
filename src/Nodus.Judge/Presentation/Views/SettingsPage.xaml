@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Nodus.Judge.Presentation.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Nodus.Judge.Presentation.ViewModels"
+    x:DataType="vm:SettingsViewModel"
+    Title="Ajustes"
+    BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12" Spacing="20">
+
+            <!-- ══════════════════════════════════════════════════════
+                 🔐 SECCIÓN: SEGURIDAD
+            ══════════════════════════════════════════════════════ -->
+            <VerticalStackLayout Spacing="10">
+                <Label
+                    Text="SEGURIDAD"
+                    Style="{StaticResource Caption1}"
+                    TextColor="{StaticResource NodusAccent}"
+                    FontAttributes="Bold"
+                    Margin="4,0,0,0" />
+
+                <Border Style="{StaticResource ElevatedCard}">
+                    <VerticalStackLayout Spacing="14">
+
+                        <!-- PIN Status row -->
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Style="{StaticResource Headline}" Text="PIN de firma" />
+                                <Label
+                                    Style="{StaticResource Caption1}"
+                                    Text="{Binding PinStatusLabel}"
+                                    TextColor="{AppThemeBinding
+                                        Light={StaticResource NodusSecondaryLabel},
+                                        Dark={StaticResource NodusSecondaryLabelDark}}" />
+                            </VerticalStackLayout>
+                            <Button
+                                Grid.Column="1"
+                                Text="Cambiar"
+                                Style="{StaticResource SecondaryButton}"
+                                Padding="12,12"
+                                MinimumHeightRequest="44"
+                                FontSize="13"
+                                Command="{Binding TogglePinFormCommand}" />
+                        </Grid>
+
+                        <!-- Último cambio -->
+                        <Label
+                            Style="{StaticResource Footnote}"
+                            Text="{Binding PinLastChanged, StringFormat='Último cambio: {0}'}"
+                            TextColor="{AppThemeBinding
+                                Light={StaticResource NodusSecondaryLabel},
+                                Dark={StaticResource NodusSecondaryLabelDark}}" />
+
+                        <!-- ── PIN Change Form (collapsible) ── -->
+                        <VerticalStackLayout
+                            Spacing="10"
+                            IsVisible="{Binding ShowPinForm}">
+
+                            <BoxView
+                                HeightRequest="1"
+                                Color="{AppThemeBinding
+                                    Light={StaticResource NodusSecondaryLabel},
+                                    Dark={StaticResource NodusSecondaryLabelDark}}"
+                                Opacity="0.2" />
+
+                            <Label
+                                Style="{StaticResource Caption1}"
+                                Text="CLAVE ACTUAL"
+                                FontAttributes="Bold" />
+                            <Entry
+                                Placeholder="Clave actual del evento"
+                                IsPassword="True"
+                                Text="{Binding CurrentPin}"
+                                FontSize="16"
+                                SemanticProperties.Description="Escribe tu clave actual del evento para autorizar el cambio." />
+
+                            <Label
+                                Style="{StaticResource Caption1}"
+                                Text="NUEVA CLAVE"
+                                FontAttributes="Bold" />
+                            <Entry
+                                Placeholder="Nueva clave del evento"
+                                IsPassword="True"
+                                Text="{Binding NewPin}"
+                                FontSize="16"
+                                SemanticProperties.Description="Escribe la nueva clave del evento." />
+
+                            <Label
+                                Style="{StaticResource Caption1}"
+                                Text="CONFIRMAR CLAVE"
+                                FontAttributes="Bold" />
+                            <Entry
+                                Placeholder="Repetir clave"
+                                IsPassword="True"
+                                Text="{Binding ConfirmPin}"
+                                FontSize="16"
+                                SemanticProperties.Description="Repite la nueva clave para confirmar." />
+
+                            <!-- Error -->
+                            <Label
+                                Style="{StaticResource Footnote}"
+                                TextColor="{StaticResource NodusError}"
+                                Text="{Binding PinErrorMessage}"
+                                IsVisible="{Binding HasPinError}" />
+
+                            <!-- Success -->
+                            <Border
+                                BackgroundColor="{StaticResource NodusSuccess}"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10"
+                                Padding="10,6"
+                                IsVisible="{Binding PinChangeSucceeded}">
+                                <Label
+                                    TextColor="White"
+                                    FontSize="14"
+                                    FontAttributes="Bold"
+                                    HorizontalTextAlignment="Center"
+                                    Text="✓ Clave actualizada correctamente" />
+                            </Border>
+
+                            <!-- Action buttons -->
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <Button
+                                    Grid.Column="0"
+                                    Text="Cancelar"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding TogglePinFormCommand}" />
+                                <Button
+                                    Grid.Column="1"
+                                    Text="Guardar clave"
+                                    Style="{StaticResource PrimaryButton}"
+                                    Command="{Binding ChangePinCommand}"
+                                    IsEnabled="{Binding CanSavePin}"
+                                    SemanticProperties.Description="Guarda la nueva clave del evento en este equipo.">
+                                    <Button.Triggers>
+                                        <DataTrigger TargetType="Button" Binding="{Binding IsBusy}" Value="True">
+                                            <Setter Property="Text" Value="Guardando…" />
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Button.Triggers>
+                                </Button>
+                            </Grid>
+
+                        </VerticalStackLayout>
+                        <!-- ── end PIN form ── -->
+
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+
+            <!-- ══════════════════════════════════════════════════════
+                 📡 SECCIÓN: SINCRONIZACIÓN
+            ══════════════════════════════════════════════════════ -->
+            <VerticalStackLayout Spacing="10">
+                <Label
+                    Text="SINCRONIZACIÓN"
+                    Style="{StaticResource Caption1}"
+                    TextColor="{StaticResource NodusAccent}"
+                    FontAttributes="Bold"
+                    Margin="4,0,0,0" />
+
+                <Border Style="{StaticResource ElevatedCard}">
+                    <VerticalStackLayout Spacing="12">
+
+                        <!-- Evento activo -->
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label
+                                Grid.Column="0"
+                                Style="{StaticResource Caption1}"
+                                Text="Evento:"
+                                Margin="0,0,8,0" />
+                            <Label
+                                Grid.Column="1"
+                                Style="{StaticResource Caption1}"
+                                Text="{Binding ActiveEventName}"
+                                FontAttributes="Bold" />
+                        </Grid>
+
+                        <!-- Juez ID -->
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label
+                                Grid.Column="0"
+                                Style="{StaticResource Caption1}"
+                                Text="Juez ID:"
+                                Margin="0,0,8,0" />
+                            <Label
+                                Grid.Column="1"
+                                Style="{StaticResource Caption1}"
+                                Text="{Binding JudgeId}"
+                                FontAttributes="Bold" />
+                        </Grid>
+
+                        <BoxView
+                            HeightRequest="1"
+                            Color="{AppThemeBinding
+                                Light={StaticResource NodusSecondaryLabel},
+                                Dark={StaticResource NodusSecondaryLabelDark}}"
+                            Opacity="0.2" />
+
+                        <Button
+                            Text="Actualizar proyectos y cambios del evento"
+                            Style="{StaticResource SecondaryButton}"
+                            Command="{Binding ResyncCommand}"
+                            SemanticProperties.Description="Busca cambios del evento y nuevos proyectos sin salir de esta pantalla." />
+
+                           <HorizontalStackLayout Spacing="10"
+                                         IsVisible="{Binding IsResyncing}">
+                            <ActivityIndicator IsRunning="{Binding IsResyncing}"
+                                         Color="{StaticResource NodusAccent}" />
+                            <Label Style="{StaticResource Footnote}"
+                                VerticalTextAlignment="Center"
+                                Text="{Binding ResyncStatusMessage}" />
+                           </HorizontalStackLayout>
+
+                           <Label Style="{StaticResource Footnote}"
+                               Text="{Binding ResyncStatusMessage}"
+                               TextColor="{StaticResource NodusSecondaryLabel}">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label"
+                                             Binding="{Binding IsResyncing}"
+                                             Value="True">
+                                    <Setter Property="IsVisible" Value="False" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+
+                        <Button
+                            Text="Ayuda de conexión"
+                            Style="{StaticResource GhostButton}"
+                            Command="{Binding OpenConnectionHelpCommand}"
+                            SemanticProperties.Description="Abre una guía simple para mejorar la conexión cercana." />
+
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+
+            <!-- ══════════════════════════════════════════════════════
+                 ⚙️ SECCIÓN: APLICACIÓN
+            ══════════════════════════════════════════════════════ -->
+            <VerticalStackLayout Spacing="10">
+                <Label
+                    Text="APLICACIÓN"
+                    Style="{StaticResource Caption1}"
+                    TextColor="{StaticResource NodusAccent}"
+                    FontAttributes="Bold"
+                    Margin="4,0,0,0" />
+
+                <Border Style="{StaticResource ElevatedCard}">
+                    <VerticalStackLayout Spacing="12">
+
+                        <!-- Version -->
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label
+                                Grid.Column="0"
+                                Style="{StaticResource Caption1}"
+                                Text="Versión:"
+                                Margin="0,0,8,0" />
+                            <Label
+                                Grid.Column="1"
+                                Style="{StaticResource Caption1}"
+                                Text="{Binding AppVersion}"
+                                FontAttributes="Bold" />
+                        </Grid>
+
+                        <!-- Votos enviados -->
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label
+                                Grid.Column="0"
+                                Style="{StaticResource Caption1}"
+                                Text="Votos enviados:"
+                                Margin="0,0,8,0" />
+                            <Label
+                                Grid.Column="1"
+                                Style="{StaticResource Caption1}"
+                                Text="{Binding VotesSentCount}"
+                                FontAttributes="Bold" />
+                        </Grid>
+
+                        <BoxView
+                            Margin="0,16,0,8"
+                            HeightRequest="1"
+                            Color="{StaticResource NodusError}"
+                            Opacity="0.3" />
+
+                        <!-- Zona peligrosa -->
+                        <Label
+                            Style="{StaticResource Footnote}"
+                            Text="Zona peligrosa · Acción irreversible"
+                            TextColor="{StaticResource NodusError}"
+                            FontAttributes="Bold"
+                            HorizontalTextAlignment="Center" />
+
+                        <Button
+                            Text="Borrar datos locales"
+                            Style="{StaticResource DestructiveButton}"
+                            Command="{Binding ClearLocalDataCommand}">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button" Binding="{Binding IsBusy}" Value="True">
+                                    <Setter Property="Text" Value="Borrando…" />
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+
+            <!-- Bottom padding -->
+            <BoxView HeightRequest="24" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Explicit app themes avoid OEM/theme-resolution issues in Shell's bottom navigation renderer. -->
+    <style name="Nodus.MainTheme" parent="Maui.MainTheme">
+        <item name="bottomNavigationStyle">@style/Widget.MaterialComponents.BottomNavigationView.Colored</item>
+        <item name="textAppearanceCaption">@style/TextAppearance.MaterialComponents.Caption</item>
+    </style>
+
+    <style name="Nodus.MainTheme.NoActionBar" parent="Nodus.MainTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:actionModeBackground">?attr/colorPrimary</item>
+        <item name="android:actionModeStyle">@style/ActionMode</item>
+    </style>
+
+    <style name="Nodus.SplashTheme" parent="Nodus.MainTheme.NoActionBar">
+        <item name="maui_splash">true</item>
+        <item name="android:windowBackground">@drawable/maui_splash</item>
+    </style>
+</resources>

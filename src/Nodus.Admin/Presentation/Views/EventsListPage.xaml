@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Nodus.Admin.Presentation.Views.EventsListPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Nodus.Admin.Presentation.ViewModels"
+    x:DataType="vm:EventsListViewModel"
+    Title="Eventos"
+    BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- ── Header + New button ─────────────────────────────────────── -->
+        <Border
+            Grid.Row="0"
+            Style="{StaticResource Card}"
+            Margin="16,12,16,0">
+            <Grid ColumnDefinitions="*,Auto">
+                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                    <Label Text="Gestión de Eventos" Style="{StaticResource Headline}" />
+                    <Label
+                        Text="Crea, activa y administra tus eventos de evaluación."
+                        Style="{StaticResource Caption1}"
+                        TextColor="{StaticResource NodusSecondaryLabel}" />
+                </VerticalStackLayout>
+                <Button
+                    Grid.Column="1"
+                    Text="+ Nuevo"
+                    Style="{StaticResource PrimaryButton}"
+                    Padding="14,8"
+                    FontSize="14"
+                    Command="{Binding NavigateToNewEventCommand}" />
+            </Grid>
+        </Border>
+
+        <!-- ── Success notification ───────────────────────────────────── -->
+        <!-- inside Grid Row 0, shown on top as overlay using absolute-like layout -->
+        <!-- We'll just put it inside a StackLayout at top of ScrollView below -->
+
+        <!-- ── Events list ────────────────────────────────────────────── -->
+        <ScrollView Grid.Row="1" Padding="0,12,0,24">
+            <VerticalStackLayout Spacing="0">
+
+                <!-- Activation success banner -->
+                <Border
+                    IsVisible="{Binding ActivationSucceeded}"
+                    BackgroundColor="{StaticResource NodusSuccess}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 10"
+                    Padding="14,10"
+                    Margin="16,0,16,12">
+                    <Label
+                        Text="{Binding ActivatedMessage}"
+                        TextColor="White"
+                        Style="{StaticResource Footnote}" />
+                </Border>
+
+                <!-- Error banner -->
+                <Border
+                    IsVisible="{Binding HasError}"
+                    BackgroundColor="{StaticResource NodusError}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 10"
+                    Padding="14,10"
+                    Margin="16,0,16,12">
+                    <Label
+                        Text="{Binding ErrorMessage}"
+                        TextColor="White"
+                        Style="{StaticResource Footnote}" />
+                </Border>
+
+                <!-- Empty state -->
+                <VerticalStackLayout
+                    IsVisible="{Binding HasNoEvents}"
+                    Spacing="12"
+                    Padding="40,60">
+                    <Label
+                        Text="Sin eventos"
+                        Style="{StaticResource Title2}"
+                        HorizontalTextAlignment="Center"
+                        TextColor="{StaticResource NodusSecondaryLabel}" />
+                    <Label
+                        Text="Crea tu primer evento con el botón &quot;+ Nuevo&quot;."
+                        Style="{StaticResource Body}"
+                        HorizontalTextAlignment="Center"
+                        TextColor="{StaticResource NodusSecondaryLabel}" />
+                </VerticalStackLayout>
+
+                <!-- Events CollectionView -->
+                <CollectionView
+                    ItemsSource="{Binding Events}"
+                    SelectionMode="None"
+                    Margin="16,0">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:EventListItem">
+                            <SwipeView>
+                                <SwipeView.RightItems>
+                                    <SwipeItems Mode="Reveal">
+                                        <SwipeItem Text="Eliminar" BackgroundColor="{StaticResource NodusError}" Command="{Binding DeleteCommand}" />
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+                                <Border Style="{StaticResource Card}" Padding="0" Margin="0,0,0,2">
+                                    <VerticalStackLayout Spacing="0">
+
+                                    <!-- ── Event header row ── -->
+                                    <Grid
+                                        ColumnDefinitions="*,Auto"
+                                        Padding="16,14,16,10">
+                                        <!-- Name + date -->
+                                        <VerticalStackLayout Grid.Column="0" Spacing="3">
+                                            <Label
+                                                Text="{Binding Event.Name}"
+                                                Style="{StaticResource Headline}"
+                                                LineBreakMode="TailTruncation" />
+                                            <Label
+                                                Text="{Binding Event.Date}"
+                                                Style="{StaticResource Caption1}"
+                                                TextColor="{StaticResource NodusSecondaryLabel}" />
+                                        </VerticalStackLayout>
+
+                                        <!-- Status chip -->
+                                        <Border
+                                            Grid.Column="1"
+                                            BackgroundColor="{Binding StatusColor}"
+                                            StrokeThickness="0"
+                                            StrokeShape="RoundRectangle 12"
+                                            Padding="10,4"
+                                            VerticalOptions="Center">
+                                            <Label
+                                                Text="{Binding StatusLabel}"
+                                                TextColor="White"
+                                                FontSize="12"
+                                                FontAttributes="Bold" />
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- ── Vote count + institution ── -->
+                                    <Grid
+                                        ColumnDefinitions="Auto,*"
+                                        Padding="16,0,16,10"
+                                        ColumnSpacing="12">
+                                        <Label
+                                            Grid.Column="0"
+                                            Style="{StaticResource Caption1}"
+                                            TextColor="{StaticResource NodusSecondaryLabel}"
+                                            Text="{Binding VoteCount, StringFormat='{0} votos'}" />
+                                        <Label
+                                            Grid.Column="1"
+                                            Style="{StaticResource Caption1}"
+                                            TextColor="{StaticResource NodusSecondaryLabel}"
+                                            Text="{Binding Event.Institution}"
+                                            LineBreakMode="TailTruncation" />
+                                    </Grid>
+
+                                    <!-- ── Separator ── -->
+                                    <BoxView
+                                        HeightRequest="1"
+                                        Color="{StaticResource NodusSeparator}"
+                                        Opacity="0.5"
+                                        Margin="16,0" />
+
+                                    <!-- ── Action buttons ── -->
+                                    <Grid
+                                        ColumnDefinitions="*,*,*"
+                                        ColumnSpacing="8"
+                                        Padding="16,12,16,16">
+
+                                        <!-- Activar -->
+                                        <Button
+                                            Grid.Column="0"
+                                            Text="Activar"
+                                            FontSize="14"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Padding="4,10"
+                                            MinimumHeightRequest="44"
+                                            IsVisible="{Binding CanActivate}"
+                                            Command="{Binding ActivateCommand}"
+                                            SemanticProperties.Description="Activa este evento para habilitar el acceso al jurado." />
+                                        <!-- Active indicator -->
+                                        <Label
+                                            Grid.Column="0"
+                                            Text="✓ Activo"
+                                            FontSize="14"
+                                            FontAttributes="Bold"
+                                            TextColor="{StaticResource NodusSuccess}"
+                                            HorizontalTextAlignment="Center"
+                                            VerticalTextAlignment="Center"
+                                            IsVisible="{Binding IsActive}"
+                                            SemanticProperties.Description="Este evento se encuentra activo." />
+
+                                        <!-- QRs -->
+                                        <Button
+                                            Grid.Column="1"
+                                            Text="QRs"
+                                            FontSize="14"
+                                            Style="{StaticResource GhostButton}"
+                                            Padding="4,10"
+                                            MinimumHeightRequest="44"
+                                            Command="{Binding ViewQrsCommand}"
+                                            SemanticProperties.Description="Ver códigos QR del evento." />
+
+                                        <!-- Resultados -->
+                                        <Button
+                                            Grid.Column="2"
+                                            Text="Resultados"
+                                            FontSize="14"
+                                            Style="{StaticResource GhostButton}"
+                                            Padding="4,10"
+                                            MinimumHeightRequest="44"
+                                            Command="{Binding ViewResultsCommand}"
+                                            SemanticProperties.Description="Ver los resultados de este evento." />
+                                    </Grid>
+
+                                </VerticalStackLayout>
+                            </Border>
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+
+</ContentPage>

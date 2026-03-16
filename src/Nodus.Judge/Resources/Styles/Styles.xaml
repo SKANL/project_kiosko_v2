@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Nodus Design System — Apple HIG-inspired styles
+    Typography scale, component styles, semantic tokens
+    No glassmorphism — flat surfaces with precise shadows
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         TYPOGRAPHY  (SF Pro equivalents via system font fallback)
+         Large Title 34 · Title1 28 · Title2 22 · Headline 17 semibold
+         Body 17 · Callout 16 · Subhead 15 · Footnote 13 · Caption 12/11
+    ══════════════════════════════════════════════════════════════════════ -->
+
+    <!-- Large Title — 34 Bold -->
+    <Style x:Key="LargeTitle" TargetType="Label">
+        <Setter Property="FontSize" Value="34" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}" />
+        <Setter Property="LineHeight" Value="1.2" />
+    </Style>
+
+    <!-- Title1 — 28 Bold -->
+    <Style x:Key="Title1" TargetType="Label">
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}" />
+    </Style>
+
+    <!-- Title2 — 22 Bold -->
+    <Style x:Key="Title2" TargetType="Label">
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}" />
+    </Style>
+
+    <!-- Title3 — 20 Semibold -->
+    <Style x:Key="Title3" TargetType="Label">
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}" />
+    </Style>
+
+    <!-- Headline — 17 Semibold -->
+    <Style x:Key="Headline" TargetType="Label">
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}" />
+    </Style>
+
+    <!-- Body — 17 Regular -->
+    <Style x:Key="Body" TargetType="Label">
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}" />
+    </Style>
+
+    <!-- Callout — 16 Regular -->
+    <Style x:Key="Callout" TargetType="Label">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}" />
+    </Style>
+
+    <!-- Subhead — 15 Regular -->
+    <Style x:Key="Subhead" TargetType="Label">
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusSecondaryLabel}, Dark={StaticResource NodusSecondaryLabelDark}}" />
+    </Style>
+
+    <!-- Footnote — 13 Regular -->
+    <Style x:Key="Footnote" TargetType="Label">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusSecondaryLabel}, Dark={StaticResource NodusSecondaryLabelDark}}" />
+    </Style>
+
+    <!-- Caption1 — 12 Regular -->
+    <Style x:Key="Caption1" TargetType="Label">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusSecondaryLabel}, Dark={StaticResource NodusSecondaryLabelDark}}" />
+    </Style>
+
+    <!-- Caption2 — 11 Regular -->
+    <Style x:Key="Caption2" TargetType="Label">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusSecondaryLabel}, Dark={StaticResource NodusSecondaryLabelDark}}" />
+    </Style>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         BASE ELEMENT STYLES  (applied globally via implicit styles)
+    ══════════════════════════════════════════════════════════════════════ -->
+
+    <Style ApplyToDerivedTypes="True" TargetType="Page">
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}" />
+    </Style>
+
+    <Style TargetType="Label">
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+    </Style>
+
+    <Style TargetType="Button">
+        <Setter Property="TextColor" Value="White" />
+        <Setter Property="BackgroundColor" Value="{StaticResource NodusAccent}" />
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="20,13" />
+        <Setter Property="MinimumHeightRequest" Value="50" />
+        <Setter Property="MinimumWidthRequest" Value="44" />
+        <Setter Property="BorderWidth" Value="0" />
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Pressed">
+                        <VisualState.Setters>
+                            <Setter Property="BackgroundColor" Value="{StaticResource NodusAccentPressed}" />
+                            <Setter Property="Opacity" Value="0.85" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="BackgroundColor" Value="{StaticResource NodusAccentDisabled}" />
+                            <Setter Property="TextColor" Value="White" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="PointerOver" />
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
+    <Style TargetType="Entry">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}" />
+        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource NodusPlaceholderText}, Dark={StaticResource NodusPlaceholderTextDark}}" />
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource NodusGroupedBackground}, Dark={StaticResource NodusGroupedBackgroundDark}}" />
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="MinimumHeightRequest" Value="44" />
+    </Style>
+
+    <Style TargetType="Editor">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}" />
+        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource NodusPlaceholderText}, Dark={StaticResource NodusPlaceholderTextDark}}" />
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource NodusGroupedBackground}, Dark={StaticResource NodusGroupedBackgroundDark}}" />
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="MinimumHeightRequest" Value="44" />
+    </Style>
+
+    <Style TargetType="ActivityIndicator">
+        <Setter Property="Color" Value="{StaticResource NodusAccent}" />
+    </Style>
+
+    <Style TargetType="ProgressBar">
+        <Setter Property="ProgressColor" Value="{StaticResource NodusAccent}" />
+    </Style>
+
+    <Style TargetType="Slider">
+        <Setter Property="MinimumTrackColor" Value="{StaticResource NodusAccent}" />
+        <Setter Property="MaximumTrackColor" Value="{AppThemeBinding Light={StaticResource NodusSeparator}, Dark={StaticResource NodusSeparatorDark}}" />
+        <Setter Property="ThumbColor" Value="White" />
+    </Style>
+
+    <Style TargetType="Switch">
+        <Setter Property="OnColor" Value="{StaticResource NodusSuccess}" />
+        <Setter Property="ThumbColor" Value="White" />
+    </Style>
+
+    <Style TargetType="RefreshView">
+        <Setter Property="RefreshColor" Value="{StaticResource NodusAccent}" />
+    </Style>
+
+    <Style TargetType="BoxView">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource NodusSeparator}, Dark={StaticResource NodusSeparatorDark}}" />
+    </Style>
+
+    <Style TargetType="Border">
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource NodusSeparator}, Dark={StaticResource NodusSeparatorDark}}" />
+        <Setter Property="StrokeThickness" Value="0.5" />
+    </Style>
+
+    <Style TargetType="SearchBar">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}" />
+        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource NodusPlaceholderText}, Dark={StaticResource NodusPlaceholderTextDark}}" />
+        <Setter Property="CancelButtonColor" Value="{StaticResource NodusAccent}" />
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource NodusGroupedBackground}, Dark={StaticResource NodusGroupedBackgroundDark}}" />
+        <Setter Property="FontSize" Value="17" />
+    </Style>
+
+    <Style ApplyToDerivedTypes="True" TargetType="Shell">
+        <Setter Property="Shell.BackgroundColor" Value="{AppThemeBinding Light={StaticResource NodusGroupedBackground}, Dark={StaticResource NodusGroupedBackgroundDark}}" />
+        <Setter Property="Shell.ForegroundColor" Value="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}" />
+        <Setter Property="Shell.TitleColor" Value="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}" />
+        <Setter Property="Shell.DisabledColor" Value="{AppThemeBinding Light={StaticResource NodusAccentDisabled}, Dark={StaticResource NodusAccentDisabled}}" />
+        <Setter Property="Shell.UnselectedColor" Value="{AppThemeBinding Light={StaticResource NodusSecondaryLabel}, Dark={StaticResource NodusSecondaryLabelDark}}" />
+        <Setter Property="Shell.NavBarHasShadow" Value="False" />
+        <Setter Property="Shell.TabBarBackgroundColor" Value="{AppThemeBinding Light={StaticResource NodusGroupedBackground}, Dark={StaticResource NodusGroupedBackgroundDark}}" />
+        <Setter Property="Shell.TabBarForegroundColor" Value="{StaticResource NodusAccent}" />
+        <Setter Property="Shell.TabBarTitleColor" Value="{StaticResource NodusAccent}" />
+        <Setter Property="Shell.TabBarUnselectedColor" Value="{AppThemeBinding Light={StaticResource NodusSecondaryLabel}, Dark={StaticResource NodusSecondaryLabelDark}}" />
+    </Style>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         NAMED COMPONENT STYLES
+    ══════════════════════════════════════════════════════════════════════ -->
+
+    <!-- ── Buttons ─────────────────────────────────────────────────────── -->
+
+    <!-- Primary CTA — filled blue (same as implicit Button) -->
+    <Style x:Key="PrimaryButton" TargetType="Button">
+        <Setter Property="TextColor" Value="White" />
+        <Setter Property="BackgroundColor" Value="{StaticResource NodusAccent}" />
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="20,13" />
+        <Setter Property="MinimumHeightRequest" Value="50" />
+        <Setter Property="BorderWidth" Value="0" />
+    </Style>
+
+    <!-- Secondary — outlined blue -->
+    <Style x:Key="SecondaryButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="TextColor" Value="{StaticResource NodusAccent}" />
+        <Setter Property="BorderColor" Value="{StaticResource NodusAccent}" />
+        <Setter Property="BorderWidth" Value="1.5" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="Padding" Value="20,13" />
+        <Setter Property="MinimumHeightRequest" Value="50" />
+        <Setter Property="MinimumWidthRequest" Value="44" />
+    </Style>
+
+    <!-- Ghost — text-only blue link -->
+    <Style x:Key="GhostButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="TextColor" Value="{StaticResource NodusAccent}" />
+        <Setter Property="BorderWidth" Value="0" />
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="Padding" Value="0,10" />
+        <Setter Property="MinimumHeightRequest" Value="44" />
+        <Setter Property="MinimumWidthRequest" Value="44" />
+    </Style>
+
+    <!-- Destructive — filled red -->
+    <Style x:Key="DestructiveButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="{StaticResource NodusError}" />
+        <Setter Property="TextColor" Value="White" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="Padding" Value="20,13" />
+        <Setter Property="MinimumHeightRequest" Value="50" />
+        <Setter Property="MinimumWidthRequest" Value="44" />
+        <Setter Property="BorderWidth" Value="0" />
+    </Style>
+
+    <!-- Circular nav control for prev/next project in Voting -->
+    <Style x:Key="IconNavButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="TextColor" Value="{StaticResource NodusAccent}" />
+        <Setter Property="FontSize" Value="26" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="MinimumHeightRequest" Value="48" />
+        <Setter Property="MinimumWidthRequest" Value="48" />
+        <Setter Property="CornerRadius" Value="24" />
+        <Setter Property="BorderColor" Value="{AppThemeBinding Light={StaticResource NodusSeparator}, Dark={StaticResource NodusSeparatorDark}}" />
+        <Setter Property="BorderWidth" Value="1" />
+    </Style>
+
+    <!-- ── Cards ───────────────────────────────────────────────────────── -->
+
+    <!-- Standard card — white rounded surface with subtle shadow -->
+    <Style x:Key="Card" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource NodusGroupedBackground}, Dark={StaticResource NodusGroupedBackgroundDark}}" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="{AppThemeBinding Light=Black, Dark=Black}"
+                        Offset="0,2"
+                        Radius="8"
+                        Opacity="0.06" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Elevated card — stronger shadow for primary content -->
+    <Style x:Key="ElevatedCard" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource NodusGroupedBackground}, Dark={StaticResource NodusGroupedBackgroundDark}}" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 16" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="Padding" Value="20" />
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="{AppThemeBinding Light=Black, Dark=Black}"
+                        Offset="0,4"
+                        Radius="16"
+                        Opacity="0.1" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Status pill: dynamically colored -->
+    <Style x:Key="StatusPill" TargetType="Border">
+        <Setter Property="StrokeShape" Value="RoundRectangle 14" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="HorizontalOptions" Value="Start" />
+        <Setter Property="VerticalOptions" Value="Center" />
+    </Style>
+
+    <!-- ── Labels ──────────────────────────────────────────────────────── -->
+
+    <Style x:Key="SectionHeader" TargetType="Label">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextTransform" Value="Uppercase" />
+        <Setter Property="CharacterSpacing" Value="0.5" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusSecondaryLabel}, Dark={StaticResource NodusSecondaryLabelDark}}" />
+        <Setter Property="Margin" Value="16,24,16,8" />
+    </Style>
+
+    <Style x:Key="StatValueLabel" TargetType="Label">
+        <Setter Property="FontSize" Value="34" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{StaticResource NodusAccent}" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="StatCaptionLabel" TargetType="Label">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusSecondaryLabel}, Dark={StaticResource NodusSecondaryLabelDark}}" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
+    </Style>
+
+    <!-- ── Separators ─────────────────────────────────────────────────── -->
+
+    <Style x:Key="HairlineSeparator" TargetType="BoxView">
+        <Setter Property="HeightRequest" Value="0.5" />
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource NodusSeparator}, Dark={StaticResource NodusSeparatorDark}}" />
+        <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+    </Style>
+
+    <!-- ── Form Inputs ──────────────────────────────────────────────────── -->
+
+    <Style x:Key="FormEntry" TargetType="Entry">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}" />
+        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource NodusPlaceholderText}, Dark={StaticResource NodusPlaceholderTextDark}}" />
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource NodusGroupedBackground}, Dark={StaticResource NodusGroupedBackgroundDark}}" />
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="MinimumHeightRequest" Value="44" />
+        <Setter Property="Margin" Value="16,0" />
+        <Setter Property="HeightRequest" Value="48" />
+    </Style>
+
+    <!-- ── Status Badges ──────────────────────────────────────────────── -->
+
+    <Style x:Key="BadgeSuccess" TargetType="Border" BasedOn="{StaticResource StatusPill}">
+        <Setter Property="BackgroundColor" Value="#E8F9ED" />
+    </Style>
+
+    <Style x:Key="BadgeWarning" TargetType="Border" BasedOn="{StaticResource StatusPill}">
+        <Setter Property="BackgroundColor" Value="#FFF6E5" />
+    </Style>
+
+    <Style x:Key="BadgeError" TargetType="Border" BasedOn="{StaticResource StatusPill}">
+        <Setter Property="BackgroundColor" Value="#FFEBEA" />
+    </Style>
+
+    <Style x:Key="BadgeInfo" TargetType="Border" BasedOn="{StaticResource StatusPill}">
+        <Setter Property="BackgroundColor" Value="#EBF3FF" />
+    </Style>
+
+    <!-- ── CollectionView / ListView ─────────────────────────────────── -->
+
+    <Style TargetType="CollectionView">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="SelectionMode" Value="None" />
+    </Style>
+
+    <Style TargetType="ListView">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="SeparatorColor" Value="{AppThemeBinding Light={StaticResource NodusSeparator}, Dark={StaticResource NodusSeparatorDark}}" />
+        <Setter Property="SeparatorVisibility" Value="Default" />
+    </Style>
+
+    <!-- ── ScrollView ─────────────────────────────────────────────────── -->
+
+    <Style TargetType="ScrollView">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+    </Style>
+
+</ResourceDictionary>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Color tokens -->
+    <Color x:Key="ColorPrimary">#007AFF</Color>
+    <Color x:Key="ColorPrimaryPressed">#0062CC</Color>
+    <Color x:Key="ColorSecondary">#5AC8FA</Color>
+    <Color x:Key="ColorSurface">#FFFFFF</Color>
+    <Color x:Key="ColorBackground">#F2F2F7</Color>
+    <Color x:Key="ColorError">#FF3B30</Color>
+    <Color x:Key="ColorSuccess">#34C759</Color>
+    <Color x:Key="ColorWarning">#FF9500</Color>
+    <Color x:Key="ColorTextPrimary">#111111</Color>
+    <Color x:Key="ColorTextSecondary">#6C6C70</Color>
+
+    <!-- Typography tokens -->
+    <x:Double x:Key="TypeDisplay">32</x:Double>
+    <x:Double x:Key="TypeH1">28</x:Double>
+    <x:Double x:Key="TypeH2">22</x:Double>
+    <x:Double x:Key="TypeBody">16</x:Double>
+    <x:Double x:Key="TypeBodySm">14</x:Double>
+    <x:Double x:Key="TypeLabel">13</x:Double>
+    <x:Double x:Key="TypeCaption">12</x:Double>
+
+    <!-- Spacing tokens (4px base) -->
+    <x:Double x:Key="Space1">4</x:Double>
+    <x:Double x:Key="Space2">8</x:Double>
+    <x:Double x:Key="Space3">12</x:Double>
+    <x:Double x:Key="Space4">16</x:Double>
+    <x:Double x:Key="Space5">20</x:Double>
+    <x:Double x:Key="Space6">24</x:Double>
+    <x:Double x:Key="Space8">32</x:Double>
+    <x:Double x:Key="Space10">40</x:Double>
+
+    <!-- Touch targets -->
+    <x:Double x:Key="TouchTargetMin">44</x:Double>
+    <x:Double x:Key="TouchTargetComfort">48</x:Double>
+
+</ResourceDictionary>

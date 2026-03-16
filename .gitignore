@@ -1,0 +1,18 @@
+# .NET Core
+**/bin/
+**/obj/
+**/*.user
+**/*.userosscache
+**/*.sln.doccache
+**/*.suo
+
+# Environment files
+**/.env
+**/.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel

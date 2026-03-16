@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Nodus.Judge.Presentation.Views.ProjectScannerPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+    Title="Escanear proyecto"
+    BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16,12,16,16">
+        <Border Grid.Row="0" Style="{StaticResource Card}">
+            <VerticalStackLayout Spacing="6">
+                <Label Style="{StaticResource Headline}" Text="Escanea el QR del proyecto" />
+                <Label Style="{StaticResource Footnote}"
+                       TextColor="{StaticResource NodusSecondaryLabel}"
+                       Text="Esta pantalla es solo para escanear. Al detectar el QR, volverás automáticamente a la evaluación." />
+            </VerticalStackLayout>
+        </Border>
+
+        <Border Grid.Row="1" Margin="0,12,0,0" Style="{StaticResource ElevatedCard}">
+            <zxing:CameraBarcodeReaderView x:Name="ProjectQrScanner"
+                                           BarcodesDetected="OnProjectQrDetected"
+                                           HeightRequest="420"
+                                           SemanticProperties.Description="Cámara para leer el QR del proyecto en la mesa." />
+        </Border>
+
+        <Button Grid.Row="2"
+                Margin="0,12,0,0"
+                Text="Cancelar"
+                Style="{StaticResource SecondaryButton}"
+                Clicked="OnCancelClicked" />
+    </Grid>
+</ContentPage>

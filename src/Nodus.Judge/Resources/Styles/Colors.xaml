@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Nodus Design System — Apple HIG-inspired color palette (Judge)
+    Light/Dark adaptive via AppThemeBinding
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- ── System Colors (Apple HIG) ──────────────────────────────────── -->
+    <Color x:Key="SystemBlue">#007AFF</Color>
+    <Color x:Key="SystemGreen">#34C759</Color>
+    <Color x:Key="SystemRed">#FF3B30</Color>
+    <Color x:Key="SystemOrange">#FF9500</Color>
+    <Color x:Key="SystemYellow">#FFCC00</Color>
+    <Color x:Key="SystemPurple">#AF52DE</Color>
+    <Color x:Key="SystemTeal">#5AC8FA</Color>
+    <Color x:Key="SystemIndigo">#5856D6</Color>
+
+    <!-- ── Background ──────────────────────────────────────────────────── -->
+    <Color x:Key="NodusBackground">#F2F2F7</Color>
+    <Color x:Key="NodusBackgroundDark">#000000</Color>
+    <Color x:Key="NodusGroupedBackground">#FFFFFF</Color>
+    <Color x:Key="NodusGroupedBackgroundDark">#1C1C1E</Color>
+    <!-- Backward-compatible alias used by some pages (e.g., VotingPage). -->
+    <Color x:Key="NodusSurface">#FFFFFF</Color>
+    <Color x:Key="NodusSurfaceDark">#1C1C1E</Color>
+    <Color x:Key="NodusSecondaryGroupedBackground">#F2F2F7</Color>
+    <Color x:Key="NodusSecondaryGroupedBackgroundDark">#2C2C2E</Color>
+    <Color x:Key="NodusTertiaryGroupedBackground">#FFFFFF</Color>
+    <Color x:Key="NodusTertiaryGroupedBackgroundDark">#3A3A3C</Color>
+
+    <!-- ── Labels ──────────────────────────────────────────────────────── -->
+    <Color x:Key="NodusLabel">#000000</Color>
+    <Color x:Key="NodusLabelDark">#FFFFFF</Color>
+    <Color x:Key="NodusSecondaryLabel">#6C6C70</Color>
+    <Color x:Key="NodusSecondaryLabelDark">#ABABAB</Color>
+    <Color x:Key="NodusTertiaryLabel">#C7C7CC</Color>
+    <Color x:Key="NodusTertiaryLabelDark">#48484A</Color>
+    <Color x:Key="NodusPlaceholderText">#C7C7CC</Color>
+    <Color x:Key="NodusPlaceholderTextDark">#636366</Color>
+
+    <!-- ── Separators ─────────────────────────────────────────────────── -->
+    <Color x:Key="NodusSeparator">#C6C6C8</Color>
+    <Color x:Key="NodusSeparatorDark">#38383A</Color>
+    <Color x:Key="NodusOpaqueSeparator">#C6C6C8</Color>
+    <Color x:Key="NodusOpaqueSeparatorDark">#38383A</Color>
+
+    <!-- ── Fill Colors ─────────────────────────────────────────────────── -->
+    <Color x:Key="NodusFill">#78788040</Color>
+    <Color x:Key="NodusFillDark">#7878805C</Color>
+    <Color x:Key="NodusSecondaryFill">#78788033</Color>
+    <Color x:Key="NodusSecondaryFillDark">#7878804D</Color>
+
+    <!-- ── Brand Accent ────────────────────────────────────────────────── -->
+    <Color x:Key="NodusAccent">#007AFF</Color>
+    <Color x:Key="NodusAccentPressed">#0062CC</Color>
+    <Color x:Key="NodusAccentDisabled">#C7C7CC</Color>
+
+    <!-- ── Semantic ────────────────────────────────────────────────────── -->
+    <Color x:Key="NodusSuccess">#248A3D</Color> <!-- Improved for WCAG AA against White -->
+    <Color x:Key="NodusWarning">#D97700</Color> <!-- Improved for WCAG AA against White -->
+    <Color x:Key="NodusError">#D92D20</Color> <!-- Improved for WCAG AA against White -->
+    <Color x:Key="NodusInfo">#0062CC</Color>
+
+    <!-- ── Convenience brushes ─────────────────────────────────────────── -->
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource NodusAccent}" />
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource NodusSuccess}" />
+    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource NodusError}" />
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource NodusWarning}" />
+
+    <!-- Legacy alias so existing template code doesn't explode -->
+    <Color x:Key="Primary">#512BD4</Color>
+
+</ResourceDictionary>

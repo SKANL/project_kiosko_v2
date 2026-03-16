@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <!-- Nodus.API: Cloud sync layer → MongoDB Atlas. Deploys to Render. -->
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Nodus.API</RootNamespace>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Official MongoDB .NET driver -->
+    <PackageReference Include="DotNetEnv" Version="3.1.1" />
+    <PackageReference Include="MongoDB.Driver" Version="3.4.0" />
+    <!-- JWT bearer authentication -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0-preview.*" />
+    <!-- Swagger / OpenAPI for endpoint docs -->
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0-preview.*" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.6.0" />
+  </ItemGroup>
+
+</Project>

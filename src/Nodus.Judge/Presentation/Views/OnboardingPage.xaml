@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Nodus.Judge.Presentation.Views.OnboardingPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Nodus.Judge.Presentation.ViewModels"
+    xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+    x:DataType="vm:OnboardingViewModel"
+    Title="Bienvenida"
+    BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24,48,24,32" Spacing="0">
+            <Label HorizontalOptions="Center"
+                   Style="{StaticResource LargeTitle}"
+                   Text="Nodus"
+                   SemanticProperties.HeadingLevel="Level1" />
+            <Label Margin="0,4,0,0"
+                   HorizontalOptions="Center"
+                   Style="{StaticResource Subhead}"
+                     Text="App del jurado"
+                   HorizontalTextAlignment="Center" />
+
+            <VerticalStackLayout Margin="0,40,0,0"
+                                 Spacing="16"
+                                 IsVisible="{Binding IsOnStepJoinEvent}">
+                <Label HorizontalOptions="Center"
+                       Style="{StaticResource Title2}"
+                      Text="Entrar al evento" />
+                <Label HorizontalOptions="Center"
+                       Style="{StaticResource Subhead}"
+                      Text="Escanea el QR de acceso, escribe la clave del evento y la app hará el resto por ti."
+                       HorizontalTextAlignment="Center" />
+
+                <Border Style="{StaticResource ElevatedCard}">
+                    <VerticalStackLayout Spacing="16">
+                        <zxing:CameraBarcodeReaderView x:Name="AccessQrScanner"
+                                                       HeightRequest="260"
+                                                       BarcodesDetected="OnBarcodesDetected"
+                                                       SemanticProperties.Description="Cámara para leer el QR de acceso mostrado por la organización." />
+                        <Label Style="{StaticResource Footnote}"
+                               HorizontalTextAlignment="Center"
+                               Text="{Binding AccessStatusMessage}" />
+
+                        <Button Style="{StaticResource SecondaryButton}"
+                                Text="Confirmar conexión con Admin"
+                                Command="{Binding ConfirmConnectionCommand}"
+                                IsEnabled="{Binding IsNotBusy}"
+                                SemanticProperties.Description="Valida que el móvil del jurado se puede conectar al equipo Admin antes de pedir datos." />
+
+                        <HorizontalStackLayout Spacing="10"
+                                               HorizontalOptions="Center"
+                                               IsVisible="{Binding IsConnecting}">
+                            <ActivityIndicator IsRunning="{Binding IsConnecting}"
+                                               Color="{StaticResource NodusAccent}" />
+                            <Label Style="{StaticResource Footnote}"
+                                   Text="Conectando..." />
+                        </HorizontalStackLayout>
+
+                        <Label Style="{StaticResource Footnote}"
+                               HorizontalTextAlignment="Center"
+                               Text="{Binding ConnectionStatusMessage}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource Card}"
+                        IsVisible="{Binding IsConnectionConfirmed}">
+                    <VerticalStackLayout Spacing="12">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Style="{StaticResource Caption1}" Text="Tu nombre" />
+                            <Entry Placeholder="Ej. Dra. Rivera"
+                                   Text="{Binding JudgeName}"
+                                   FontSize="18"
+                                   AutomationId="JudgeNameEntry"
+                                   SemanticProperties.Description="Nombre visible para identificar tus evaluaciones." />
+                        </VerticalStackLayout>
+                        <BoxView Style="{StaticResource HairlineSeparator}" />
+                        <VerticalStackLayout Spacing="6">
+                            <Label Style="{StaticResource Caption1}" Text="Clave del evento" />
+                            <Entry Placeholder="Clave compartida por la organización"
+                                   Text="{Binding EventPassword}"
+                                   IsPassword="True"
+                                   FontSize="18"
+                                   AutomationId="EventPasswordEntry"
+                                   SemanticProperties.Description="Clave oral o visible que acompaña al QR de acceso." />
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Style="{StaticResource Footnote}"
+                       TextColor="{StaticResource NodusError}"
+                       Text="{Binding ErrorMessage}"
+                       IsVisible="{Binding HasError}" />
+
+                <Button Style="{StaticResource PrimaryButton}"
+            Text="Entrar y descargar proyectos"
+            Command="{Binding JoinEventCommand}"
+            IsVisible="{Binding IsConnectionConfirmed}"
+            SemanticProperties.Description="Completa el ingreso seguro y descarga los proyectos del evento." />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Margin="0,48,0,0"
+                                 Spacing="24"
+                                 IsVisible="{Binding IsOnStepDone}">
+                <Grid HorizontalOptions="Center"
+                      WidthRequest="80"
+                      HeightRequest="80">
+                    <Ellipse Fill="{StaticResource NodusSuccess}"
+                             WidthRequest="80"
+                             HeightRequest="80" />
+                    <Label Text="✓"
+                           FontSize="36"
+                           TextColor="White"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Grid>
+
+                <Label HorizontalOptions="Center"
+                       Style="{StaticResource Title2}"
+                       Text="Todo está listo" />
+
+                <Border Style="{StaticResource ElevatedCard}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Style="{StaticResource SectionHeader}" Text="RESUMEN" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Style="{StaticResource Body}" Text="Evento" />
+                            <Label Grid.Column="1" Style="{StaticResource Headline}" Text="{Binding SyncEventName}" />
+                        </Grid>
+                        <BoxView Style="{StaticResource HairlineSeparator}" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Style="{StaticResource Body}" Text="Proyectos" />
+                            <Label Grid.Column="1" Style="{StaticResource Headline}" Text="{Binding SyncProjectCount}" />
+                        </Grid>
+                        <BoxView Style="{StaticResource HairlineSeparator}" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Style="{StaticResource Body}" Text="Jueces" />
+                            <Label Grid.Column="1" Style="{StaticResource Headline}" Text="{Binding SyncJudgeCount}" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Button Style="{StaticResource PrimaryButton}"
+                        Text="Comenzar a evaluar"
+                        Command="{Binding NavigateToVotingCommand}"
+                        SemanticProperties.Description="Abre la pantalla principal para escanear proyectos y evaluarlos." />
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

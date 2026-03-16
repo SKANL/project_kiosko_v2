@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Nodus.Admin.Presentation.ViewModels"
+             x:Class="Nodus.Admin.MainPage"
+             x:DataType="vm:MainViewModel"
+             BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <RefreshView Command="{Binding RefreshCommand}" IsRefreshing="{Binding IsBusy}">
+        <ScrollView>
+            <VerticalStackLayout Padding="0,0,0,32" Spacing="0">
+
+                <!-- ── Large Title Header ─────────────────────────────── -->
+                <Label Text="Nodus Admin"
+                       Style="{StaticResource LargeTitle}"
+                       Margin="20,24,20,2" />
+                <Label Text="{Binding DeviceId, StringFormat='Device: {0}'}"
+                       Style="{StaticResource Footnote}"
+                       Margin="20,0,20,16" />
+
+                <!-- ── BLE Connectivity ───────────────────────────────── -->
+                <Label Text="CONNECTIVITY" Style="{StaticResource SectionHeader}" />
+
+                <Border Style="{StaticResource Card}" Margin="16,0">
+                    <VerticalStackLayout Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0"
+                                   Text="BLE GATT Server"
+                                   Style="{StaticResource Headline}" />
+                            <!-- Status indicator uses DataTrigger for color change -->
+                            <Label Grid.Column="1"
+                                   x:Name="BleStatusLabel"
+                                   Text="●"
+                                   FontSize="20"
+                                   VerticalOptions="Center">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label"
+                                                 Binding="{Binding IsBleRunning}"
+                                                 Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource NodusSuccess}" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label"
+                                                 Binding="{Binding IsBleRunning}"
+                                                 Value="False">
+                                        <Setter Property="TextColor" Value="{StaticResource NodusError}" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Grid>
+                        <Button Command="{Binding ToggleBleCommand}"
+                                Style="{StaticResource SecondaryButton}">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button"
+                                             Binding="{Binding IsBleRunning}" Value="True">
+                                    <Setter Property="Text" Value="Stop Server" />
+                                    <Setter Property="BackgroundColor" Value="Transparent" />
+                                    <Setter Property="TextColor" Value="{StaticResource NodusError}" />
+                                    <Setter Property="BorderColor" Value="{StaticResource NodusError}" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Button"
+                                             Binding="{Binding IsBleRunning}" Value="False">
+                                    <Setter Property="Text" Value="Start Server" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ── Active Event ───────────────────────────────────── -->
+                <Label Text="ACTIVE EVENT" Style="{StaticResource SectionHeader}" />
+
+                <Border Style="{StaticResource Card}" Margin="16,0">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" Spacing="4">
+                            <Label Text="{Binding EventName}" Style="{StaticResource Title3}" />
+                            <Label Text="{Binding EventStatus}" Style="{StaticResource Subhead}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" HorizontalOptions="End" Spacing="0">
+                            <Label Text="{Binding TotalVotes}"
+                                   Style="{StaticResource StatValueLabel}"
+                                   FontSize="28" />
+                            <Label Text="votes"
+                                   Style="{StaticResource StatCaptionLabel}" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- ── Quick Actions ─────────────────────────────────── -->
+                <Label Text="ACTIONS" Style="{StaticResource SectionHeader}" />
+
+                <VerticalStackLayout Margin="16,0" Spacing="10">
+                    <Button Text="Set Up Event"
+                            Style="{StaticResource PrimaryButton}"
+                            Clicked="OnEventSetupClicked" />
+                    <Button Text="Live Monitor"
+                            Style="{StaticResource SecondaryButton}"
+                            Clicked="OnMonitorClicked" />
+                    <Button Text="View Results"
+                            Style="{StaticResource SecondaryButton}"
+                            Clicked="OnResultsClicked" />
+                </VerticalStackLayout>
+
+                <!-- ── Error Banner ───────────────────────────────────── -->
+                <Border IsVisible="{Binding HasError}"
+                        BackgroundColor="{StaticResource NodusError}"
+                        StrokeShape="RoundRectangle 10"
+                        StrokeThickness="0"
+                        Padding="14,10"
+                        Margin="16,12,16,0">
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="White"
+                           Style="{StaticResource Footnote}" />
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+
+</ContentPage>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Nodus.Judge.Presentation.Views.MyVotesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Nodus.Judge.Presentation.ViewModels"
+    x:DataType="vm:MyVotesViewModel"
+    Title="Mis Votos"
+    BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <Grid RowDefinitions="Auto,*">
+        
+        <Border Grid.Row="0" Style="{StaticResource Card}" Margin="16,12,16,0">
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Historial de Evaluaciones" Style="{StaticResource Headline}" />
+                <Label Text="Proyectos que has evaluado en este evento." Style="{StaticResource Caption1}" TextColor="{StaticResource NodusSecondaryLabel}" />
+            </VerticalStackLayout>
+        </Border>
+
+        <ScrollView Grid.Row="1" Padding="0,12,0,24">
+            <VerticalStackLayout Spacing="0">
+                <CollectionView ItemsSource="{Binding MyVotes}" SelectionMode="None" Margin="16,0">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.EmptyView>
+                        <Label Text="Aún no has evaluado ningún proyecto." Style="{StaticResource Footnote}" HorizontalTextAlignment="Center" Margin="0,20"/>
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:MyVoteItem">
+                            <Border Style="{StaticResource Card}" Padding="16" Margin="0,0,0,2">
+                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                        <Label Text="{Binding ProjectName}" Style="{StaticResource Headline}" />
+                                        <Label Text="{Binding ProjectCategory}" Style="{StaticResource Footnote}" TextColor="{StaticResource NodusSecondaryLabel}" />
+                                    </VerticalStackLayout>
+                                    
+                                    <Label Grid.Column="1" Grid.Row="0" Text="{Binding Vote.WeightedScore, StringFormat='{0:F2}'}" 
+                                           Style="{StaticResource Title2}" TextColor="{StaticResource NodusAccent}" VerticalOptions="Center" />
+                                    
+                                    <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Vote.CreatedAt, StringFormat='Fecha: {0}'}" 
+                                           Style="{StaticResource Caption1}" TextColor="{StaticResource NodusSecondaryLabel}" Margin="0,8,0,0"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

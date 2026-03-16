@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Nodus.Judge.Presentation.Views.VotingPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Nodus.Judge.Presentation.ViewModels"
+    x:DataType="vm:VotingViewModel"
+    Title="Votar"
+    Shell.TitleColor="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}"
+    Shell.ForegroundColor="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}"
+    BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="📅 Mis Votos" Command="{Binding OpenMyVotesCommand}" />
+        <ToolbarItem Text="☁ Sincronización" Command="{Binding OpenSyncCommand}" />
+        <ToolbarItem Text="⚙ Ajustes" Command="{Binding OpenSettingsCommand}" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+        <!-- ── Event Closed Banner (Doc 06 §F) ──────────────────────── -->
+        <Border Grid.Row="0"
+                BackgroundColor="{StaticResource NodusWarning}"
+                StrokeThickness="0"
+                IsVisible="{Binding IsEventClosed}"
+                Padding="16,10">
+            <Label TextColor="White"
+                   FontAttributes="Bold"
+                   FontSize="14"
+                   HorizontalTextAlignment="Center"
+                   Text="{Binding EventStateMessage}"
+                   SemanticProperties.Description="Estado del evento actual." />
+        </Border>
+
+        <!-- ── Header: current project ───────────────────────────────── -->
+        <Border Grid.Row="1"
+                Margin="16,12,16,0"
+                Style="{StaticResource Card}">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                    <Label Style="{StaticResource Headline}" Text="{Binding CurrentProjectName}" />
+                    <Label Style="{StaticResource Footnote}" TextColor="{StaticResource NodusAccent}" Text="{Binding CurrentProjectCategory}" />
+                </VerticalStackLayout>
+                <Button Grid.Column="1"
+                        Text="Cambiar"
+                        Style="{StaticResource SecondaryButton}"
+                        Padding="12,8"
+                        FontSize="14"
+                        Command="{Binding OpenProjectSelectionCommand}" />
+            </Grid>
+        </Border>
+
+        <ScrollView Grid.Row="2" Padding="16,16,16,8">
+            <VerticalStackLayout Spacing="0">
+                <Border Margin="0,0,0,16"
+                        Style="{StaticResource Card}"
+                        IsVisible="{Binding HasNoProjects}">
+                    <VerticalStackLayout Spacing="12" Padding="8">
+                        <Label Style="{StaticResource Headline}"
+                               HorizontalTextAlignment="Center"
+                               Text="Aun no hay proyectos cargados" />
+                        <Label Style="{StaticResource Body}"
+                               HorizontalTextAlignment="Center"
+                               TextColor="{StaticResource NodusError}"
+                               Text="{Binding ErrorMessage}"
+                               IsVisible="{Binding HasError}" />
+                        <Button Style="{StaticResource PrimaryButton}"
+                                Text="Volver a intentar"
+                                Command="{Binding AppearingCommand}"
+                                SemanticProperties.Description="Intenta cargar otra vez los proyectos del evento." />
+                    </VerticalStackLayout>
+                </Border>
+
+                <VerticalStackLayout Spacing="0" IsVisible="{Binding HasCurrentProject}">
+                    <Label Style="{StaticResource Subhead}"
+                           Text="{Binding CurrentProjectDescription}"
+                           Margin="0,0,0,16" />
+
+                    <Border Style="{StaticResource Card}" Padding="16">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Style="{StaticResource SectionHeader}" Text="EVALUACION" />
+                            <CollectionView ItemsSource="{Binding Criteria}" SelectionMode="None">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:CriterionScoreItem">
+                                        <VerticalStackLayout Spacing="4" Padding="0,4">
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <Label Grid.Column="0"
+                                                       Style="{StaticResource Body}"
+                                                       Text="{Binding Label}" />
+                                                <Label Grid.Column="1"
+                                                       Style="{StaticResource Headline}"
+                                                       TextColor="{StaticResource NodusAccent}"
+                                                       Text="{Binding Value, StringFormat='{0:F1}'}" />
+                                            </Grid>
+                                            <Slider Minimum="{Binding Min}"
+                                                    Maximum="{Binding Max}"
+                                                    Value="{Binding Value, Mode=TwoWay}"
+                                                    ThumbColor="{StaticResource NodusAccent}"
+                                                    MinimumTrackColor="{StaticResource NodusAccent}"
+                                                    SemanticProperties.Description="Control para ajustar la nota del criterio actual." />
+                                            <BoxView Style="{StaticResource HairlineSeparator}" />
+                                        </VerticalStackLayout>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Label Margin="0,8,0,0"
+                           Style="{StaticResource Footnote}"
+                           TextColor="{StaticResource NodusError}"
+                           Text="{Binding ErrorMessage}"
+                           IsVisible="{Binding HasError}" />
+
+                    <Border Margin="0,12,0,0"
+                            BackgroundColor="{StaticResource NodusSuccess}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12"
+                            IsVisible="{Binding VoteSubmitted}">
+                        <Label TextColor="White"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center"
+                               Text="{Binding SubmittedMessage}" />
+                    </Border>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Border Grid.Row="3"
+                Margin="16,8,16,16"
+                Style="{StaticResource Card}">
+            <VerticalStackLayout Spacing="12">
+              <Label Style="{StaticResource Caption1}" Text="CLAVE PARA FIRMAR" />
+
+              <Border StrokeShape="RoundRectangle 10"
+                   StrokeThickness="0"
+                   BackgroundColor="{AppThemeBinding Light={StaticResource NodusInfo}, Dark={StaticResource NodusSecondaryFillDark}}"
+                   Padding="12,10"
+                   IsVisible="{Binding IsPinCaptured}">
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                   <Label Grid.Column="0"
+                       Style="{StaticResource Footnote}"
+                       Text="Clave lista para esta sesión. Puedes evaluar sin volver a escribirla."
+                       TextColor="White" />
+                   <Button Grid.Column="1"
+                        Text="Cambiar"
+                        Style="{StaticResource GhostButton}"
+                        Command="{Binding ClearPinCommand}"
+                        Padding="8,0"
+                        FontSize="13"
+                        SemanticProperties.Description="Borra la clave cargada para escribir otra." />
+                  </Grid>
+              </Border>
+
+              <Entry Placeholder="Clave del evento para firmar"
+                  IsPassword="True"
+                  IsVisible="{Binding IsPinMissing}"
+                  Text="{Binding Pin}"
+                  FontSize="18"
+                  SemanticProperties.Description="Clave del evento. Solo se pide una vez por sesión." />
+              <Label Style="{StaticResource Footnote}"
+                  IsVisible="{Binding IsPinMissing}"
+                  TextColor="{StaticResource NodusSecondaryLabel}"
+                  Text="Si ya la escribiste en esta sesión, la app la recuerda automáticamente." />
+                <Button Style="{StaticResource PrimaryButton}"
+                        Text="Enviar evaluacion"
+                        Command="{Binding SubmitVoteCommand}"
+                        SemanticProperties.Description="Guarda y envia la evaluacion del proyecto actual.">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding IsBusy}" Value="True">
+                            <Setter Property="Text" Value="Enviando..." />
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

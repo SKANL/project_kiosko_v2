@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="Nodus.Admin.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:Nodus.Admin"
+    xmlns:views="clr-namespace:Nodus.Admin.Presentation.Views"
+    Shell.TabBarBackgroundColor="{AppThemeBinding Light={StaticResource NodusGroupedBackground}, Dark={StaticResource NodusGroupedBackgroundDark}}"
+    Shell.TabBarForegroundColor="{StaticResource NodusSecondaryLabel}"
+    Shell.TabBarTitleColor="{StaticResource NodusAccent}"
+    Shell.NavBarIsVisible="False">
+
+    <TabBar>
+        <Tab Title="Inicio">
+            <ShellContent
+                Route="MainPage"
+                ContentTemplate="{DataTemplate local:MainPage}" />
+        </Tab>
+        <Tab Title="Eventos">
+            <ShellContent
+                Route="EventsListPage"
+                ContentTemplate="{DataTemplate views:EventsListPage}" />
+        </Tab>
+        <Tab Title="Proyectos">
+            <ShellContent
+                Route="ManageProjectsPage"
+                ContentTemplate="{DataTemplate views:ManageProjectsPage}" />
+        </Tab>
+        <Tab Title="Jueces">
+            <ShellContent
+                Route="ManageJudgesPage"
+                ContentTemplate="{DataTemplate views:ManageJudgesPage}" />
+        </Tab>
+        <Tab Title="Monitor">
+            <ShellContent
+                Route="MonitorPage"
+                ContentTemplate="{DataTemplate views:MonitorPage}" />
+        </Tab>
+        <Tab Title="Resultados">
+            <ShellContent
+                Route="ResultsPage"
+                ContentTemplate="{DataTemplate views:ResultsPage}" />
+        </Tab>
+    </TabBar>
+
+</Shell>

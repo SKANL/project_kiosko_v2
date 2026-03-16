@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Nodus.Admin/Nodus.Admin.csproj" />
+  <Project Path="Nodus.Judge/Nodus.Judge.csproj" />
+  <Project Path="Nodus.Web/Nodus.Web.csproj" />
+  <Project Path="Nodus.API/Nodus.API.csproj" />
+</Solution>

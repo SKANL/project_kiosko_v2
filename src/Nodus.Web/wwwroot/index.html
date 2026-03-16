@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nodus — Registro de Proyectos</title>
+    <meta name="description" content="Registra tu proyecto para el evento Nodus y obtén tu QR de participante." />
+    <meta name="theme-color" content="#6c63ff" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="favicon.ico" />
+    <!-- Blazor WASM assets -->
+    <link rel="stylesheet" href="app.css" />
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+    <div id="app">
+        <div class="blazor-loading">
+            <div class="bl-spinner"></div>
+            <p>Cargando Nodus…</p>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui" style="display:none">
+        Se produjo un error no controlado.
+        <a href="" class="reload">Recargar</a>
+        <a class="dismiss">✕</a>
+    </div>
+
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script>navigator.serviceWorker.register('service-worker.js');</script>
+</body>
+</html>

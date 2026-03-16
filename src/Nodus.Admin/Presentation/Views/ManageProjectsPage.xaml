@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Nodus.Admin.Presentation.Views.ManageProjectsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Nodus.Admin.Presentation.ViewModels"
+    x:DataType="vm:ManageProjectsViewModel"
+    Title="Proyectos"
+    BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+        
+        <!-- Header -->
+        <Border Grid.Row="0" Style="{StaticResource Card}" Margin="16,12,16,0">
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Gestión de Proyectos" Style="{StaticResource Headline}" />
+                <Label Text="Añade o elimina proyectos del evento actual." Style="{StaticResource Caption1}" TextColor="{StaticResource NodusSecondaryLabel}" />
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Add Form -->
+        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="16,12,16,0">
+            <VerticalStackLayout Spacing="12">
+                <Label Text="Nuevo Proyecto" Style="{StaticResource Title3}" />
+                <Entry Placeholder="Nombre del Proyecto" Text="{Binding NewProjectName}" Style="{StaticResource FormEntry}" />
+                <Entry Placeholder="Categoría/Institución" Text="{Binding NewProjectCategory}" Style="{StaticResource FormEntry}" />
+                <Button Text="Agregar" Command="{Binding AddProjectCommand}" Style="{StaticResource PrimaryButton}" />
+            </VerticalStackLayout>
+        </Border>
+
+        <ScrollView Grid.Row="2" Padding="0,12,0,24">
+            <VerticalStackLayout Spacing="0">
+                <CollectionView ItemsSource="{Binding Projects}" SelectionMode="None" Margin="16,0">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.EmptyView>
+                        <Label Text="No hay proyectos." Style="{StaticResource Footnote}" HorizontalTextAlignment="Center" Margin="0,20"/>
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ManageProjectItem">
+                            <SwipeView>
+                                <SwipeView.RightItems>
+                                    <SwipeItems Mode="Reveal">
+                                        <SwipeItem Text="Eliminar" BackgroundColor="{StaticResource NodusError}" Command="{Binding DeleteCommand}" />
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+                                <Border Style="{StaticResource Card}" Padding="16" Margin="0,0,0,2">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                            <Label Text="{Binding Project.Name}" Style="{StaticResource Headline}" />
+                                            <Label Text="{Binding Project.Category}" Style="{StaticResource Footnote}" TextColor="{StaticResource NodusSecondaryLabel}" />
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="1" Text="{Binding Project.ProjectCode}" Style="{StaticResource Title3}" TextColor="{StaticResource NodusAccent}" VerticalOptions="Center" />
+                                    </Grid>
+                                </Border>
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
