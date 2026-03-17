@@ -90,7 +90,7 @@ public sealed class LocalHttpServerService : ILocalHttpServerService, IAsyncDisp
 
     private const int Port = 5000;
     // Vercel deployment domain for CORS
-    private const string VercelOrigin = "https://nodus-web.vercel.app";
+    private const string VercelOrigin = "https://project-kiosko-v2.vercel.app";
 
     public bool   IsRunning { get; private set; }
     public string LocalUrl  { get; private set; } = string.Empty;
@@ -230,7 +230,7 @@ public sealed class LocalHttpServerService : ILocalHttpServerService, IAsyncDisp
                 return Results.Problem(createResult.Error, statusCode: 500);
 
             var localIp  = LocalUrl.Split(':')[0];
-            var editUrl  = $"https://nodus-web.vercel.app/edit?token={editToken}&server={LocalUrl}";
+            var editUrl  = $"https://project-kiosko-v2.vercel.app/edit?token={editToken}&server={LocalUrl}";
             var qrPayload = $"nodus://vote?pid={projectCode}";
 
             return Results.Ok(new RegisterProjectResponse
