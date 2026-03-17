@@ -198,7 +198,7 @@ public sealed class BleGattServerService : IBleGattServerService, IDisposable
                 int offset = 0;
                 foreach (var b in buffer)
                 {
-                    Buffer.BlockCopy(b, 0, assembled, offset, b.Length);
+                    System.Buffer.BlockCopy(b, 0, assembled, offset, b.Length);
                     offset += b.Length;
                 }
                 
@@ -226,7 +226,7 @@ public sealed class BleGattServerService : IBleGattServerService, IDisposable
 
         // Push to the observer pipeline via ThreadPool to avoid blocking WinRT GATT thread
         // with heavy Crypto/JSON tasks in ProcessVoteUseCase.
-        Task.Run(() => _incoming.OnNext(data));
+        _ = Task.Run(() => _incoming.OnNext(data));
     }
 
     private async void OnBootstrapReadRequested(

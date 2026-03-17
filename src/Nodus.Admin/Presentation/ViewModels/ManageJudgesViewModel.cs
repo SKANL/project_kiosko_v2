@@ -10,7 +10,7 @@ namespace Nodus.Admin.Presentation.ViewModels;
 
 public sealed class ManageJudgeItem : ObservableObject
 {
-    private Judge _judge;
+    private Judge _judge = default!;
     public required Judge Judge 
     { 
         get => _judge; 
@@ -39,7 +39,12 @@ public sealed partial class ManageJudgesViewModel : BaseViewModel
 
     public ObservableCollection<ManageJudgeItem> Judges { get; } = new();
 
-    [ObservableProperty] private bool _hasJudges;
+    private bool _hasJudges;
+    public bool HasJudges
+    {
+        get => _hasJudges;
+        set => SetProperty(ref _hasJudges, value);
+    }
 
     public ManageJudgesViewModel(IJudgeRepository judges, IAppSettingsService settings)
     {

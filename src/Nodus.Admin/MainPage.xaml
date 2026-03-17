@@ -14,18 +14,18 @@
                 <Label Text="Nodus Admin"
                        Style="{StaticResource LargeTitle}"
                        Margin="20,24,20,2" />
-                <Label Text="{Binding DeviceId, StringFormat='Device: {0}'}"
+                <Label Text="{Binding DeviceId, StringFormat='Dispositivo: {0}'}"
                        Style="{StaticResource Footnote}"
                        Margin="20,0,20,16" />
 
                 <!-- ── BLE Connectivity ───────────────────────────────── -->
-                <Label Text="CONNECTIVITY" Style="{StaticResource SectionHeader}" />
+                <Label Text="CONECTIVIDAD" Style="{StaticResource SectionHeader}" />
 
                 <Border Style="{StaticResource Card}" Margin="16,0">
                     <VerticalStackLayout Spacing="10">
                         <Grid ColumnDefinitions="*,Auto">
                             <Label Grid.Column="0"
-                                   Text="BLE GATT Server"
+                                   Text="Servidor BLE GATT"
                                    Style="{StaticResource Headline}" />
                             <!-- Status indicator uses DataTrigger for color change -->
                             <Label Grid.Column="1"
@@ -52,14 +52,14 @@
                             <Button.Triggers>
                                 <DataTrigger TargetType="Button"
                                              Binding="{Binding IsBleRunning}" Value="True">
-                                    <Setter Property="Text" Value="Stop Server" />
+                                    <Setter Property="Text" Value="Detener Servidor" />
                                     <Setter Property="BackgroundColor" Value="Transparent" />
                                     <Setter Property="TextColor" Value="{StaticResource NodusError}" />
                                     <Setter Property="BorderColor" Value="{StaticResource NodusError}" />
                                 </DataTrigger>
                                 <DataTrigger TargetType="Button"
                                              Binding="{Binding IsBleRunning}" Value="False">
-                                    <Setter Property="Text" Value="Start Server" />
+                                    <Setter Property="Text" Value="Iniciar Servidor" />
                                 </DataTrigger>
                             </Button.Triggers>
                         </Button>
@@ -67,7 +67,7 @@
                 </Border>
 
                 <!-- ── Active Event ───────────────────────────────────── -->
-                <Label Text="ACTIVE EVENT" Style="{StaticResource SectionHeader}" />
+                <Label Text="EVENTO ACTIVO" Style="{StaticResource SectionHeader}" />
 
                 <Border Style="{StaticResource Card}" Margin="16,0">
                     <Grid ColumnDefinitions="*,Auto">
@@ -79,26 +79,36 @@
                             <Label Text="{Binding TotalVotes}"
                                    Style="{StaticResource StatValueLabel}"
                                    FontSize="28" />
-                            <Label Text="votes"
+                            <Label Text="votos"
                                    Style="{StaticResource StatCaptionLabel}" />
                         </VerticalStackLayout>
                     </Grid>
                 </Border>
 
                 <!-- ── Quick Actions ─────────────────────────────────── -->
-                <Label Text="ACTIONS" Style="{StaticResource SectionHeader}" />
+                <Label Text="ACCIONES RÁPIDAS" Style="{StaticResource SectionHeader}" />
 
                 <VerticalStackLayout Margin="16,0" Spacing="10">
-                    <Button Text="Set Up Event"
+                    <Button Text="Configurar Evento"
                             Style="{StaticResource PrimaryButton}"
                             Clicked="OnEventSetupClicked" />
-                    <Button Text="Live Monitor"
+                    <Button Text="Monitor en Vivo"
                             Style="{StaticResource SecondaryButton}"
                             Clicked="OnMonitorClicked" />
-                    <Button Text="View Results"
+                    <Button Text="Ver Resultados"
                             Style="{StaticResource SecondaryButton}"
                             Clicked="OnResultsClicked" />
                 </VerticalStackLayout>
+
+                <!-- ── Danger Zone ────────────────────────────────────── -->
+                <Label Text="ZONA DE PELIGRO" Style="{StaticResource SectionHeader}" />
+                <Border Style="{StaticResource Card}" Margin="16,0" Stroke="{StaticResource NodusError}">
+                    <Button Text="Restablecer Aplicación"
+                            Command="{Binding ResetAppCommand}"
+                            Style="{StaticResource SecondaryButton}"
+                            TextColor="{StaticResource NodusError}"
+                            BorderColor="{StaticResource NodusError}" />
+                </Border>
 
                 <!-- ── Error Banner ───────────────────────────────────── -->
                 <Border IsVisible="{Binding HasError}"

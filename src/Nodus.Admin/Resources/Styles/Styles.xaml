@@ -326,7 +326,7 @@
     <Style x:Key="HairlineSeparator" TargetType="BoxView">
         <Setter Property="HeightRequest" Value="0.5" />
         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource NodusSeparator}, Dark={StaticResource NodusSeparatorDark}}" />
-        <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+        <Setter Property="HorizontalOptions" Value="Fill" />
     </Style>
 
     <!-- ── Form Inputs ──────────────────────────────────────────────────── -->
@@ -359,17 +359,11 @@
         <Setter Property="BackgroundColor" Value="#EBF3FF" />
     </Style>
 
-    <!-- ── CollectionView / ListView ─────────────────────────────────── -->
+    <!-- ── CollectionView ────────────────────────────────────────────── -->
 
     <Style TargetType="CollectionView">
         <Setter Property="BackgroundColor" Value="Transparent" />
         <Setter Property="SelectionMode" Value="None" />
-    </Style>
-
-    <Style TargetType="ListView">
-        <Setter Property="BackgroundColor" Value="Transparent" />
-        <Setter Property="SeparatorColor" Value="{AppThemeBinding Light={StaticResource NodusSeparator}, Dark={StaticResource NodusSeparatorDark}}" />
-        <Setter Property="SeparatorVisibility" Value="Default" />
     </Style>
 
     <!-- ── ScrollView ─────────────────────────────────────────────────── -->

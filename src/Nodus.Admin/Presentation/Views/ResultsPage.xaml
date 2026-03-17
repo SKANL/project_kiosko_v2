@@ -5,7 +5,7 @@
              xmlns:dto="clr-namespace:Nodus.Admin.Application.DTOs"
              x:Class="Nodus.Admin.Presentation.Views.ResultsPage"
              x:DataType="vm:ResultsViewModel"
-             Title="Results"
+             Title="Resultados"
              BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
 
     <Grid RowDefinitions="Auto,*,Auto">
@@ -14,7 +14,7 @@
         <VerticalStackLayout Grid.Row="0" Padding="20,16,20,0" Spacing="2">
             <Label Text="{Binding EventName}"
                    Style="{StaticResource LargeTitle}" />
-            <Label Text="Final Rankings"
+            <Label Text="Clasificación Final"
                    Style="{StaticResource Subhead}" />
         </VerticalStackLayout>
 
@@ -29,11 +29,11 @@
                                          VerticalOptions="Center"
                                          Spacing="8"
                                          Margin="0,48">
-                        <Label Text="No results yet"
+                        <Label Text="Aún no hay resultados"
                                Style="{StaticResource Title3}"
                                HorizontalTextAlignment="Center"
                                TextColor="{AppThemeBinding Light={StaticResource NodusSecondaryLabel}, Dark={StaticResource NodusSecondaryLabelDark}}" />
-                        <Label Text="Results appear after votes are received."
+                        <Label Text="Los resultados aparecerán cuando lleguen los votos."
                                Style="{StaticResource Subhead}"
                                HorizontalTextAlignment="Center" />
                     </VerticalStackLayout>
@@ -71,7 +71,7 @@
                                     <Label Text="{Binding MeanScore, StringFormat='{0:F2}'}"
                                            Style="{StaticResource StatValueLabel}"
                                            FontSize="22" />
-                                    <Label Text="{Binding VoteCount, StringFormat='{0} votes'}"
+                                    <Label Text="{Binding VoteCount, StringFormat='{0} votos'}"
                                            Style="{StaticResource Caption1}"
                                            HorizontalTextAlignment="End" />
                                 </VerticalStackLayout>
@@ -100,12 +100,12 @@
 
         <!-- ── Export Button ─────────────────────────────────────── -->
         <VerticalStackLayout Grid.Row="2" Margin="16,8,16,20" Spacing="10">
-            <Button Text="Export to Excel"
+            <Button Text="Exportar a Excel"
                     Command="{Binding ExportToExcelCommand}"
                     Style="{StaticResource PrimaryButton}"
                     IsEnabled="{Binding HasResults}" />
             <Label IsVisible="{Binding ExportSucceeded}"
-                   Text="{Binding ExportedFilePath, StringFormat='Saved: {0}'}"
+                   Text="{Binding ExportedFilePath, StringFormat='Guardado: {0}'}"
                    Style="{StaticResource Footnote}"
                    HorizontalTextAlignment="Center"
                    TextColor="{StaticResource NodusSuccess}" />

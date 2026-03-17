@@ -21,23 +21,110 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
 
     public ObservableCollection<ManageProjectItem> Projects { get; } = new();
 
-    [ObservableProperty] private string _newProjectName = string.Empty;
-    [ObservableProperty] private string _newProjectCategory = string.Empty;
-    [ObservableProperty] private string _newProjectDescription = string.Empty;
-    [ObservableProperty] private string _newProjectMembers = string.Empty;
-    [ObservableProperty] private string _newProjectStand = string.Empty;
-    [ObservableProperty] private string _newProjectGithub = string.Empty;
+    private string _newProjectName = string.Empty;
+    public string NewProjectName
+    {
+        get => _newProjectName;
+        set => SetProperty(ref _newProjectName, value);
+    }
 
-    [ObservableProperty] private Project? _selectedProject;
-    [ObservableProperty] private string _editName = string.Empty;
-    [ObservableProperty] private string _editCategory = string.Empty;
-    [ObservableProperty] private string _editDescription = string.Empty;
-    [ObservableProperty] private string _editMembers = string.Empty;
-    [ObservableProperty] private string _editStand = string.Empty;
-    [ObservableProperty] private string _editGithub = string.Empty;
+    private string _newProjectCategory = string.Empty;
+    public string NewProjectCategory
+    {
+        get => _newProjectCategory;
+        set => SetProperty(ref _newProjectCategory, value);
+    }
 
-    [ObservableProperty] private bool _isEditing;
-    [ObservableProperty] private bool _hasProjects;
+    private string _newProjectDescription = string.Empty;
+    public string NewProjectDescription
+    {
+        get => _newProjectDescription;
+        set => SetProperty(ref _newProjectDescription, value);
+    }
+
+    private string _newProjectMembers = string.Empty;
+    public string NewProjectMembers
+    {
+        get => _newProjectMembers;
+        set => SetProperty(ref _newProjectMembers, value);
+    }
+
+    private string _newProjectStand = string.Empty;
+    public string NewProjectStand
+    {
+        get => _newProjectStand;
+        set => SetProperty(ref _newProjectStand, value);
+    }
+
+    private string _newProjectGithub = string.Empty;
+    public string NewProjectGithub
+    {
+        get => _newProjectGithub;
+        set => SetProperty(ref _newProjectGithub, value);
+    }
+
+    private Project? _selectedProject;
+    public Project? SelectedProject
+    {
+        get => _selectedProject;
+        set => SetProperty(ref _selectedProject, value);
+    }
+
+    private string _editName = string.Empty;
+    public string EditName
+    {
+        get => _editName;
+        set => SetProperty(ref _editName, value);
+    }
+
+    private string _editCategory = string.Empty;
+    public string EditCategory
+    {
+        get => _editCategory;
+        set => SetProperty(ref _editCategory, value);
+    }
+
+    private string _editDescription = string.Empty;
+    public string EditDescription
+    {
+        get => _editDescription;
+        set => SetProperty(ref _editDescription, value);
+    }
+
+    private string _editMembers = string.Empty;
+    public string EditMembers
+    {
+        get => _editMembers;
+        set => SetProperty(ref _editMembers, value);
+    }
+
+    private string _editStand = string.Empty;
+    public string EditStand
+    {
+        get => _editStand;
+        set => SetProperty(ref _editStand, value);
+    }
+
+    private string _editGithub = string.Empty;
+    public string EditGithub
+    {
+        get => _editGithub;
+        set => SetProperty(ref _editGithub, value);
+    }
+
+    private bool _isEditing;
+    public bool IsEditing
+    {
+        get => _isEditing;
+        set => SetProperty(ref _isEditing, value);
+    }
+
+    private bool _hasProjects;
+    public bool HasProjects
+    {
+        get => _hasProjects;
+        set => SetProperty(ref _hasProjects, value);
+    }
 
     public ManageProjectsViewModel(IProjectRepository projects, IAppSettingsService settings)
     {

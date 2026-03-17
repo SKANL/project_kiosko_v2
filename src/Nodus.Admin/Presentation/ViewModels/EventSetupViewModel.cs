@@ -94,11 +94,40 @@ public sealed partial class EventSetupViewModel : BaseViewModel
         get => _newProjectName;
         set => SetProperty(ref _newProjectName, value);
     }
-    [ObservableProperty] private string _newProjectCategory = string.Empty;
-    [ObservableProperty] private string _newProjectDescription = string.Empty;
-    [ObservableProperty] private string _newProjectMembers = string.Empty;
-    [ObservableProperty] private string _newProjectStand = string.Empty;
-    [ObservableProperty] private string _newProjectGithub = string.Empty;
+    private string _newProjectCategory = string.Empty;
+    public string NewProjectCategory
+    {
+        get => _newProjectCategory;
+        set => SetProperty(ref _newProjectCategory, value);
+    }
+
+    private string _newProjectDescription = string.Empty;
+    public string NewProjectDescription
+    {
+        get => _newProjectDescription;
+        set => SetProperty(ref _newProjectDescription, value);
+    }
+
+    private string _newProjectMembers = string.Empty;
+    public string NewProjectMembers
+    {
+        get => _newProjectMembers;
+        set => SetProperty(ref _newProjectMembers, value);
+    }
+
+    private string _newProjectStand = string.Empty;
+    public string NewProjectStand
+    {
+        get => _newProjectStand;
+        set => SetProperty(ref _newProjectStand, value);
+    }
+
+    private string _newProjectGithub = string.Empty;
+    public string NewProjectGithub
+    {
+        get => _newProjectGithub;
+        set => SetProperty(ref _newProjectGithub, value);
+    }
 
     private bool _hasQrCodes;
     public bool HasQrCodes
@@ -204,7 +233,7 @@ public sealed partial class EventSetupViewModel : BaseViewModel
         RubricCriteria.Add(new RubricCriterionEditorItem
         {
             Id = $"criterion_{RubricCriteria.Count + 1}",
-            Label = $"Criterion {RubricCriteria.Count + 1}",
+            Label = $"Criterio {RubricCriteria.Count + 1}",
             Weight = 1,
             Min = 0,
             Max = 10,

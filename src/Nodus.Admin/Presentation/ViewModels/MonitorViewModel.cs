@@ -47,13 +47,54 @@ public sealed partial class MonitorViewModel : BaseViewModel, IDisposable
 
     // ── State ─────────────────────────────────────────────────────────
 
-    [ObservableProperty] private bool   _isBleRunning;
-    [ObservableProperty] private int    _totalVotes;
-    [ObservableProperty] private int    _activeJudges;
-    [ObservableProperty] private int    _registeredJudges;
-    [ObservableProperty] private int    _activeRelaysEstimated;
-    [ObservableProperty] private int    _unsyncedToCloud;
-    [ObservableProperty] private string _lastReceivedAt = "—";
+    private bool _isBleRunning;
+    public bool IsBleRunning
+    {
+        get => _isBleRunning;
+        set => SetProperty(ref _isBleRunning, value);
+    }
+
+    private int _totalVotes;
+    public int TotalVotes
+    {
+        get => _totalVotes;
+        set => SetProperty(ref _totalVotes, value);
+    }
+
+    private int _activeJudges;
+    public int ActiveJudges
+    {
+        get => _activeJudges;
+        set => SetProperty(ref _activeJudges, value);
+    }
+
+    private int _registeredJudges;
+    public int RegisteredJudges
+    {
+        get => _registeredJudges;
+        set => SetProperty(ref _registeredJudges, value);
+    }
+
+    private int _activeRelaysEstimated;
+    public int ActiveRelaysEstimated
+    {
+        get => _activeRelaysEstimated;
+        set => SetProperty(ref _activeRelaysEstimated, value);
+    }
+
+    private int _unsyncedToCloud;
+    public int UnsyncedToCloud
+    {
+        get => _unsyncedToCloud;
+        set => SetProperty(ref _unsyncedToCloud, value);
+    }
+
+    private string _lastReceivedAt = "—";
+    public string LastReceivedAt
+    {
+        get => _lastReceivedAt;
+        set => SetProperty(ref _lastReceivedAt, value);
+    }
 
     public ObservableCollection<Vote> RecentVotes { get; } = new();
     public ObservableCollection<ProjectMonitorItem> ProjectCoverage { get; } = new();
@@ -209,9 +250,18 @@ public sealed partial class MonitorViewModel : BaseViewModel, IDisposable
 
     // ── Commands ─────────────────────────────────────────────────────
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanCloseEvent))]
     private bool _isEventClosed;
+    public bool IsEventClosed
+    {
+        get => _isEventClosed;
+        set
+        {
+            if (SetProperty(ref _isEventClosed, value))
+            {
+                OnPropertyChanged(nameof(CanCloseEvent));
+            }
+        }
+    }
 
     public bool CanCloseEvent => !IsEventClosed;
 

@@ -25,16 +25,39 @@ public sealed partial class ResultsViewModel : BaseViewModel
         _summary  = summary;
         _excel    = excel;
         _settings = settings;
-        Title     = "Results";
+        Title     = "Resultados";
     }
 
     // ── State ─────────────────────────────────────────────────────────
     /// <summary>When set via QueryProperty, overrides ActiveEventId for this page visit.</summary>
     private int? _viewEventId;
-    [ObservableProperty] private string _eventName      = "—";
-    [ObservableProperty] private bool   _hasResults;
-    [ObservableProperty] private string _exportedFilePath = string.Empty;
-    [ObservableProperty] private bool   _exportSucceeded;
+    private string _eventName = "—";
+    public string EventName
+    {
+        get => _eventName;
+        set => SetProperty(ref _eventName, value);
+    }
+
+    private bool _hasResults;
+    public bool HasResults
+    {
+        get => _hasResults;
+        set => SetProperty(ref _hasResults, value);
+    }
+
+    private string _exportedFilePath = string.Empty;
+    public string ExportedFilePath
+    {
+        get => _exportedFilePath;
+        set => SetProperty(ref _exportedFilePath, value);
+    }
+
+    private bool _exportSucceeded;
+    public bool ExportSucceeded
+    {
+        get => _exportSucceeded;
+        set => SetProperty(ref _exportSucceeded, value);
+    }
 
     public ObservableCollection<ProjectScoreDto> Rankings { get; } = new();
 

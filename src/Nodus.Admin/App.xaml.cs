@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Nodus.Admin.Application.Services;
 using Nodus.Admin.Application.Interfaces.Services;
 
@@ -41,7 +41,13 @@ public partial class App : global::Microsoft.Maui.Controls.Application
 		var backup = services.GetRequiredService<Application.Services.IBackupService>();
 		backup.Start();
 
-		var shell = services.GetRequiredService<AppShell>();
-		MainPage = shell;
+		_shell = services.GetRequiredService<AppShell>();
+	}
+
+	private readonly AppShell _shell;
+
+	protected override Window CreateWindow(IActivationState? activationState)
+	{
+		return new Window(_shell);
 	}
 }

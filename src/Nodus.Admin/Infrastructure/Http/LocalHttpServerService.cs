@@ -210,7 +210,7 @@ public sealed class LocalHttpServerService : ILocalHttpServerService, IAsyncDisp
                 return Results.Conflict(new { error = "Maximum projects reached." }); // 409
 
             // Assign next PROJ-{3} code
-            var projectCode = await GenerateUniqueCodeAsync(eventId.Value, existingResult.IsOk ? existingResult.Value! : []);
+            var projectCode = await GenerateUniqueCodeAsync(eventId.Value, existingResult.IsOk ? existingResult.Value! : Enumerable.Empty<Project>());
 
             var editToken = Guid.NewGuid().ToString("N");
             var project   = new Project
@@ -218,9 +218,9 @@ public sealed class LocalHttpServerService : ILocalHttpServerService, IAsyncDisp
                 EventId     = eventId.Value,
                 Name        = req.Name.Trim(),
                 Category    = req.Category.Trim(),
-                Description = req.Description?.Trim(),
-                GithubLink  = req.GithubLink?.Trim(),
-                TeamMembers = req.TeamMembers?.Trim(),
+                Description = req.Description?.Trim() ?? string.Empty,
+                GithubLink  = req.GithubLink?.Trim() ?? string.Empty,
+                TeamMembers = req.TeamMembers?.Trim() ?? string.Empty,
                 ProjectCode = projectCode,
                 EditToken   = editToken
             };
@@ -295,9 +295,9 @@ public sealed class LocalHttpServerService : ILocalHttpServerService, IAsyncDisp
 
             project.Name        = req.Name.Trim();
             project.Category    = req.Category.Trim();
-            project.Description = req.Description?.Trim();
-            project.GithubLink  = req.GithubLink?.Trim();
-            project.TeamMembers = req.TeamMembers?.Trim();
+            project.Description = req.Description?.Trim() ?? string.Empty;
+            project.GithubLink  = req.GithubLink?.Trim() ?? string.Empty;
+            project.TeamMembers = req.TeamMembers?.Trim() ?? string.Empty;
 
             var updateResult = await _projects.UpdateAsync(project);
             return updateResult.IsOk ? Results.NoContent() : Results.Problem(updateResult.Error, statusCode: 500);
@@ -306,7 +306,7 @@ public sealed class LocalHttpServerService : ILocalHttpServerService, IAsyncDisp
 
     // ── Helpers ───────────────────────────────────────────────────────────
 
-    private async Task<string> GenerateUniqueCodeAsync(int eventId, List<Project> existing)
+    private async Task<string> GenerateUniqueCodeAsync(int eventId, IEnumerable<Project> existing)
     {
         const string alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
         var used = existing.Select(p => p.ProjectCode).ToHashSet();

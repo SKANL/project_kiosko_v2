@@ -43,6 +43,16 @@ public sealed class NodusDatabase : IDisposable
         await ApplyMigrationAsync("ALTER TABLE projects ADD COLUMN SequenceNumber INTEGER NOT NULL DEFAULT 0");
     }
 
+    /// <summary>Deletes all data from the database.</summary>
+    public async Task PurgeAllDataAsync()
+    {
+        await _db.DropTableAsync<Vote>();
+        await _db.DropTableAsync<Judge>();
+        await _db.DropTableAsync<Project>();
+        await _db.DropTableAsync<NodusEvent>();
+        await InitializeAsync();
+    }
+
     /// <summary>Run a DDL statement, suppressing the 'duplicate column' error from SQLite.</summary>
     private async Task ApplyMigrationAsync(string ddl)
     {

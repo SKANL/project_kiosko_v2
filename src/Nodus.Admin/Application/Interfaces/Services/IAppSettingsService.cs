@@ -12,4 +12,5 @@ public interface IAppSettingsService
 
     void Save();
     void Load();
+    void Reset();
 }

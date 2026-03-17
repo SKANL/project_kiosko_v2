@@ -82,14 +82,36 @@ public sealed partial class EventsListViewModel : BaseViewModel
 
     public ObservableCollection<EventListItem> Events { get; } = new();
 
-    [ObservableProperty] private bool   _hasEvents;
-    [ObservableProperty] private string _activatedMessage = string.Empty;
-    [ObservableProperty] private bool   _activationSucceeded;
+    private bool _hasEvents;
+    public bool HasEvents
+    {
+        get => _hasEvents;
+        set
+        {
+            if (SetProperty(ref _hasEvents, value))
+            {
+                OnPropertyChanged(nameof(HasNoEvents));
+            }
+        }
+    }
+
+    private string _activatedMessage = string.Empty;
+    public string ActivatedMessage
+    {
+        get => _activatedMessage;
+        set => SetProperty(ref _activatedMessage, value);
+    }
+
+    private bool _activationSucceeded;
+    public bool ActivationSucceeded
+    {
+        get => _activationSucceeded;
+        set => SetProperty(ref _activationSucceeded, value);
+    }
 
     /// <summary>True when there are no events — used by XAML instead of InvertedBoolConverter.</summary>
     public bool HasNoEvents => !HasEvents;
 
-    partial void OnHasEventsChanged(bool value) => OnPropertyChanged(nameof(HasNoEvents));
 
     // ── Lifecycle ─────────────────────────────────────────────────────
 

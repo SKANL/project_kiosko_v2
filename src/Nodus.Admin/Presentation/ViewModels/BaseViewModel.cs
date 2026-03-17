@@ -8,18 +8,37 @@ namespace Nodus.Admin.Presentation.ViewModels;
 /// </summary>
 public abstract partial class BaseViewModel : ObservableObject
 {
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsNotBusy))]
     private bool _isBusy;
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set
+        {
+            if (SetProperty(ref _isBusy, value))
+                OnPropertyChanged(nameof(IsNotBusy));
+        }
+    }
 
-    [ObservableProperty]
     private string _title = string.Empty;
+    public string Title
+    {
+        get => _title;
+        set => SetProperty(ref _title, value);
+    }
 
-    [ObservableProperty]
     private string _errorMessage = string.Empty;
+    public string ErrorMessage
+    {
+        get => _errorMessage;
+        set => SetProperty(ref _errorMessage, value);
+    }
 
-    [ObservableProperty]
     private bool _hasError;
+    public bool HasError
+    {
+        get => _hasError;
+        set => SetProperty(ref _hasError, value);
+    }
 
     public bool IsNotBusy => !IsBusy;
 

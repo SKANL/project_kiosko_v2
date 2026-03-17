@@ -41,6 +41,13 @@ public sealed class AppSettingsService : IAppSettingsService
         catch { _data = new(); }
     }
 
+    public void Reset()
+    {
+        _data = new();
+        if (File.Exists(_filePath)) File.Delete(_filePath);
+        Save();
+    }
+
     private sealed class AppSettingsData
     {
         public int? ActiveEventId { get; set; }
