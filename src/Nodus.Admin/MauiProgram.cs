@@ -81,6 +81,7 @@ public static class MauiProgram
         // ── Presentation ─────────────────────────────────────────────────
         builder.Services.AddTransient<MainViewModel>();
         builder.Services.AddTransient<EventSetupViewModel>();
+        builder.Services.AddTransient<EventQrViewModel>();
         builder.Services.AddTransient<EventsListViewModel>();
         builder.Services.AddTransient<MonitorViewModel>();
         builder.Services.AddTransient<ResultsViewModel>();
@@ -89,6 +90,7 @@ public static class MauiProgram
 
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddTransient<EventSetupPage>();
+        builder.Services.AddTransient<EventQrPage>();
         builder.Services.AddTransient<EventsListPage>();
         builder.Services.AddTransient<MonitorPage>();
         builder.Services.AddTransient<ResultsPage>();

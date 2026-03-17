@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Nodus.Admin.Presentation.Views.EventQrPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Nodus.Admin.Presentation.ViewModels"
+    x:DataType="vm:EventQrViewModel"
+    Title="{Binding EventName}"
+    BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+    <Grid RowDefinitions="Auto, *">
+        
+        <!-- Header -->
+        <Border Grid.Row="0" Style="{StaticResource Card}" Margin="16,12,16,0">
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Códigos QR del Evento" Style="{StaticResource Headline}" />
+                <Label Text="{Binding EventName}" Style="{StaticResource Caption1}" TextColor="{StaticResource NodusSecondaryLabel}" />
+            </VerticalStackLayout>
+        </Border>
+
+        <ScrollView Grid.Row="1" Padding="0,12,0,24">
+            <VerticalStackLayout Spacing="20">
+                
+                <!-- Judge Access QR -->
+                <Border IsVisible="{Binding HasJudgeAccessQr}" Style="{StaticResource Card}" Margin="16,0">
+                    <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
+                        <Label Text="Acceso para Jueces" Style="{StaticResource Title3}" HorizontalTextAlignment="Center" />
+                        <Label Text="Los jueces deben escanear este código para configurar su aplicación y empezar a votar."
+                               Style="{StaticResource Caption1}" HorizontalTextAlignment="Center" MaxLines="2" />
+                        
+                        <Border StrokeThickness="0" StrokeShape="RoundRectangle 12" BackgroundColor="White" Padding="20" HorizontalOptions="Center">
+                            <Image Source="{Binding JudgeAccessQrSource}" WidthRequest="220" HeightRequest="220" Aspect="AspectFit" />
+                        </Border>
+
+                        <Label Text="nodus://judge/access" FontSize="12" TextColor="{StaticResource NodusSecondaryLabel}" HorizontalTextAlignment="Center" FontAttributes="Italic" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Project QRs for Students -->
+                <Border IsVisible="{Binding HasStudentRegistrationQr}" Style="{StaticResource Card}" Margin="16,0">
+                    <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
+                        <Label Text="Registro de Proyectos (Alumnos)" Style="{StaticResource Title3}" HorizontalTextAlignment="Center" />
+                        <Label Text="Los estudiantes deben escanear este código para acceder a la aplicación web y registrar su proyecto."
+                               Style="{StaticResource Caption1}" HorizontalTextAlignment="Center" MaxLines="2" />
+                        
+                        <Border StrokeThickness="0" StrokeShape="RoundRectangle 12" BackgroundColor="White" Padding="20" HorizontalOptions="Center">
+                            <Image Source="{Binding StudentRegistrationQrSource}" WidthRequest="220" HeightRequest="220" Aspect="AspectFit" />
+                        </Border>
+
+                        <Label Text="{Binding StudentRegistrationUrl}" FontSize="12" TextColor="{StaticResource NodusSecondaryLabel}" HorizontalTextAlignment="Center" FontAttributes="Italic" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+</ContentPage>

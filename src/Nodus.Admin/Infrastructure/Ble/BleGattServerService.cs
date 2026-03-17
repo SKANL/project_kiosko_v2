@@ -285,7 +285,7 @@ public sealed class BleGattServerService : IBleGattServerService, IDisposable
                 _bootstrapStreamExpiresUtc = DateTime.UtcNow.AddSeconds(10);
 
                 var remaining = _bootstrapStreamPayload.Length - _bootstrapStreamOffset;
-                var chunkSize = Math.Min(480, remaining);
+                var chunkSize = Math.Min(240, remaining);
                 window = _bootstrapStreamPayload
                     .AsSpan(_bootstrapStreamOffset, chunkSize)
                     .ToArray();

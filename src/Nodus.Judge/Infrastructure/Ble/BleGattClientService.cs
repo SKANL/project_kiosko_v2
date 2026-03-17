@@ -279,7 +279,9 @@ public sealed class BleGattClientService : IBleGattClientService, IDisposable
 
             if (ackWaitTask is not null && preReadPayload is not null && preReadPayload[0] == NodusPrefix.SyncRequest)
             {
-                _ = ObserveOptionalSyncAckAsync(ackWaitTask);
+                // For sync requests, we MUST await the ACK to guarantee the Admin has 
+                // finished building the compressed/encrypted payload.
+                await ObserveOptionalSyncAckAsync(ackWaitTask).ConfigureAwait(false);
             }
 
             var readResult = await ReadBootstrapAggregateAsync().ConfigureAwait(false);
@@ -309,22 +311,30 @@ public sealed class BleGattClientService : IBleGattClientService, IDisposable
         if (bytes.Count < 2)
             return false;
 
-        // Legacy format has no explicit envelope lengths.
-        if (bytes.Count < 11)
-            return false;
+        byte version = bytes[1];
+        
+        // v1 envelope (unencrypted, legacy):
+        // [prefix:1][0x01][jsonLen:4][compLen:4][compressedBytes...]
+        if (version == 0x01)
+        {
+            if (bytes.Count < 10) return false;
+            int expectedCompLength = BitConverter.ToInt32(bytes.ToArray(), 6);
+            if (expectedCompLength <= 0) return false;
+            return (bytes.Count - 10) >= expectedCompLength;
+        }
+        
+        // v2 envelope (encrypted):
+        // [prefix:1][0x02][jsonLen:4][compLen:4][aesLen:4][nonce(12)|tag(16)|cipher...]
+        if (version == 0x02)
+        {
+            if (bytes.Count < 14) return false;
+            int expectedAesLength = BitConverter.ToInt32(bytes.ToArray(), 10);
+            if (expectedAesLength <= 0) return false;
+            return (bytes.Count - 14) >= expectedAesLength;
+        }
 
-        if (bytes[1] != 0x01)
-            return true;
-
-        var bodyCount = bytes.Count - 1;
-        if (bodyCount < 9)
-            return false;
-
-        int expectedCompressedLength = BitConverter.ToInt32(bytes.ToArray(), 6);
-        if (expectedCompressedLength <= 0)
-            return false;
-
-        return bodyCount >= 9 + expectedCompressedLength;
+        // Unknown version or legacy simple payload
+        return bytes.Count > 100; // Heuristic for simple legacy data
     }
 
     private Task<Result> WaitForPreReadAckAsync(byte[] preReadPayload)
@@ -387,15 +397,6 @@ public sealed class BleGattClientService : IBleGattClientService, IDisposable
 
             // Give Android GATT a brief warm-up window to reduce first-read failures.
             await Task.Delay(300).ConfigureAwait(false);
-
-            if (Microsoft.Maui.Devices.DeviceInfo.Platform == Microsoft.Maui.Devices.DevicePlatform.Android)
-            {
-                try
-                {
-                    await peripheral.RequestMtu(512).Timeout(TimeSpan.FromSeconds(2)).ToTask();
-                }
-                catch { } // Ignore if MTU request fails or times out
-            }
 
             EnsureAckNotifySubscription();
 

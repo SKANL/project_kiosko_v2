@@ -73,7 +73,7 @@ public sealed class SyncFromAdminUseCase
                 continue;
             }
 
-            parseResult = TryParseBootstrapPayload(rawResult.Value!);
+            parseResult = TryParseBootstrapPayload(rawResult.Value!, registration?.SharedKeyBase64);
             if (parseResult.IsOk || !LooksLikeIncompletePayload(parseResult.Error))
                 break;
         }
@@ -244,7 +244,7 @@ public sealed class SyncFromAdminUseCase
 
     private async Task MergeSyncPayloadAsync(byte[] raw)
     {
-        var parse = TryParseBootstrapPayload(raw);
+        var parse = TryParseBootstrapPayload(raw, _settings.SharedEventKey);
         if (parse.IsFail)
             return;
         var dto = parse.Value!;
@@ -325,7 +325,7 @@ public sealed class SyncFromAdminUseCase
     private sealed record JudgeRegisterEnvelope(int EventId, string CipherTextBase64);
     private sealed record JudgeRegisterPayload(string JudgeName, string PublicKeyBase64);
 
-    private Result<BootstrapPayloadDto> TryParseBootstrapPayload(byte[] raw)
+    private Result<BootstrapPayloadDto> TryParseBootstrapPayload(byte[] raw, string? sharedKeyOverride = null)
     {
         if (raw.Length < 2 || (raw[0] != NodusPrefix.Bootstrap && raw[0] != NodusPrefix.ProjectSync))
             return Result<BootstrapPayloadDto>.Fail(raw.Length == 0
@@ -357,7 +357,7 @@ public sealed class SyncFromAdminUseCase
                         $"Incomplete v2 bootstrap envelope: expected {aesLen} AES bytes but got {Math.Max(0, body.Length - 13)}");
 
                 byte[] aesPacket = body.AsSpan(13, aesLen).ToArray();
-                string sharedKey = _settings.SharedEventKey;
+                string sharedKey = sharedKeyOverride ?? _settings.SharedEventKey;
                 if (string.IsNullOrWhiteSpace(sharedKey))
                     return Result<BootstrapPayloadDto>.Fail("No shared event key stored — cannot decrypt bootstrap payload.");
 

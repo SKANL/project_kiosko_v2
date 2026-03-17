@@ -76,7 +76,7 @@ public sealed class SubmitVoteUseCase
         Result<PreparedVotePayload>? preparedResult = null;
         try
         {
-            preparedResult = await Task.Run(() => PrepareVotePayload(req.EventId, req, self, nextVersion));
+            preparedResult = await Task.Run(() => PrepareVotePayload(eventId, req, self, nextVersion));
         }
         catch (Exception ex)
         {

@@ -24,6 +24,7 @@ public sealed class EventListItem
     // Commands — set during construction in EventsListViewModel.LoadEventsAsync
     public required ICommand ActivateCommand    { get; init; }
     public required ICommand DeleteCommand      { get; init; }
+    public required ICommand EditCommand        { get; init; }
     public required ICommand ViewQrsCommand     { get; init; }
     public required ICommand ViewResultsCommand { get; init; }
 
@@ -155,6 +156,7 @@ public sealed partial class EventsListViewModel : BaseViewModel
                 VoteCount  = capturedVoteCount,
                 ActivateCommand    = new AsyncRelayCommand(async () => await ActivateItemAsync(item!)),
                 DeleteCommand      = new AsyncRelayCommand(async () => await DeleteItemAsync(item!)),
+                EditCommand        = new AsyncRelayCommand(async () => await EditItemAsync(item!)),
                 ViewQrsCommand     = new AsyncRelayCommand(async () => await ViewQrsItemAsync(item!)),
                 ViewResultsCommand = new AsyncRelayCommand(async () => await ViewResultsItemAsync(item!)),
             };
@@ -213,10 +215,15 @@ public sealed partial class EventsListViewModel : BaseViewModel
     private async Task NavigateToNewEventAsync()
         => await Shell.Current.GoToAsync(nameof(EventSetupPage));
 
+    /// <summary>Called from each item's EditCommand closure.</summary>
+    private async Task EditItemAsync(EventListItem item)
+        => await Shell.Current.GoToAsync(
+               $"{nameof(EventSetupPage)}?sourceEventId={item.Event.Id}");
+
     /// <summary>Called from each item's ViewQrsCommand closure.</summary>
     private async Task ViewQrsItemAsync(EventListItem item)
         => await Shell.Current.GoToAsync(
-               $"{nameof(EventSetupPage)}?sourceEventId={item.Event.Id}");
+               $"{nameof(EventQrPage)}?eventId={item.Event.Id}");
 
     /// <summary>Called from each item's ViewResultsCommand closure.</summary>
     private async Task ViewResultsItemAsync(EventListItem item)

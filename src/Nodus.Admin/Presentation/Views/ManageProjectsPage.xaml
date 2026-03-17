@@ -4,39 +4,129 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:Nodus.Admin.Presentation.ViewModels"
+    xmlns:conv="clr-namespace:Nodus.Admin.Presentation.Converters"
     x:DataType="vm:ManageProjectsViewModel"
     Title="Proyectos"
     BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
 
+    <ContentPage.Resources>
+        <conv:InverseBooleanConverter x:Key="InvertedBoolConverter" />
+        <conv:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
+    </ContentPage.Resources>
+
     <Grid RowDefinitions="Auto,Auto,*">
         
         <!-- Header -->
-        <Border Grid.Row="0" Style="{StaticResource Card}" Margin="16,12,16,0">
-            <VerticalStackLayout Spacing="2">
-                <Label Text="Gestión de Proyectos" Style="{StaticResource Headline}" />
-                <Label Text="Añade o elimina proyectos del evento actual." Style="{StaticResource Caption1}" TextColor="{StaticResource NodusSecondaryLabel}" />
-            </VerticalStackLayout>
+        <Border Grid.Row="0" Style="{StaticResource PremiumCard}" Margin="16,12,16,0">
+            <Grid ColumnDefinitions="*, Auto">
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Gestión de Proyectos" Style="{StaticResource Title2}" />
+                    <Label Text="Añade o elimina proyectos del evento actual." Style="{StaticResource Footnote}" TextColor="{StaticResource NodusSecondaryLabel}" />
+                </VerticalStackLayout>
+
+                <Button Grid.Column="1" Text="Nuevo Proyecto" Command="{Binding ToggleCreateProjectCommand}" 
+                        Style="{StaticResource GhostButton}" VerticalOptions="Center" Padding="16,8" />
+            </Grid>
         </Border>
 
         <!-- Add Form -->
-        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="16,12,16,0">
-            <VerticalStackLayout Spacing="12">
+        <Border Grid.Row="1" Style="{StaticResource PremiumCard}" Margin="16,12,16,0"
+                IsVisible="{Binding IsCreatingProject}">
+            <VerticalStackLayout Spacing="16">
                 <Label Text="Nuevo Proyecto" Style="{StaticResource Title3}" />
-                <Entry Placeholder="Nombre del Proyecto" Text="{Binding NewProjectName}" Style="{StaticResource FormEntry}" />
-                <Entry Placeholder="Categoría/Institución" Text="{Binding NewProjectCategory}" Style="{StaticResource FormEntry}" />
-                <Button Text="Agregar" Command="{Binding AddProjectCommand}" Style="{StaticResource PrimaryButton}" />
+                
+                <Grid ColumnDefinitions="*, *" ColumnSpacing="12">
+                     <VerticalStackLayout Spacing="4" Grid.Column="0">
+                        <Label Text="Nombre del Proyecto" Style="{StaticResource FormLabel}" />
+                        <Entry Placeholder="Nombre" Text="{Binding NewProjectName}" Style="{StaticResource FormEntry}" Margin="0" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="4" Grid.Column="1">
+                        <Label Text="Categoría" Style="{StaticResource FormLabel}" />
+                        <Border BackgroundColor="{AppThemeBinding Light={StaticResource NodusGroupedBackground}, Dark={StaticResource NodusGroupedBackgroundDark}}"
+                                StrokeShape="RoundRectangle 8" StrokeThickness="0.5" HeightRequest="48" Padding="0">
+                            <Picker Title="Seleccionar categoría" 
+                                    ItemsSource="{Binding AvailableCategories}" 
+                                    SelectedItem="{Binding NewProjectCategory}" 
+                                    BackgroundColor="Transparent"
+                                    TextColor="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}"
+                                    VerticalOptions="Center" Margin="12,-2,12,0" />
+                        </Border>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Descripción" Style="{StaticResource FormLabel}" />
+                    <Editor Placeholder="Resumen del proyecto..." Text="{Binding NewProjectDescription}" 
+                            Style="{StaticResource FormEntry}" Margin="0" AutoSize="TextChanges" MinimumHeightRequest="80" />
+                </VerticalStackLayout>
+
+                <Grid ColumnDefinitions="*, *" ColumnSpacing="12">
+                    <VerticalStackLayout Spacing="4" Grid.Column="0">
+                        <Label Text="Stand" Style="{StaticResource FormLabel}" />
+                        <Entry Placeholder="Ej. 42" Text="{Binding NewProjectStand}" Style="{StaticResource FormEntry}" Margin="0" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="4" Grid.Column="1">
+                        <Label Text="GitHub (Opcional)" Style="{StaticResource FormLabel}" />
+                        <Entry Placeholder="https://github.com/..." Text="{Binding NewProjectGithub}" Style="{StaticResource FormEntry}" Margin="0" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- Team Members Chips -->
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Integrantes del equipo" Style="{StaticResource FormLabel}" />
+                    <FlexLayout BindableLayout.ItemsSource="{Binding TeamMemberList}" 
+                                Wrap="Wrap" Direction="Row" AlignContent="Start" AlignItems="Start">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Border Margin="0,0,8,8" Padding="12,4" StrokeShape="RoundRectangle 16"
+                                        BackgroundColor="{StaticResource NodusAccentSurface}">
+                                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                        <Label Text="{Binding .}" VerticalOptions="Center" Style="{StaticResource Caption1}" />
+                                        <Button Text="✕" Style="{StaticResource GhostButton}" Padding="0" Margin="0" 
+                                                HeightRequest="20" WidthRequest="20" FontSize="10"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ManageProjectsViewModel}}, Path=RemoveMemberCommand}"
+                                                CommandParameter="{Binding .}" />
+                                    </HorizontalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                    
+                    <Border BackgroundColor="{AppThemeBinding Light={StaticResource NodusGroupedBackground}, Dark={StaticResource NodusGroupedBackgroundDark}}"
+                            StrokeShape="RoundRectangle 10" StrokeThickness="0.5" Padding="4">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <Entry Placeholder="Añadir integrante..." Text="{Binding NewMemberName}" 
+                                   BackgroundColor="Transparent" Margin="8,0" HeightRequest="40" />
+                            <Button Grid.Column="1" Text="Añadir" Command="{Binding AddMemberCommand}" 
+                                    Style="{StaticResource GhostButton}" Padding="16,0" HeightRequest="40" MinimumHeightRequest="40" />
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+                
+                <Button Text="Agregar Proyecto" Command="{Binding AddProjectCommand}" Style="{StaticResource GradientButton}" 
+                        HorizontalOptions="End" WidthRequest="220" />
             </VerticalStackLayout>
         </Border>
 
         <ScrollView Grid.Row="2" Padding="0,12,0,24">
             <VerticalStackLayout Spacing="0">
-                <CollectionView ItemsSource="{Binding Projects}" SelectionMode="None" Margin="16,0">
+                <!-- Empty State -->
+                <VerticalStackLayout IsVisible="{Binding HasProjects, Converter={StaticResource InvertedBoolConverter}}"
+                                     HorizontalOptions="Center" VerticalOptions="Center" Spacing="20" Padding="0,60">
+                    <Path Data="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z"
+                          Fill="{StaticResource NodusSecondaryLabel}" Aspect="Uniform" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center" />
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="No hay proyectos registrados" Style="{StaticResource Headline}" HorizontalTextAlignment="Center" />
+                        <Label Text="Los proyectos que registres aparecerán en esta lista." Style="{StaticResource Footnote}" 
+                               TextColor="{StaticResource NodusSecondaryLabel}" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+
+                <CollectionView ItemsSource="{Binding Projects}" SelectionMode="None" Margin="16,0"
+                                IsVisible="{Binding HasProjects}">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
                     </CollectionView.ItemsLayout>
-                    <CollectionView.EmptyView>
-                        <Label Text="No hay proyectos." Style="{StaticResource Footnote}" HorizontalTextAlignment="Center" Margin="0,20"/>
-                    </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="vm:ManageProjectItem">
                             <SwipeView>
@@ -46,12 +136,21 @@
                                     </SwipeItems>
                                 </SwipeView.RightItems>
                                 <Border Style="{StaticResource Card}" Padding="16" Margin="0,0,0,2">
-                                    <Grid ColumnDefinitions="*,Auto">
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto, Auto">
                                         <VerticalStackLayout Grid.Column="0" Spacing="4">
                                             <Label Text="{Binding Project.Name}" Style="{StaticResource Headline}" />
-                                            <Label Text="{Binding Project.Category}" Style="{StaticResource Footnote}" TextColor="{StaticResource NodusSecondaryLabel}" />
+                                            <HorizontalStackLayout Spacing="12">
+                                                <Label Text="{Binding Project.Category}" Style="{StaticResource Footnote}" TextColor="{StaticResource NodusSecondaryLabel}" />
+                                                <Label Text="•" VerticalOptions="Center" TextColor="{StaticResource NodusSeparator}" />
+                                                <Label Text="{Binding Project.StandNumber, StringFormat='Stand {0}'}" IsVisible="{Binding Project.StandNumber, Converter={StaticResource StringNotEmptyConverter}}"
+                                                       Style="{StaticResource Footnote}" TextColor="{StaticResource NodusSecondaryLabel}" />
+                                            </HorizontalStackLayout>
                                         </VerticalStackLayout>
                                         <Label Grid.Column="1" Text="{Binding Project.ProjectCode}" Style="{StaticResource Title3}" TextColor="{StaticResource NodusAccent}" VerticalOptions="Center" />
+                                        
+                                        <HorizontalStackLayout Grid.Row="1" Spacing="8" Margin="0,8,0,0" IsVisible="{Binding Project.GithubLink, Converter={StaticResource StringNotEmptyConverter}}">
+                                            <Label Text="GitHub" Style="{StaticResource Caption2}" TextColor="{StaticResource SystemBlue}" />
+                                        </HorizontalStackLayout>
                                     </Grid>
                                 </Border>
                             </SwipeView>

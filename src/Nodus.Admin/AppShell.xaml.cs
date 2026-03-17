@@ -1,4 +1,4 @@
-﻿namespace Nodus.Admin;
+namespace Nodus.Admin;
 
 public partial class AppShell : Shell
 {
@@ -6,5 +6,6 @@ public partial class AppShell : Shell
     {
         InitializeComponent();
         Routing.RegisterRoute(nameof(Presentation.Views.EventSetupPage), typeof(Presentation.Views.EventSetupPage));
+        Routing.RegisterRoute(nameof(Presentation.Views.EventQrPage), typeof(Presentation.Views.EventQrPage));
     }
 }

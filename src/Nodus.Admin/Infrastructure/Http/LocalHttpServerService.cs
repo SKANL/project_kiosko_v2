@@ -163,17 +163,10 @@ public sealed class LocalHttpServerService : ILocalHttpServerService, IAsyncDisp
             var evt = result.Value;
             var isClosed = !string.IsNullOrEmpty(evt.FinishedAt);
 
-            // Parse categories from RubricJson or fallback
-            string[] categories = ["Software", "Hardware", "Social"];
-            if (!string.IsNullOrEmpty(evt.RubricJson))
-            {
-                try
-                {
-                    // Categories stored separately in settings — use a sensible fallback
-                    // TODO: add a dedicated Categories field to NodusEvent in a future pass
-                }
-                catch { /* use fallback */ }
-            }
+            // Fetch categories from the event entity
+            var categories = string.IsNullOrWhiteSpace(evt.Categories) 
+                ? new[] { "Software", "Hardware", "Social" }
+                : evt.Categories.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
             var projectsResult = await _projects.GetByEventAsync(eventId.Value);
             var projectCount   = projectsResult.IsOk ? projectsResult.Value!.Count : 0;
@@ -184,7 +177,7 @@ public sealed class LocalHttpServerService : ILocalHttpServerService, IAsyncDisp
                 Name        = evt.Name,
                 Institution = evt.Institution,
                 Categories  = categories,
-                MaxProjects = 100,
+                MaxProjects = evt.MaxProjects,
                 IsOpen      = !isClosed
             }, json);
         });
@@ -197,16 +190,18 @@ public sealed class LocalHttpServerService : ILocalHttpServerService, IAsyncDisp
 
             var evtResult = await _events.GetByIdAsync(eventId.Value);
             if (evtResult.IsFail || evtResult.Value is null) return Results.NotFound();
-            if (!string.IsNullOrEmpty(evtResult.Value.FinishedAt))
+            var activeEvt = evtResult.Value;
+
+            if (!string.IsNullOrEmpty(activeEvt.FinishedAt))
                 return Results.StatusCode(410); // Gone — event closed
 
             // Validate
             if (string.IsNullOrWhiteSpace(req.Name) || req.Name.Trim().Length < 3)
                 return Results.BadRequest(new { error = "Project name too short." });
 
-            // Check maxProjects (Decision #49) — hardcoded 100 for now
+            // Check maxProjects (Decision #49)
             var existingResult = await _projects.GetByEventAsync(eventId.Value);
-            if (existingResult.IsOk && existingResult.Value!.Count >= 100)
+            if (existingResult.IsOk && existingResult.Value!.Count >= activeEvt.MaxProjects)
                 return Results.Conflict(new { error = "Maximum projects reached." }); // 409
 
             // Assign next PROJ-{3} code

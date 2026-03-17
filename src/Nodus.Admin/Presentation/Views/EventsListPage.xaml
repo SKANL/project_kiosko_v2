@@ -164,13 +164,24 @@
 
                                     <!-- ── Action buttons ── -->
                                     <Grid
-                                        ColumnDefinitions="*,*,*"
+                                        ColumnDefinitions="*,*,*,*"
                                         ColumnSpacing="8"
                                         Padding="16,12,16,16">
 
-                                        <!-- Activar -->
+                                        <!-- Editar -->
                                         <Button
                                             Grid.Column="0"
+                                            Text="Editar"
+                                            FontSize="14"
+                                            Style="{StaticResource GhostButton}"
+                                            Padding="4,10"
+                                            MinimumHeightRequest="44"
+                                            Command="{Binding EditCommand}"
+                                            SemanticProperties.Description="Editar detalles de este evento." />
+
+                                        <!-- Activar -->
+                                        <Button
+                                            Grid.Column="1"
                                             Text="Activar"
                                             FontSize="14"
                                             Style="{StaticResource SecondaryButton}"
@@ -181,7 +192,7 @@
                                             SemanticProperties.Description="Activa este evento para habilitar el acceso al jurado." />
                                         <!-- Active indicator -->
                                         <Label
-                                            Grid.Column="0"
+                                            Grid.Column="1"
                                             Text="✓ Activo"
                                             FontSize="14"
                                             FontAttributes="Bold"
@@ -193,7 +204,7 @@
 
                                         <!-- QRs -->
                                         <Button
-                                            Grid.Column="1"
+                                            Grid.Column="2"
                                             Text="QRs"
                                             FontSize="14"
                                             Style="{StaticResource GhostButton}"
@@ -204,7 +215,7 @@
 
                                         <!-- Resultados -->
                                         <Button
-                                            Grid.Column="2"
+                                            Grid.Column="3"
                                             Text="Resultados"
                                             FontSize="14"
                                             Style="{StaticResource GhostButton}"

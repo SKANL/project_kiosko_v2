@@ -1,5 +1,8 @@
 using Nodus.Admin.Domain.Entities;
 using SQLite;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Nodus.Admin.Infrastructure.Persistence;
 
@@ -41,6 +44,43 @@ public sealed class NodusDatabase : IDisposable
         await ApplyMigrationAsync("ALTER TABLE votes   ADD COLUMN RemainingTtl INTEGER NOT NULL DEFAULT 0");
         await ApplyMigrationAsync("ALTER TABLE projects ADD COLUMN ProjectCode TEXT NOT NULL DEFAULT ''");
         await ApplyMigrationAsync("ALTER TABLE projects ADD COLUMN SequenceNumber INTEGER NOT NULL DEFAULT 0");
+
+        await RepairSequenceNumbersAsync().ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Ensures all existing projects have a valid monotic SequenceNumber.
+    /// Crucial for Judge apps to sync projects added before the sequence logic was implemented.
+    /// </summary>
+    private async Task RepairSequenceNumbersAsync()
+    {
+        var projects = await _db.Table<Project>()
+            .Where(p => p.SequenceNumber <= 0)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        if (projects == null || projects.Count == 0) return;
+
+        // Group by event manually to avoid LINQ extension issues in this environment
+        var eventIds = projects.Select(p => p.EventId).Distinct().ToList();
+
+        foreach (var eventId in eventIds)
+        {
+            var maxSeqItem = await _db.Table<Project>()
+                .Where(p => p.EventId == eventId)
+                .OrderByDescending(p => p.SequenceNumber)
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
+
+            int current = maxSeqItem?.SequenceNumber ?? 0;
+            var eventProjects = projects.Where(p => p.EventId == eventId).ToList();
+
+            foreach (var p in eventProjects)
+            {
+                p.SequenceNumber = ++current;
+                await _db.UpdateAsync(p).ConfigureAwait(false);
+            }
+        }
     }
 
     /// <summary>Deletes all data from the database.</summary>

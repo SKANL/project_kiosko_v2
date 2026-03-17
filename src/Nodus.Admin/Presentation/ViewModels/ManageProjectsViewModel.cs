@@ -17,51 +17,33 @@ public sealed class ManageProjectItem
 public sealed partial class ManageProjectsViewModel : BaseViewModel
 {
     private readonly IProjectRepository _projects;
+    private readonly IEventRepository _events;
     private readonly IAppSettingsService _settings;
 
     public ObservableCollection<ManageProjectItem> Projects { get; } = new();
+    public ObservableCollection<string> AvailableCategories { get; } = new();
 
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(AddProjectCommand))]
     private string _newProjectName = string.Empty;
-    public string NewProjectName
-    {
-        get => _newProjectName;
-        set => SetProperty(ref _newProjectName, value);
-    }
 
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(AddProjectCommand))]
     private string _newProjectCategory = string.Empty;
-    public string NewProjectCategory
-    {
-        get => _newProjectCategory;
-        set => SetProperty(ref _newProjectCategory, value);
-    }
 
+    [ObservableProperty]
     private string _newProjectDescription = string.Empty;
-    public string NewProjectDescription
-    {
-        get => _newProjectDescription;
-        set => SetProperty(ref _newProjectDescription, value);
-    }
 
-    private string _newProjectMembers = string.Empty;
-    public string NewProjectMembers
-    {
-        get => _newProjectMembers;
-        set => SetProperty(ref _newProjectMembers, value);
-    }
+    [ObservableProperty]
+    private string _newMemberName = string.Empty;
 
+    public ObservableCollection<string> TeamMemberList { get; } = new();
+
+    [ObservableProperty]
     private string _newProjectStand = string.Empty;
-    public string NewProjectStand
-    {
-        get => _newProjectStand;
-        set => SetProperty(ref _newProjectStand, value);
-    }
 
+    [ObservableProperty]
     private string _newProjectGithub = string.Empty;
-    public string NewProjectGithub
-    {
-        get => _newProjectGithub;
-        set => SetProperty(ref _newProjectGithub, value);
-    }
 
     private Project? _selectedProject;
     public Project? SelectedProject
@@ -119,16 +101,27 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
         set => SetProperty(ref _isEditing, value);
     }
 
+    [ObservableProperty]
     private bool _hasProjects;
-    public bool HasProjects
+
+    [ObservableProperty]
+    private bool _isCreatingProject;
+
+    [RelayCommand]
+    private void ToggleCreateProject()
     {
-        get => _hasProjects;
-        set => SetProperty(ref _hasProjects, value);
+        IsCreatingProject = !IsCreatingProject;
     }
 
-    public ManageProjectsViewModel(IProjectRepository projects, IAppSettingsService settings)
+    public void CheckProjectsState()
+    {
+        HasProjects = Projects.Count > 0;
+    }
+
+    public ManageProjectsViewModel(IProjectRepository projects, IEventRepository events, IAppSettingsService settings)
     {
         _projects = projects;
+        _events = events;
         _settings = settings;
         Title = "Proyectos";
     }
@@ -144,6 +137,35 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
             HasProjects = false;
             return;
         }
+
+        // Load Categories
+        AvailableCategories.Clear();
+        var evtResult = await _events.GetByIdAsync(eventId.Value);
+        if (evtResult.IsOk && evtResult.Value != null && !string.IsNullOrEmpty(evtResult.Value.Categories))
+        {
+            foreach (var c in evtResult.Value.Categories.Split(';', StringSplitOptions.RemoveEmptyEntries))
+            {
+                AvailableCategories.Add(c.Trim());
+            }
+        }
+        else
+        {
+            // Default categories if none defined
+            AvailableCategories.Add("Software");
+            AvailableCategories.Add("Hardware");
+            AvailableCategories.Add("Social");
+        }
+
+        // Members
+        TeamMemberList.Clear();
+        NewMemberName = string.Empty;
+
+        // Form
+        NewProjectName = string.Empty;
+        NewProjectDescription = string.Empty;
+        NewProjectCategory = string.Empty;
+        NewProjectStand = string.Empty;
+        NewProjectGithub = string.Empty;
 
         var result = await _projects.GetByEventAsync(eventId.Value);
         if (result.IsFail)
@@ -213,26 +235,45 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    private void AddMember()
+    {
+        if (string.IsNullOrWhiteSpace(NewMemberName)) return;
+        var name = NewMemberName.Trim();
+        if (!TeamMemberList.Contains(name))
+            TeamMemberList.Add(name);
+        NewMemberName = string.Empty;
+        AddProjectCommand.NotifyCanExecuteChanged();
+    }
+
+    [RelayCommand]
+    private void RemoveMember(string name)
+    {
+        if (TeamMemberList.Contains(name))
+            TeamMemberList.Remove(name);
+        AddProjectCommand.NotifyCanExecuteChanged();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanAddProject))]
     private async Task AddProjectAsync()
     {
         if (string.IsNullOrWhiteSpace(NewProjectName)) return;
 
-        var eventId = _settings.ActiveEventId;
-        if (!eventId.HasValue) return;
-
-        var newProject = new Project
+        var members = string.Join(", ", TeamMemberList);
+        
+        var project = new Project
         {
-            EventId = eventId.Value,
+            EventId = _settings.ActiveEventId ?? 0,
             Name = NewProjectName.Trim(),
-            Category = NewProjectCategory.Trim(),
-            Description = NewProjectDescription.Trim(),
-            TeamMembers = NewProjectMembers.Trim(),
-            StandNumber = NewProjectStand.Trim(),
-            GithubLink = NewProjectGithub.Trim(),
-            ProjectCode = GenerateProjectCode()
+            Category = NewProjectCategory ?? "General",
+            Description = NewProjectDescription?.Trim() ?? string.Empty,
+            TeamMembers = members,
+            StandNumber = NewProjectStand?.Trim() ?? string.Empty,
+            GithubLink = NewProjectGithub?.Trim() ?? string.Empty,
+            ProjectCode = await _projects.GenerateUniqueCodeAsync(_settings.ActiveEventId ?? 0),
+            CreatedAt = DateTime.UtcNow.ToString("O")
         };
 
-        var result = await _projects.CreateAsync(newProject);
+        var result = await _projects.CreateAsync(project);
         if (result.IsFail)
         {
             ErrorMessage = result.Error!;
@@ -240,15 +281,20 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
             return;
         }
 
+        // Reset form
         NewProjectName = string.Empty;
-        NewProjectCategory = string.Empty;
         NewProjectDescription = string.Empty;
-        NewProjectMembers = string.Empty;
+        NewProjectCategory = string.Empty;
         NewProjectStand = string.Empty;
         NewProjectGithub = string.Empty;
-        
+        TeamMemberList.Clear();
+
+        IsCreatingProject = false;
+
         await LoadProjectsAsync();
     }
+
+    private bool CanAddProject() => !string.IsNullOrWhiteSpace(NewProjectName) && !string.IsNullOrWhiteSpace(NewProjectCategory);
 
     private async Task DeleteProjectAsync(Project project)
     {

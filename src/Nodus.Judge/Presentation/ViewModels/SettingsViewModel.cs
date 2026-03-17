@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Nodus.Judge.Application.Interfaces.Persistence;
 using Nodus.Judge.Application.Interfaces.Services;
 using Nodus.Judge.Application.UseCases.Onboarding;
+using Nodus.Judge.Domain.Common;
 
 namespace Nodus.Judge.Presentation.ViewModels;
 

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Nodus.Admin.Application.Services;
 using Nodus.Admin.Application.Interfaces.Services;
+using Nodus.Admin.Infrastructure.Http;
 
 namespace Nodus.Admin;
 
@@ -21,25 +22,48 @@ public partial class App : global::Microsoft.Maui.Controls.Application
 		// tries to look up StaticResource keys such as NodusGroupedBackground.
 		InitializeComponent();
 
-		// Create SQLite tables before any page tries to query them.
-		// Task.Run avoids deadlock: SQLiteAsyncConnection continuations must not
-		// post back to the MAUI main-thread SynchronizationContext.
-		var db = services.GetRequiredService<Infrastructure.Persistence.NodusDatabase>();
-		Task.Run(() => db.InitializeAsync()).GetAwaiter().GetResult();
+		try
+		{
+			// 1. Initialize SQLite (Synchronous block is risky but often necessary for first page)
+			// Using Task.Run to ensure SQLite extensions don't capture the UI SynchronizationContext.
+			var db = services.GetRequiredService<Infrastructure.Persistence.NodusDatabase>();
+			Task.Run(() => db.InitializeAsync()).Wait();
 
-		// Start vote processing service to listen for incoming votes from judges
-		var voteProcessor = services.GetRequiredService<VoteProcessingService>();
-		voteProcessor.Start();
+			// 2. Start Services (Background - do not block UI thread)
+			_ = Task.Run(async () =>
+			{
+				try
+				{
+					// BLE server
+					var bleServer = services.GetRequiredService<IBleGattServerService>();
+					await bleServer.StartAsync().ConfigureAwait(false);
 
-		// Start BLE server automatically so Judge devices can discover/connect immediately.
-		var bleServer = services.GetRequiredService<IBleGattServerService>();
-		var bleStart = Task.Run(() => bleServer.StartAsync()).GetAwaiter().GetResult();
-		if (bleStart.IsFail)
-			System.Diagnostics.Debug.WriteLine($"Admin BLE auto-start failed: {bleStart.Error}");
+					// HTTP server
+					var httpServer = services.GetRequiredService<ILocalHttpServerService>();
+					await httpServer.StartAsync().ConfigureAwait(false);
 
-		// Start periodic backup (every 5 min, 3-file rotation)
-		var backup = services.GetRequiredService<Application.Services.IBackupService>();
-		backup.Start();
+					// Backup service
+					var backup = services.GetRequiredService<Application.Services.IBackupService>();
+					backup.Start();
+
+					// Vote processing
+					var voteProcessor = services.GetRequiredService<VoteProcessingService>();
+					voteProcessor.Start();
+				}
+				catch (Exception backgroundEx)
+				{
+					System.Diagnostics.Debug.WriteLine($"Admin background services failure: {backgroundEx.Message}");
+				}
+			});
+		}
+		catch (Exception startupEx)
+		{
+			// Critical startup failure
+			System.Diagnostics.Debug.WriteLine($"Admin critical startup failure: {startupEx.Message}");
+			File.WriteAllText(
+				Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "nodus_critical_error.txt"),
+				startupEx.ToString());
+		}
 
 		_shell = services.GetRequiredService<AppShell>();
 	}

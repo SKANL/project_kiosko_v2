@@ -30,7 +30,15 @@ public sealed class CreateEventUseCase
     /// Format: [{"id":"...","label":"...","weight":1.0,"min":0,"max":10,"step":0.5},...]
     /// </param>
     /// <param name="AccessPassword">Shared event password used to decrypt the Judge Access QR.</param>
-    public sealed record Request(string Name, string Institution, string Description, string Date, string RubricJson = "", string AccessPassword = "");
+    public sealed record Request(
+        string Name, 
+        string Institution, 
+        string Description, 
+        string Date, 
+        string Categories,
+        int MaxProjects,
+        string RubricJson = "", 
+        string AccessPassword = "");
 
     public async Task<Result<NodusEvent>> ExecuteAsync(Request req)
     {
@@ -46,6 +54,8 @@ public sealed class CreateEventUseCase
             Name          = req.Name.Trim(),
             Institution   = req.Institution.Trim(),
             Description   = req.Description.Trim(),
+            Categories    = req.Categories.Trim(),
+            MaxProjects   = req.MaxProjects,
             Date          = req.Date,
             Status        = EventStatus.Draft,
             RubricVersion = 1,

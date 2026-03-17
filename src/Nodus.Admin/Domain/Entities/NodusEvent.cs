@@ -20,6 +20,8 @@ public class NodusEvent
     public string Institution { get; set; } = string.Empty;
 
     public string Description { get; set; } = string.Empty;
+    public string Categories  { get; set; } = "Software;Hardware;Social";
+    public int    MaxProjects { get; set; } = 100;
 
     /// <summary>ISO 8601 date string — SQLite stores as TEXT.</summary>
     public string Date        { get; set; } = string.Empty;

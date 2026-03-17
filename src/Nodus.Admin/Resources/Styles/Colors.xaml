@@ -63,6 +63,7 @@
 
     <!-- ── Brand Accent ────────────────────────────────────────────────── -->
     <Color x:Key="NodusAccent">#007AFF</Color>
+    <Color x:Key="NodusAccentSurface">#26007AFF</Color>
     <Color x:Key="NodusAccentPressed">#0062CC</Color>
     <Color x:Key="NodusAccentDisabled">#C7C7CC</Color>
 

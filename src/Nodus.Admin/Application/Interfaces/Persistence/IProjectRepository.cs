@@ -13,4 +13,5 @@ public interface IProjectRepository
     Task<Result>                        DeleteAsync(int id);
     Task<Result>                        DeleteByEventAsync(int eventId);
     Task<Result>                        BulkInsertAsync(IEnumerable<Project> projects);
+    Task<string>                        GenerateUniqueCodeAsync(int eventId);
 }

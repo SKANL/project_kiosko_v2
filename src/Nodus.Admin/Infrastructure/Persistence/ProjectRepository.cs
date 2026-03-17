@@ -49,7 +49,17 @@ public sealed class ProjectRepository : IProjectRepository
     {
         try
         {
-            await _db.Connection.InsertAsync(project);
+            if (project.SequenceNumber <= 0 && project.EventId > 0)
+            {
+                var maxSequence = await _db.Connection.Table<Project>()
+                    .Where(item => item.EventId == project.EventId)
+                    .OrderByDescending(item => item.SequenceNumber)
+                    .FirstOrDefaultAsync()
+                    .ConfigureAwait(false);
+                project.SequenceNumber = (maxSequence?.SequenceNumber ?? 0) + 1;
+            }
+
+            await _db.Connection.InsertAsync(project).ConfigureAwait(false);
             return Result<int>.Ok(project.Id);
         }
         catch (Exception ex) { return Result<int>.Fail(ex.Message); }
@@ -57,13 +67,13 @@ public sealed class ProjectRepository : IProjectRepository
 
     public async Task<Result> UpdateAsync(Project project)
     {
-        try { await _db.Connection.UpdateAsync(project); return Result.Ok(); }
+        try { await _db.Connection.UpdateAsync(project).ConfigureAwait(false); return Result.Ok(); }
         catch (Exception ex) { return Result.Fail(ex.Message); }
     }
 
     public async Task<Result> DeleteAsync(int id)
     {
-        try { await _db.Connection.DeleteAsync<Project>(id); return Result.Ok(); }
+        try { await _db.Connection.DeleteAsync<Project>(id).ConfigureAwait(false); return Result.Ok(); }
         catch (Exception ex) { return Result.Fail(ex.Message); }
     }
 
@@ -71,7 +81,8 @@ public sealed class ProjectRepository : IProjectRepository
     {
         try
         {
-            await _db.Connection.ExecuteAsync("DELETE FROM Project WHERE EventId = ?", eventId);
+            await _db.Connection.ExecuteAsync("DELETE FROM Project WHERE EventId = ?", eventId)
+                .ConfigureAwait(false);
             return Result.Ok();
         }
         catch (Exception ex) { return Result.Fail(ex.Message); }
@@ -81,21 +92,37 @@ public sealed class ProjectRepository : IProjectRepository
     {
         try
         {
+            int currentMax = -1;
+
             foreach (var project in projects)
             {
-                if (project.SequenceNumber <= 0)
+                if (project.SequenceNumber <= 0 && project.EventId > 0)
                 {
-                    var maxSequence = await _db.Connection.Table<Project>()
-                        .Where(item => item.EventId == project.EventId)
-                        .OrderByDescending(item => item.SequenceNumber)
-                        .FirstOrDefaultAsync();
-                    project.SequenceNumber = (maxSequence?.SequenceNumber ?? 0) + 1;
+                    if (currentMax == -1)
+                    {
+                        var maxSequence = await _db.Connection.Table<Project>()
+                            .Where(item => item.EventId == project.EventId)
+                            .OrderByDescending(item => item.SequenceNumber)
+                            .FirstOrDefaultAsync()
+                            .ConfigureAwait(false);
+                        currentMax = maxSequence?.SequenceNumber ?? 0;
+                    }
+                    
+                    project.SequenceNumber = ++currentMax;
                 }
             }
 
-            await _db.Connection.InsertAllAsync(projects);
+            await _db.Connection.InsertAllAsync(projects).ConfigureAwait(false);
             return Result.Ok();
         }
         catch (Exception ex) { return Result.Fail(ex.Message); }
+    }
+
+    public async Task<string> GenerateUniqueCodeAsync(int eventId)
+    {
+        var count = await _db.Connection.Table<Project>()
+            .Where(p => p.EventId == eventId)
+            .CountAsync();
+        return $"PROJ-{(count + 1):D3}";
     }
 }

@@ -219,6 +219,35 @@
         <Setter Property="BorderWidth" Value="0" />
     </Style>
 
+    <!-- Gradient Button — Premium feel -->
+    <Style x:Key="GradientButton" TargetType="Button">
+        <Setter Property="TextColor" Value="White" />
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="24,14" />
+        <Setter Property="MinimumHeightRequest" Value="54" />
+        <Setter Property="Background">
+            <LinearGradientBrush EndPoint="1,0">
+                <GradientStop Color="#157EFB" Offset="0.1" />
+                <GradientStop Color="#2DBCFF" Offset="1.0" />
+            </LinearGradientBrush>
+        </Setter>
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="Opacity" Value="0.5" />
+                            <Setter Property="Background" Value="#333333" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
     <!-- Secondary — outlined blue -->
     <Style x:Key="SecondaryButton" TargetType="Button">
         <Setter Property="BackgroundColor" Value="Transparent" />
@@ -288,6 +317,23 @@
         </Setter>
     </Style>
 
+    <!-- Premium glass-inspired card -->
+    <Style x:Key="PremiumCard" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#F9FFFFFF, Dark=#1A000000}" />
+        <Setter Property="Stroke" Value="{AppThemeBinding Light=#20000000, Dark=#20FFFFFF}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 24" />
+        <Setter Property="Padding" Value="24" />
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="Black"
+                        Offset="0,8"
+                        Radius="24"
+                        Opacity="0.08" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Status pill: dynamically colored -->
     <Style x:Key="StatusPill" TargetType="Border">
         <Setter Property="StrokeShape" Value="RoundRectangle 14" />
@@ -306,6 +352,13 @@
         <Setter Property="CharacterSpacing" Value="0.5" />
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusSecondaryLabel}, Dark={StaticResource NodusSecondaryLabelDark}}" />
         <Setter Property="Margin" Value="16,24,16,8" />
+    </Style>
+
+    <Style x:Key="FormLabel" TargetType="Label">
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource NodusSecondaryLabel}, Dark={StaticResource NodusSecondaryLabelDark}}" />
+        <Setter Property="Margin" Value="4,0,0,4" />
     </Style>
 
     <Style x:Key="StatValueLabel" TargetType="Label">
@@ -357,6 +410,19 @@
 
     <Style x:Key="BadgeInfo" TargetType="Border" BasedOn="{StaticResource StatusPill}">
         <Setter Property="BackgroundColor" Value="#EBF3FF" />
+    </Style>
+
+    <!-- Wizard Step Indicator -->
+    <Style x:Key="WizardLabel" TargetType="Label">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="WizardIcon" TargetType="Ellipse">
+        <Setter Property="WidthRequest" Value="32" />
+        <Setter Property="HeightRequest" Value="32" />
+        <Setter Property="StrokeThickness" Value="2" />
     </Style>
 
     <!-- ── CollectionView ────────────────────────────────────────────── -->
