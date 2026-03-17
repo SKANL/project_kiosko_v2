@@ -49,6 +49,10 @@ public partial class App : global::Microsoft.Maui.Controls.Application
 					// Vote processing
 					var voteProcessor = services.GetRequiredService<VoteProcessingService>();
 					voteProcessor.Start();
+
+					// Cloud Sync
+					var cloudSync = services.GetRequiredService<ICloudSyncService>();
+					await cloudSync.StartAsync().ConfigureAwait(false);
 				}
 				catch (Exception backgroundEx)
 				{

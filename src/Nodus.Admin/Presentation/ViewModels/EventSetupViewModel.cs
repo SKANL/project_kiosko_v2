@@ -21,6 +21,7 @@ public sealed partial class EventSetupViewModel : BaseViewModel
     private readonly IEventRepository _events;
     private readonly IProjectRepository _projects;
     private readonly IVoteRepository _votes;
+    private readonly ICloudSyncService _cloudSync;
 
     [ObservableProperty]
     private int _eventId;
@@ -35,12 +36,14 @@ public sealed partial class EventSetupViewModel : BaseViewModel
         IProjectRepository projects,
         IVoteRepository votes,
         IBleGattServerService ble,
-        IAppSettingsService settings)
+        IAppSettingsService settings,
+        ICloudSyncService cloudSync)
     {
         _createEvent = createEvent;
         _events = events;
         _projects = projects;
         _votes = votes;
+        _cloudSync = cloudSync;
         Title = "Preparar evento";
 
         LoadRubricEditorsFromJson(RubricJson);
@@ -478,6 +481,10 @@ public sealed partial class EventSetupViewModel : BaseViewModel
             }
 
             await Task.Run(() => GenerateQrCodes(accessQrPayload));
+            
+            // Sync to cloud
+            _ = Task.Run(() => _cloudSync.PushActiveEventAsync(evt.Id));
+
             SaveSucceeded = true;
         });
 

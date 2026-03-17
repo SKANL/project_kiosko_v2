@@ -73,6 +73,9 @@ public sealed class ProjectDocument
     [BsonElement("sortOrder")]
     public int SortOrder { get; set; }
 
+    [BsonElement("editToken")]
+    public string EditToken { get; set; } = string.Empty;
+
     [BsonElement("syncedAtUtc")]
     public DateTime SyncedAtUtc { get; set; } = DateTime.UtcNow;
 }

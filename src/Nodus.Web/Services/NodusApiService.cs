@@ -17,11 +17,15 @@ public sealed class NodusApiService
 
     // ── Event Info ─────────────────────────────────────────────────────────
 
-    public async Task<EventInfoDto?> GetCurrentEventAsync(string serverBase)
+    public async Task<EventInfoDto?> GetCurrentEventAsync(string? serverBase, string? cloudApiUrl = null)
     {
         try
         {
-            return await _http.GetFromJsonAsync<EventInfoDto>($"http://{serverBase}/api/event/current");
+            var url = !string.IsNullOrEmpty(cloudApiUrl) 
+                ? $"{cloudApiUrl}/api/public/event/{serverBase}" // in cloud, serverBase IS the eventId 
+                : $"http://{serverBase}/api/event/current";
+
+            return await _http.GetFromJsonAsync<EventInfoDto>(url);
         }
         catch { return null; }
     }
@@ -29,11 +33,16 @@ public sealed class NodusApiService
     // ── Project Registration ────────────────────────────────────────────────
 
     public async Task<(RegisterProjectResponse? Response, string? Error)> RegisterProjectAsync(
-        string serverBase, RegisterProjectRequest request)
+        string? serverBase, RegisterProjectRequest request, string? cloudApiUrl = null)
     {
         try
         {
-            var response = await _http.PostAsJsonAsync($"http://{serverBase}/api/projects", request);
+            var isCloud = !string.IsNullOrEmpty(cloudApiUrl);
+            var url = isCloud
+                ? $"{cloudApiUrl}/api/public/projects"
+                : $"http://{serverBase}/api/projects";
+
+            var response = await _http.PostAsJsonAsync(url, request);
             if (response.IsSuccessStatusCode)
             {
                 var dto = await response.Content.ReadFromJsonAsync<RegisterProjectResponse>();
@@ -53,23 +62,29 @@ public sealed class NodusApiService
 
     // ── Edit Registration ───────────────────────────────────────────────────
 
-    public async Task<ProjectEditDto?> GetProjectForEditAsync(string serverBase, string editToken)
+    public async Task<ProjectEditDto?> GetProjectForEditAsync(string? serverBase, string editToken, string? cloudApiUrl = null)
     {
         try
         {
-            return await _http.GetFromJsonAsync<ProjectEditDto>(
-                $"http://{serverBase}/api/projects/edit/{editToken}");
+            var url = !string.IsNullOrEmpty(cloudApiUrl)
+                ? $"{cloudApiUrl}/api/public/projects/edit/{editToken}"
+                : $"http://{serverBase}/api/projects/edit/{editToken}";
+
+            return await _http.GetFromJsonAsync<ProjectEditDto>(url);
         }
         catch { return null; }
     }
 
     public async Task<(bool Success, string? Error)> UpdateProjectAsync(
-        string serverBase, string editToken, UpdateProjectRequest request)
+        string? serverBase, string editToken, UpdateProjectRequest request, string? cloudApiUrl = null)
     {
         try
         {
-            var response = await _http.PutAsJsonAsync(
-                $"http://{serverBase}/api/projects/edit/{editToken}", request);
+            var url = !string.IsNullOrEmpty(cloudApiUrl)
+                ? $"{cloudApiUrl}/api/public/projects/edit/{editToken}"
+                : $"http://{serverBase}/api/projects/edit/{editToken}";
+
+            var response = await _http.PutAsJsonAsync(url, request);
 
             if (response.IsSuccessStatusCode) return (true, null);
             if ((int)response.StatusCode == 410) return (false, "event_closed");

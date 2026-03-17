@@ -74,6 +74,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 
 // ── Endpoints ─────────────────────────────────────────────────────────────
 AuthEndpoints.Map(app);
+PublicEndpoints.Map(app);
 SyncEndpoints.Map(app);
 MediaEndpoints.Map(app);
 ResultsEndpoints.Map(app);

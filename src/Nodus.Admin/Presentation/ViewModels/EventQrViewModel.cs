@@ -106,7 +106,11 @@ public sealed partial class EventQrViewModel : BaseViewModel
         {
             byte[]? accessPng = null;
             byte[]? studentPng = null;
-            var registerUrl = $"https://project-kiosko-v2.vercel.app/register?server={serverLocalUrl}";
+
+            // Updated URL to use Cloud API to bypass Mixed Content on Vercel
+            var cloudApi = "https://nodusapi-nhsm2zm5.b4a.run";
+            var cloudEventId = $"EVT-{EventId:D3}"; // e.g. EVT-001
+            var registerUrl = $"https://project-kiosko-v2.vercel.app/register?event={cloudEventId}&cloudApi={cloudApi}";
 
             await Task.Run(() =>
             {

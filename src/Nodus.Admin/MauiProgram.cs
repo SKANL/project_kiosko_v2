@@ -10,6 +10,7 @@ using Nodus.Admin.Infrastructure.Crypto;
 using Nodus.Admin.Infrastructure.Export;
 using Nodus.Admin.Infrastructure.Http;
 using Nodus.Admin.Infrastructure.Persistence;
+using Nodus.Admin.Infrastructure.Services;
 using Nodus.Admin.Infrastructure.Settings;
 using Nodus.Admin.Presentation.ViewModels;
 using Nodus.Admin.Presentation.Views;
@@ -69,6 +70,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<VoteProcessingService>();
         builder.Services.AddSingleton<IBackupService, BackupService>();
         builder.Services.AddSingleton<ILocalHttpServerService, LocalHttpServerService>();
+        builder.Services.AddSingleton<ICloudSyncService, CloudSyncService>();
 
         // ── Use Cases ────────────────────────────────────────────────────
         builder.Services.AddTransient<BuildBootstrapPayloadUseCase>();

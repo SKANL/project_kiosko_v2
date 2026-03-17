@@ -128,8 +128,9 @@ else
 
 @code {
     // ── Query params ──────────────────────────────────────────────────────
-    [SupplyParameterFromQuery(Name = "event")]  public string? EventId    { get; set; }
-    [SupplyParameterFromQuery(Name = "server")] public string? ServerBase { get; set; }
+    [SupplyParameterFromQuery(Name = "event")]    public string? EventId    { get; set; }
+    [SupplyParameterFromQuery(Name = "server")]   public string? ServerBase { get; set; }
+    [SupplyParameterFromQuery(Name = "cloudApi")] public string? CloudApi   { get; set; }
 
     // ── State ─────────────────────────────────────────────────────────────
     private EventInfoDto?            _eventInfo;
@@ -157,19 +158,22 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        if (string.IsNullOrWhiteSpace(ServerBase))
+        if (string.IsNullOrWhiteSpace(ServerBase) && string.IsNullOrWhiteSpace(EventId))
         {
             _serverError = true;
-            _errorDetail = "El parámetro 'server' no está en la URL. Escanea el QR de registro generado por el organizador.";
+            _errorDetail = "Faltan parámetros en la URL. Escanea el QR de registro generado por el organizador.";
             _loading = false;
             return;
         }
 
-        _eventInfo = await Api.GetCurrentEventAsync(ServerBase);
+        // Si hay cloudApi, serverBase actúa como el eventId si EventId es nulo
+        var effectiveEventId = EventId ?? ServerBase;
+        
+        _eventInfo = await Api.GetCurrentEventAsync(effectiveEventId, CloudApi);
         if (_eventInfo is null)
         {
             _serverError = true;
-            _errorDetail = $"No se pudo obtener información del evento desde {ServerBase}.";
+            _errorDetail = $"No se pudo obtener información del evento {(string.IsNullOrEmpty(CloudApi) ? "desde " + ServerBase : "desde la nube")}.";
         }
         _loading = false;
     }
@@ -200,7 +204,7 @@ else
             TeamMembers = string.IsNullOrWhiteSpace(_members)     ? null : _members.Trim()
         };
 
-        var (response, error) = await Api.RegisterProjectAsync(ServerBase!, request);
+        var (response, error) = await Api.RegisterProjectAsync(ServerBase, request, CloudApi);
 
         _submitting = false;
 
