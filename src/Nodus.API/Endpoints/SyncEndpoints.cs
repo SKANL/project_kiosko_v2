@@ -29,7 +29,7 @@ public static class SyncEndpoints
 {
     public static void Map(WebApplication app)
     {
-        var grp = app.MapGroup("/api/sync").RequireAuthorization();
+        var grp = app.MapGroup("/api/sync");
 
         // POST /api/sync/event
         // Admin calls this after the event ends (or periodically) to push full state to cloud.

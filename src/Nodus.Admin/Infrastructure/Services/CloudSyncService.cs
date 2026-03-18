@@ -78,9 +78,21 @@ public sealed class CloudSyncService : ICloudSyncService
             // For now, let's assume the Cloud API has a dedicated internal sync endpoint or use the public one if allowed.
             // Since we want the Admin to "Push", we'll use a simplified POST.
             
-            await _http.PostAsJsonAsync($"{_cloudApiUrl}/api/sync/event", new { Event = payload, Projects = new List<object>(), Judges = new List<object>() });
+            var response = await _http.PostAsJsonAsync($"{_cloudApiUrl}/api/sync/event", new { Event = payload, Projects = new List<object>(), Judges = new List<object>() });
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[CloudSync] Event {cloudEventId} pushed successfully to cloud.");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"[CloudSync] Failed to push event {cloudEventId}. Status: {response.StatusCode}, Error: {error}");
+            }
         }
-        catch { /* Ignore */ }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[CloudSync] Exception during push: {ex.Message}");
+        }
     }
 
     private async Task PullNewRegistrationsAsync()

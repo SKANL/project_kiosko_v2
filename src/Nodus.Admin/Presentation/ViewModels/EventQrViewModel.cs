@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Nodus.Admin.Application.Interfaces.Persistence;
+using Nodus.Admin.Application.Interfaces.Services;
 using Nodus.Admin.Domain.Entities;
 using Nodus.Admin.Infrastructure.Http;
 using QRCoder;
@@ -13,12 +14,23 @@ public sealed partial class EventQrViewModel : BaseViewModel
 {
     private readonly IEventRepository _events;
     private readonly ILocalHttpServerService _server;
+    private readonly ICloudSyncService _cloudSync;
 
-    public EventQrViewModel(IEventRepository events, ILocalHttpServerService server)
+    public EventQrViewModel(IEventRepository events, ILocalHttpServerService server, ICloudSyncService cloudSync)
     {
         _events = events;
         _server = server;
+        _cloudSync = cloudSync;
         Title = "Códigos QR";
+    }
+
+    [RelayCommand]
+    public async Task RefreshQrAsync()
+    {
+        IsBusy = true;
+        await _cloudSync.PushActiveEventAsync(EventId);
+        await LoadDataAsync();
+        IsBusy = false;
     }
 
     [ObservableProperty]
