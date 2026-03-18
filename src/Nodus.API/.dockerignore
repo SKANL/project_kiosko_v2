@@ -1,0 +1,10 @@
+** [Oo]bj/
+** [Bb]in/
+.git/
+.vs/
+.vscode/
+*.user
+*.suo
+node_modules/
+docker-compose*
+**/Properties/launchSettings.json
