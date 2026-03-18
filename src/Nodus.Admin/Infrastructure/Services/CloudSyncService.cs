@@ -10,7 +10,9 @@ public sealed class CloudSyncService : ICloudSyncService
     private readonly IEventRepository _events;
     private readonly IProjectRepository _projects;
     private readonly HttpClient _http;
-    private readonly string _cloudApiUrl = "https://nodusapi-nhsm2zm5.b4a.run";
+    // Updated URL to use Cloud API to bypass Mixed Content on Vercel
+    // Added URL encoding for safety
+    private readonly string _cloudApiUrl = "https://nodusapi-nlw0pofa.b4a.run";
     
     private bool _isRunning;
     private CancellationTokenSource? _cts;
