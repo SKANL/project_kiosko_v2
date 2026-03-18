@@ -11,6 +11,12 @@ Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ── JSON Configuration ──────────────────────────────────────────────────
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.PropertyNameCaseInsensitive = true;
+});
+
 // ── MongoDB ─────────────────────────────────────────────────────────────
 builder.Services.AddSingleton<MongoDbService>();
 builder.Services.AddSingleton<IMongoDatabase>(sp =>

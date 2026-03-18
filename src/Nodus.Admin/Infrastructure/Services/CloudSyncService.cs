@@ -14,6 +14,28 @@ public sealed class CloudSyncService : ICloudSyncService
     // Added URL encoding for safety
     private readonly string _cloudApiUrl = "https://nodusapi-nlw0pofa.b4a.run";
     
+    // ── DTOs for Cloud Sync ───────────────────────────────────────────────
+    private sealed class CloudEventDto
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Institution { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string RubricJson { get; set; } = string.Empty;
+        public int RubricVersion { get; set; } = 1;
+        public int MaxProjects { get; set; } = 100;
+        public string[] Categories { get; set; } = [];
+        public DateTime? FinishedAt { get; set; }
+        public DateTime SyncedAtUtc { get; set; } = DateTime.UtcNow;
+    }
+
+    private sealed class SyncEventRequestDto
+    {
+        public CloudEventDto Event { get; set; } = new();
+        public List<object> Projects { get; set; } = new();
+        public List<object> Judges { get; set; } = new();
+    }
+    
     private bool _isRunning;
     private CancellationTokenSource? _cts;
 
@@ -64,7 +86,7 @@ public sealed class CloudSyncService : ICloudSyncService
             var evt = eventResult.Value;
             var cloudEventId = $"EVT-{evt.Id:D3}";
 
-            var payload = new
+            var payload = new CloudEventDto
             {
                 Id = cloudEventId,
                 Name = evt.Name,
@@ -74,11 +96,19 @@ public sealed class CloudSyncService : ICloudSyncService
                 MaxProjects = evt.MaxProjects,
                 RubricJson = evt.RubricJson,
                 RubricVersion = evt.RubricVersion,
-                FinishedAt = string.IsNullOrEmpty(evt.FinishedAt) ? (DateTime?)null : DateTime.Parse(evt.FinishedAt)
+                FinishedAt = string.IsNullOrEmpty(evt.FinishedAt) ? (DateTime?)null : DateTime.Parse(evt.FinishedAt),
+                SyncedAtUtc = DateTime.UtcNow
+            };
+
+            var syncRequest = new SyncEventRequestDto
+            {
+                Event = payload,
+                Projects = new List<object>(),
+                Judges = new List<object>()
             };
 
             var syncUrl = $"{_cloudApiUrl}/api/sync/event";
-            var response = await _http.PostAsJsonAsync(syncUrl, new { Event = payload, Projects = new List<object>(), Judges = new List<object>() });
+            var response = await _http.PostAsJsonAsync(syncUrl, syncRequest);
             
             if (response.IsSuccessStatusCode)
             {
