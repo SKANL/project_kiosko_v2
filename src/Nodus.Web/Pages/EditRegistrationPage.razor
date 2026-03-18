@@ -104,8 +104,9 @@ else if (_project is not null)
 }
 
 @code {
-    [SupplyParameterFromQuery(Name = "token")]  public string? Token      { get; set; }
-    [SupplyParameterFromQuery(Name = "server")] public string? ServerBase { get; set; }
+    [SupplyParameterFromQuery(Name = "token")]    public string? Token      { get; set; }
+    [SupplyParameterFromQuery(Name = "server")]   public string? ServerBase { get; set; }
+    [SupplyParameterFromQuery(Name = "cloudApi")] public string? CloudApi   { get; set; }
 
     private ProjectEditDto? _project;
     private bool _loading = true;
@@ -125,14 +126,14 @@ else if (_project is not null)
 
     protected override async Task OnInitializedAsync()
     {
-        if (string.IsNullOrWhiteSpace(Token) || string.IsNullOrWhiteSpace(ServerBase))
+        if (string.IsNullOrWhiteSpace(Token) || (string.IsNullOrWhiteSpace(ServerBase) && string.IsNullOrWhiteSpace(CloudApi)))
         {
             _tokenInvalid = true;
             _loading = false;
             return;
         }
 
-        _project = await Api.GetProjectForEditAsync(ServerBase, Token);
+        _project = await Api.GetProjectForEditAsync(ServerBase, Token, CloudApi);
         if (_project is null) { _tokenInvalid = true; _loading = false; return; }
         if (!_project.IsEventOpen) { _eventClosed = true; _loading = false; return; }
 
@@ -153,14 +154,14 @@ else if (_project is not null)
         _saving = true;
         _submitError = string.Empty;
 
-        var (ok, error) = await Api.UpdateProjectAsync(ServerBase!, Token!, new UpdateProjectRequest
+        var (ok, error) = await Api.UpdateProjectAsync(ServerBase, Token!, new UpdateProjectRequest
         {
             Name        = _name.Trim(),
             Category    = _category.Trim(),
             Description = string.IsNullOrWhiteSpace(_description) ? null : _description.Trim(),
             GithubLink  = string.IsNullOrWhiteSpace(_github)      ? null : _github.Trim(),
             TeamMembers = string.IsNullOrWhiteSpace(_members)     ? null : _members.Trim()
-        });
+        }, CloudApi);
 
         _saving = false;
 
