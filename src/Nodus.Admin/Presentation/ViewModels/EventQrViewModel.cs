@@ -28,7 +28,20 @@ public sealed partial class EventQrViewModel : BaseViewModel
     public async Task RefreshQrAsync()
     {
         IsBusy = true;
-        await _cloudSync.PushActiveEventAsync(EventId);
+        var success = await _cloudSync.PushActiveEventAsync(EventId);
+        
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            if (success)
+            {
+                await Shell.Current.DisplayAlert("Configuración en la Nube", "El evento se ha configurado correctamente en la nube. Los estudiantes ya pueden registrarse.", "OK");
+            }
+            else
+            {
+                await Shell.Current.DisplayAlert("Error", "No se pudo sincronizar el evento con la nube. Asegúrate de tener conexión a Internet.", "OK");
+            }
+        });
+
         await LoadDataAsync();
         IsBusy = false;
     }

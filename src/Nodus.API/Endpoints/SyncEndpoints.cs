@@ -68,7 +68,8 @@ public static class SyncEndpoints
         .WithName("SyncEvent")
         .WithSummary("Admin: push full event state to cloud (MongoDB).")
         .Produces<SyncEventResponse>()
-        .ProducesProblem(401);
+        .ProducesProblem(401)
+        .AllowAnonymous();
 
         // POST /api/sync/votes
         // Admin calls this in batches to push received votes to cloud.
@@ -105,6 +106,7 @@ public static class SyncEndpoints
         .WithName("SyncVotes")
         .WithSummary("Admin: push batch of votes to cloud. Latest Version Wins (Decision #34).")
         .Produces<SyncVotesResponse>()
-        .ProducesProblem(401);
+        .ProducesProblem(401)
+        .AllowAnonymous();
     }
 }

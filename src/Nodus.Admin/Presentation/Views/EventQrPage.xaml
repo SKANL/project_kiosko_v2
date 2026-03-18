@@ -19,7 +19,7 @@
                 
                 <Button Text="Regenerar QRs" 
                         Command="{Binding RefreshQrCommand}" 
-                        Style="{StaticResource ButtonSecondary}"
+                        Style="{StaticResource SecondaryButton}"
                         HeightRequest="40"
                         Padding="16,0" />
             </HorizontalStackLayout>

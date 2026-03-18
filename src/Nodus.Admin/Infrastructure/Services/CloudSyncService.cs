@@ -51,12 +51,12 @@ public sealed class CloudSyncService : ICloudSyncService
         _cts?.Cancel();
     }
 
-    public async Task PushActiveEventAsync(int eventId)
+    public async Task<bool> PushActiveEventAsync(int eventId)
     {
         try
         {
             var eventResult = await _events.GetByIdAsync(eventId);
-            if (eventResult.IsFail || eventResult.Value is null) return;
+            if (eventResult.IsFail || eventResult.Value is null) return false;
 
             var evt = eventResult.Value;
             var cloudEventId = $"EVT-{evt.Id:D3}";
@@ -74,24 +74,23 @@ public sealed class CloudSyncService : ICloudSyncService
                 FinishedAt = string.IsNullOrEmpty(evt.FinishedAt) ? (DateTime?)null : DateTime.Parse(evt.FinishedAt)
             };
 
-            // Using the SyncEndpoints structure (no JWT for this simplified public simulation or if using a public key)
-            // For now, let's assume the Cloud API has a dedicated internal sync endpoint or use the public one if allowed.
-            // Since we want the Admin to "Push", we'll use a simplified POST.
-            
             var response = await _http.PostAsJsonAsync($"{_cloudApiUrl}/api/sync/event", new { Event = payload, Projects = new List<object>(), Judges = new List<object>() });
             if (response.IsSuccessStatusCode)
             {
                 Console.WriteLine($"[CloudSync] Event {cloudEventId} pushed successfully to cloud.");
+                return true;
             }
             else
             {
                 var error = await response.Content.ReadAsStringAsync();
                 Console.WriteLine($"[CloudSync] Failed to push event {cloudEventId}. Status: {response.StatusCode}, Error: {error}");
+                return false;
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"[CloudSync] Exception during push: {ex.Message}");
+            return false;
         }
     }
 
