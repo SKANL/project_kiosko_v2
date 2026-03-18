@@ -108,9 +108,13 @@ public sealed partial class EventQrViewModel : BaseViewModel
             byte[]? studentPng = null;
 
             // Updated URL to use Cloud API to bypass Mixed Content on Vercel
+            // Added URL encoding for safety
             var cloudApi = "https://nodusapi-nhsm2zm5.b4a.run";
             var cloudEventId = $"EVT-{EventId:D3}"; // e.g. EVT-001
-            var registerUrl = $"https://project-kiosko-v2.vercel.app/register?event={cloudEventId}&cloudApi={cloudApi}";
+            var encodedApi = Uri.EscapeDataString(cloudApi);
+            var encodedEvt = Uri.EscapeDataString(cloudEventId);
+            
+            var registerUrl = $"https://project-kiosko-v2.vercel.app/register?event={encodedEvt}&cloudApi={encodedApi}";
 
             await Task.Run(() =>
             {
