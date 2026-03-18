@@ -53,12 +53,13 @@ public sealed class CloudSyncService : ICloudSyncService
         _cts?.Cancel();
     }
 
-    public async Task<bool> PushActiveEventAsync(int eventId)
+    public async Task<(bool Success, string? Error)> PushActiveEventAsync(int eventId)
     {
         try
         {
             var eventResult = await _events.GetByIdAsync(eventId);
-            if (eventResult.IsFail || eventResult.Value is null) return false;
+            if (eventResult.IsFail || eventResult.Value is null) 
+                return (false, eventResult.Error ?? "Evento local no encontrado.");
 
             var evt = eventResult.Value;
             var cloudEventId = $"EVT-{evt.Id:D3}";
@@ -76,23 +77,24 @@ public sealed class CloudSyncService : ICloudSyncService
                 FinishedAt = string.IsNullOrEmpty(evt.FinishedAt) ? (DateTime?)null : DateTime.Parse(evt.FinishedAt)
             };
 
-            var response = await _http.PostAsJsonAsync($"{_cloudApiUrl}/api/sync/event", new { Event = payload, Projects = new List<object>(), Judges = new List<object>() });
+            var syncUrl = $"{_cloudApiUrl}/api/sync/event";
+            var response = await _http.PostAsJsonAsync(syncUrl, new { Event = payload, Projects = new List<object>(), Judges = new List<object>() });
+            
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine($"[CloudSync] Event {cloudEventId} pushed successfully to cloud.");
-                return true;
+                return (true, null);
             }
             else
             {
                 var error = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"[CloudSync] Failed to push event {cloudEventId}. Status: {response.StatusCode}, Error: {error}");
-                return false;
+                var msg = $"Error API ({(int)response.StatusCode}): {error}";
+                if (string.IsNullOrEmpty(error)) msg = $"Error API ({(int)response.StatusCode}) en {syncUrl}";
+                return (false, msg);
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[CloudSync] Exception during push: {ex.Message}");
-            return false;
+            return (false, $"Error de conexión: {ex.Message}");
         }
     }
 

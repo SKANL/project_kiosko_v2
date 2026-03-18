@@ -29,6 +29,7 @@ COPY --from=build /app/publish .
 
 # Environment variables for production
 ENV ASPNETCORE_ENVIRONMENT=Production
+ENV ASPNETCORE_URLS=http://0.0.0.0:8080
 ENV DOTNET_PRINT_TELEMETRY_MESSAGE=false
 
 # Entry point for the application

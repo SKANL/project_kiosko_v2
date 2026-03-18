@@ -18,6 +18,7 @@ public interface ICloudSyncService
 
     /// <summary>
     /// Forces a push of the current active event data to the Cloud API.
+    /// Returns (success, errorMessage)
     /// </summary>
-    Task<bool> PushActiveEventAsync(int eventId);
+    Task<(bool Success, string? Error)> PushActiveEventAsync(int eventId);
 }

@@ -28,7 +28,7 @@ public sealed partial class EventQrViewModel : BaseViewModel
     public async Task RefreshQrAsync()
     {
         IsBusy = true;
-        var success = await _cloudSync.PushActiveEventAsync(EventId);
+        var (success, error) = await _cloudSync.PushActiveEventAsync(EventId);
         
         await MainThread.InvokeOnMainThreadAsync(async () =>
         {
@@ -38,7 +38,7 @@ public sealed partial class EventQrViewModel : BaseViewModel
             }
             else
             {
-                await Shell.Current.DisplayAlert("Error", "No se pudo sincronizar el evento con la nube. Asegúrate de tener conexión a Internet.", "OK");
+                await Shell.Current.DisplayAlert("Error de Sincronización", error ?? "No se pudo sincronizar el evento con la nube.", "OK");
             }
         });
 
