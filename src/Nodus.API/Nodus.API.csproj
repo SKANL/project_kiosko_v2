@@ -10,14 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Official MongoDB .NET driver -->
-    <PackageReference Include="DotNetEnv" Version="3.1.1" />
-    <PackageReference Include="MongoDB.Driver" Version="3.4.0" />
-    <!-- JWT bearer authentication -->
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0-preview.*" />
-    <!-- Swagger / OpenAPI for endpoint docs -->
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0-preview.*" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.6.0" />
+    <None Update=".env">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

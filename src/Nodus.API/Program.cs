@@ -72,6 +72,10 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     });
 }
 
+// ── Diagnostic Endpoints ──────────────────────────────────────────────────
+app.MapGet("/", () => $"Nodus API is alive at {DateTime.UtcNow} UTC");
+app.MapGet("/ping", () => "pong");
+
 // ── Endpoints ─────────────────────────────────────────────────────────────
 AuthEndpoints.Map(app);
 PublicEndpoints.Map(app);
@@ -83,6 +87,14 @@ ResultsEndpoints.Map(app);
 app.MapGet("/health", () => Results.Ok(new { status = "ok", utc = DateTime.UtcNow }))
    .AllowAnonymous()
    .WithName("HealthCheck")
-   .WithSummary("Returns 200 OK — used by Render health checks.");
+   .WithSummary("Returns 200 OK — used by Render/Back4App health checks.");
+
+// ── Fallback Logging ──────────────────────────────────────────────────────
+app.MapFallback(async context =>
+{
+    Console.WriteLine($"[404 DEBUG] {context.Request.Method} {context.Request.Path}");
+    context.Response.StatusCode = 404;
+    await context.Response.WriteAsync($"Nodus API: Route '{context.Request.Path}' not found.");
+});
 
 app.Run();
