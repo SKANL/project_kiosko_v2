@@ -60,12 +60,20 @@ public partial class OnboardingPage : ContentPage
             return;
 
         _accessQrLocked = true;
-        MainThread.BeginInvokeOnMainThread(() =>
+        MainThread.BeginInvokeOnMainThread(async () =>
         {
             if (!_isPageActive)
                 return;
 
+            HapticFeedback.Default.Perform(HapticFeedbackType.Click);
             _vm.AcceptAccessQrCommand.Execute(value);
+            
+            // Automatically trigger connection confirmation for a smoother flow
+            if (_vm.ConfirmConnectionCommand.CanExecute(null))
+            {
+                await _vm.ConfirmConnectionCommand.ExecuteAsync(null);
+            }
+
             // Keep scanner paused after a successful read to avoid camera pressure
             // while BLE onboarding requests are executed.
             AccessQrScanner.IsDetecting = false;

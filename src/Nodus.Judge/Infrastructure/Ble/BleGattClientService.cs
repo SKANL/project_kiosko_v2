@@ -174,9 +174,10 @@ public sealed class BleGattClientService : IBleGattClientService, IDisposable
             if (payload.Length <= maxPayloadSize + 7 && payload[0] != NodusPrefix.ChunkedPayload)
             {
                 await _peripheral
-                    .WriteCharacteristic(NodusGatt.MainServiceUuid, NodusGatt.DataWriteCharUuid, payload, withResponse: true)
+                    .WriteCharacteristic(NodusGatt.MainServiceUuid, NodusGatt.DataWriteCharUuid, payload, withResponse: false)
                     .Timeout(TimeSpan.FromSeconds(10))
                     .DefaultIfEmpty()
+
                     .FirstAsync();
                 return Result.Ok();
             }
@@ -199,7 +200,7 @@ public sealed class BleGattClientService : IBleGattClientService, IDisposable
                 Buffer.BlockCopy(payload, offset, chunk, 7, len);
 
                 await _peripheral
-                    .WriteCharacteristic(NodusGatt.MainServiceUuid, NodusGatt.DataWriteCharUuid, chunk, withResponse: true)
+                    .WriteCharacteristic(NodusGatt.MainServiceUuid, NodusGatt.DataWriteCharUuid, chunk, withResponse: false)
                     .Timeout(TimeSpan.FromSeconds(5))
                     .DefaultIfEmpty()
                     .FirstAsync();

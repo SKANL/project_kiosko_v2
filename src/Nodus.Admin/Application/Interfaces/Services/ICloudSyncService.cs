@@ -17,6 +17,11 @@ public interface ICloudSyncService
     void Stop();
 
     /// <summary>
+    /// The Cloud API base URL currently configured (read from AppSettings).
+    /// </summary>
+    string CloudApiUrl { get; }
+
+    /// <summary>
     /// Forces a push of the current active event data to the Cloud API.
     /// Returns (success, errorMessage)
     /// </summary>

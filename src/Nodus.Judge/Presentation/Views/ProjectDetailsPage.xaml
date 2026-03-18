@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Nodus.Judge.Presentation.Views.ProjectDetailsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:Nodus.Judge.Presentation.ViewModels"
+    x:DataType="vm:ProjectDetailsViewModel"
+    Title="{Binding Project.Name}"
+    BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <ContentPage.Resources>
+        <toolkit:IsStringNotNullOrWhiteSpaceConverter x:Key="StringNotEmptyConverter" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="*,Auto" Padding="24">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Spacing="24">
+                
+                <!-- Header Section -->
+                <VerticalStackLayout Spacing="8">
+                    <Label Style="{StaticResource LargeTitle}" 
+                           Text="{Binding Project.Name}" 
+                           LineBreakMode="WordWrap" />
+                    
+                    <HorizontalStackLayout Spacing="10">
+                        <Border Style="{StaticResource BadgeInfo}">
+                            <Label Text="{Binding Project.Category}" 
+                                   Style="{StaticResource Caption1}" 
+                                   TextColor="{StaticResource NodusAccent}" 
+                                   FontAttributes="Bold" />
+                        </Border>
+                        <Border Style="{StaticResource BadgeWarning}" IsVisible="{Binding Project.StandNumber, Converter={StaticResource StringNotEmptyConverter}}">
+                            <Label Text="{Binding Project.StandNumber, StringFormat='Stand {0}'}" 
+                                   Style="{StaticResource Caption1}" 
+                                   TextColor="{StaticResource NodusWarning}" 
+                                   FontAttributes="Bold" />
+                        </Border>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- Status Card if Voted -->
+                <Border Style="{StaticResource Card}" IsVisible="{Binding IsAlreadyVoted}" BackgroundColor="{StaticResource NodusSuccess}">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <VerticalStackLayout Grid.Column="0">
+                            <Label Text="Ya evaluado" Style="{StaticResource Headline}" TextColor="White" />
+                            <Label Text="Puedes volver a evaluar para actualizar la nota." Style="{StaticResource Footnote}" TextColor="White" Opacity="0.9" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="1" Text="{Binding PreviousScore}" Style="{StaticResource Title1}" TextColor="White" VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Description -->
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="SOBRE EL PROYECTO" Style="{StaticResource SectionHeader}" Margin="0" />
+                    <Label Text="{Binding Project.Description}" Style="{StaticResource Body}" />
+                </VerticalStackLayout>
+
+                <!-- Team -->
+                <VerticalStackLayout Spacing="8" IsVisible="{Binding Project.TeamMembers, Converter={StaticResource StringNotEmptyConverter}}">
+                    <Label Text="EQUIPO" Style="{StaticResource SectionHeader}" Margin="0" />
+                    <Label Text="{Binding Project.TeamMembers}" Style="{StaticResource Body}" />
+                </VerticalStackLayout>
+
+                <!-- Links Section -->
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="RECURSOS" Style="{StaticResource SectionHeader}" Margin="0" 
+                           IsVisible="{Binding Project.GithubLink, Converter={StaticResource StringNotEmptyConverter}}" />
+                    
+                    <Button Text="Ver Código en GitHub" 
+                            IsVisible="{Binding Project.GithubLink, Converter={StaticResource StringNotEmptyConverter}}"
+                            Command="{Binding OpenGithubCommand}"
+                            Style="{StaticResource GhostButton}"
+                            HorizontalOptions="Start" />
+
+                    <Button Text="Ver Video del Pitch" 
+                            IsVisible="{Binding Project.VideoLink, Converter={StaticResource StringNotEmptyConverter}}"
+                            Command="{Binding OpenVideoCommand}"
+                            Style="{StaticResource GhostButton}"
+                            HorizontalOptions="Start" />
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Action Button -->
+        <VerticalStackLayout Grid.Row="1" Padding="0,16,0,0" Spacing="12">
+            <Button Text="Evaluar Proyecto" 
+                    Style="{StaticResource PrimaryButton}" 
+                    Command="{Binding EvaluateCommand}" />
+            <Button Text="Volver a la lista" 
+                    Style="{StaticResource GhostButton}" 
+                    Command="{Binding BackCommand}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

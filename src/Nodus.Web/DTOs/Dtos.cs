@@ -24,6 +24,7 @@ public sealed class RegisterProjectRequest
     public string Category   { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? GithubLink  { get; set; }
+    public string? VideoLink   { get; set; }
     public string? TeamMembers { get; set; }
 }
 
@@ -49,6 +50,7 @@ public sealed record ProjectEditDto(
     string Category,
     string? Description,
     string? GithubLink,
+    string? VideoLink,
     string? TeamMembers,
     bool   IsEventOpen);
 
@@ -61,5 +63,6 @@ public sealed class UpdateProjectRequest
     public string  Category    { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? GithubLink  { get; set; }
+    public string? VideoLink   { get; set; }
     public string? TeamMembers { get; set; }
 }

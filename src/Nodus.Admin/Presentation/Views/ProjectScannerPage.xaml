@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Nodus.Admin.Presentation.Views.ProjectScannerPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+    xmlns:vm="clr-namespace:Nodus.Admin.Presentation.ViewModels"
+    x:DataType="vm:ProjectScannerViewModel"
+    Title="Escanear Registro de Estudiante"
+    BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="24" RowSpacing="20">
+        <!-- Summary / Status -->
+        <Border Grid.Row="0" Style="{StaticResource PremiumCard}">
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Registro Rápido mediante QR" Style="{StaticResource Title2}" />
+                <Label Text="Apunta la cámara al pase de abordar del estudiante (el QR grande)." 
+                       Style="{StaticResource Footnote}" 
+                       TextColor="{StaticResource NodusSecondaryLabel}" />
+                
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" 
+                                   Color="{StaticResource NodusAccent}" HeightRequest="20" HorizontalOptions="Start" />
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Scanner View -->
+        <Border Grid.Row="1" Style="{StaticResource Card}" Padding="0" VerticalOptions="Fill" HorizontalOptions="Fill">
+            <zxing:CameraBarcodeReaderView x:Name="ProjectQrScanner"
+                                            BarcodesDetected="OnBarcodeDetected"
+                                            HeightRequest="480" />
+        </Border>
+
+        <!-- Footer -->
+        <Grid Grid.Row="2" ColumnDefinitions="*, Auto" ColumnSpacing="12">
+            <Label Text="{Binding StatusMessage}" VerticalOptions="Center" 
+                   Style="{StaticResource Caption1}" TextColor="{Binding StatusColor}" />
+            
+            <Button Grid.Column="1" Text="Cancelar" 
+                    Command="{Binding CancelCommand}"
+                    Style="{StaticResource GhostButton}" WidthRequest="120" />
+        </Grid>
+    </Grid>
+</ContentPage>

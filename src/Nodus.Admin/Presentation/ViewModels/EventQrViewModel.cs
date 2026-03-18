@@ -121,20 +121,18 @@ public sealed partial class EventQrViewModel : BaseViewModel
             var evt = eventResult.Value!;
             EventName = evt.Name;
 
-            await Task.Run(() => GenerateQrCodes(evt.AccessQrPayload, _server.LocalUrl));
+            await Task.Run(() => GenerateQrCodes(evt.AccessQrPayload, _server.LocalUrl, _cloudSync.CloudApiUrl));
         });
     }
 
-    private async Task GenerateQrCodes(string judgeAccessPayload, string serverLocalUrl)
+    private async Task GenerateQrCodes(string judgeAccessPayload, string serverLocalUrl, string cloudApi)
     {
         try
         {
             byte[]? accessPng = null;
             byte[]? studentPng = null;
 
-            // Updated URL to use Cloud API to bypass Mixed Content on Vercel
-            // Added URL encoding for safety
-            var cloudApi = "https://nodusapi-nlw0pofa.b4a.run";
+            // URL encoding for safety
             var cloudEventId = $"EVT-{EventId:D3}"; // e.g. EVT-001
             var encodedApi = Uri.EscapeDataString(cloudApi);
             var encodedEvt = Uri.EscapeDataString(cloudEventId);

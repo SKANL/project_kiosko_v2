@@ -70,6 +70,9 @@
 		<PackageReference Include="BouncyCastle.Cryptography" Version="2.4.0" />
 		<!-- QR code generation for project stand printouts -->
 		<PackageReference Include="QRCoder" Version="1.6.0" />
+		<!-- QR code scanner: reads Project Display QR -->
+		<PackageReference Include="ZXing.Net.Maui" Version="0.4.0" />
+		<PackageReference Include="ZXing.Net.Maui.Controls" Version="0.4.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<!-- ASP.NET Core / Kestrel embedded HTTP server (serves Nodus.Web static files on port 5000, Decision #52) -->

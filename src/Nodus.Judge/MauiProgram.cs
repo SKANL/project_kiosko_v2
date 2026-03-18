@@ -75,10 +75,12 @@ public static class MauiProgram
         builder.Services.AddTransient<SyncViewModel>();
         builder.Services.AddTransient<SettingsViewModel>();
         builder.Services.AddTransient<MyVotesViewModel>();
+        builder.Services.AddTransient<ProjectDetailsViewModel>();
 
         builder.Services.AddTransient<OnboardingPage>();
         builder.Services.AddTransient<VotingPage>();
         builder.Services.AddTransient<ProjectSelectionPage>();
+        builder.Services.AddTransient<ProjectDetailsPage>();
         builder.Services.AddTransient<ProjectScannerPage>();
         builder.Services.AddTransient<SyncPage>();
         builder.Services.AddTransient<SettingsPage>();

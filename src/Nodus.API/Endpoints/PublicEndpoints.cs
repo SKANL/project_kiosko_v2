@@ -8,7 +8,7 @@ public static class PublicEndpoints
 {
     public static void Map(WebApplication app)
     {
-        var grp = app.MapGroup("/api/public");
+        var grp = app.MapGroup("/api/public").RequireCors("AllowAll");
 
         // GET /api/public/event/{id}
         // Web App calls this to check if event exists and is open
@@ -98,6 +98,14 @@ public static class PublicEndpoints
             await mongo.Projects.ReplaceOneAsync(Builders<ProjectDocument>.Filter.Eq(p => p.Id, existing.Id), existing);
 
             return Results.NoContent();
+        });
+
+        // GET /api/public/projects/{pid}
+        grp.MapGet("/projects/{pid}", async (string pid, MongoDbService mongo) =>
+        {
+            var project = await mongo.Projects.Find(Builders<ProjectDocument>.Filter.Eq(p => p.Id, pid)).FirstOrDefaultAsync();
+            if (project is null) return Results.NotFound();
+            return Results.Ok(project);
         });
         
         // GET /api/public/projects?eventId={eventId}

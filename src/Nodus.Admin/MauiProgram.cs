@@ -15,6 +15,7 @@ using Nodus.Admin.Infrastructure.Settings;
 using Nodus.Admin.Presentation.ViewModels;
 using Nodus.Admin.Presentation.Views;
 using Shiny;
+using ZXing.Net.Maui.Controls;
 
 namespace Nodus.Admin;
 
@@ -40,6 +41,7 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseShiny()
+            .UseBarcodeReader()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -89,6 +91,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ResultsViewModel>();
         builder.Services.AddTransient<ManageProjectsViewModel>();
         builder.Services.AddTransient<ManageJudgesViewModel>();
+        builder.Services.AddTransient<ProjectScannerViewModel>();
 
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddTransient<EventSetupPage>();
@@ -98,6 +101,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ResultsPage>();
         builder.Services.AddTransient<ManageProjectsPage>();
         builder.Services.AddTransient<ManageJudgesPage>();
+        builder.Services.AddTransient<ProjectScannerPage>();
         builder.Services.AddSingleton<AppShell>();
 
 #if DEBUG

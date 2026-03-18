@@ -28,5 +28,8 @@ public class LocalProject
     /// <summary>Optional link to source code.</summary>
     public string GithubLink { get; set; } = string.Empty;
 
+    /// <summary>Optional link to a pitch video.</summary>
+    public string VideoLink  { get; set; } = string.Empty;
+
     public string SyncedAt    { get; set; } = DateTime.UtcNow.ToString("O");
 }

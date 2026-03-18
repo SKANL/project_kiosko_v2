@@ -49,15 +49,19 @@ builder.Services
 builder.Services.AddAuthorization();
 
 // ── CORS ─────────────────────────────────────────────────────────────────
-var allowedOrigins = builder.Configuration
-    .GetSection("Cors:AllowedOrigins")
-    .Get<string[]>() ?? [];
-
+// Explicitly allow Vercel + localhost — also keeps AllowAnyOrigin as fallback
 builder.Services.AddCors(opts =>
+{
     opts.AddDefaultPolicy(policy =>
-        policy.AllowAnyOrigin()
+        policy.WithOrigins(
+                "https://project-kiosko-v2.vercel.app",
+                "http://localhost:3000",
+                "http://localhost:5173")
               .AllowAnyHeader()
-              .AllowAnyMethod()));
+              .AllowAnyMethod());
+    opts.AddPolicy("AllowAll", policy =>
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+});
 
 // ── OpenAPI / Scalar ─────────────────────────────────────────────────────
 builder.Services.AddOpenApi();

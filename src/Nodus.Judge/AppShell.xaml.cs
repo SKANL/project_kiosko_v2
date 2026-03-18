@@ -12,9 +12,9 @@ public partial class AppShell : Shell
 		_settings = settings;
 		InitializeComponent();
 
-		// OnboardingPage is NOT a tab — it is a modal wizard pushed over the tab bar.
 		Routing.RegisterRoute(nameof(OnboardingPage), typeof(OnboardingPage));
 		Routing.RegisterRoute(nameof(ProjectSelectionPage), typeof(ProjectSelectionPage));
+		Routing.RegisterRoute(nameof(ProjectDetailsPage), typeof(ProjectDetailsPage));
 		Routing.RegisterRoute(nameof(ProjectScannerPage), typeof(ProjectScannerPage));
 		Routing.RegisterRoute(nameof(SyncPage), typeof(SyncPage));
 		Routing.RegisterRoute(nameof(SettingsPage), typeof(SettingsPage));

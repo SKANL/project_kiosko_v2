@@ -114,6 +114,13 @@ else
                    @bind="_github" maxlength="256" />
         </div>
 
+        <!-- Video Link -->
+        <div class="field">
+            <div class="label">Video de Pitch u otro <span class="hint" style="text-transform:none">(opcional)</span></div>
+            <input type="url" placeholder="https://youtube.com/..."
+                   @bind="_video" maxlength="256" />
+        </div>
+
         <!-- Team Members -->
         <div class="field">
             <div class="label">Integrantes <span class="hint" style="text-transform:none">(opcional · max 128)</span></div>
@@ -150,6 +157,7 @@ else
     private string _category    = string.Empty;
     private string _description = string.Empty;
     private string _github      = string.Empty;
+    private string _video       = string.Empty;
     private string _members     = string.Empty;
 
     // ── Validation flags ──────────────────────────────────────────────────
@@ -203,6 +211,7 @@ else
             Category    = _category,
             Description = string.IsNullOrWhiteSpace(_description) ? null : _description.Trim(),
             GithubLink  = string.IsNullOrWhiteSpace(_github)      ? null : _github.Trim(),
+            VideoLink   = string.IsNullOrWhiteSpace(_video)       ? null : _video.Trim(),
             TeamMembers = string.IsNullOrWhiteSpace(_members)     ? null : _members.Trim()
         };
 

@@ -9,6 +9,7 @@ public interface IAppSettingsService
     int?   ActiveEventId   { get; set; }
     bool   IsFirstRun      { get; }
     string DatabasePath    { get; }
+    string CloudApiUrl     { get; set; }  // Back4App URL — set once, applied everywhere
 
     void Save();
     void Load();

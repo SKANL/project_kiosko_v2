@@ -3,93 +3,111 @@
     x:Class="Nodus.Judge.Presentation.Views.ProjectSelectionPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:vm="clr-namespace:Nodus.Judge.Presentation.ViewModels"
+    xmlns:models="clr-namespace:Nodus.Judge.Domain.Entities"
     x:DataType="vm:VotingViewModel"
     Title="Seleccionar proyecto"
     BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="16,12,16,20" Spacing="10">
-            <Border Style="{StaticResource ElevatedCard}">
-                <VerticalStackLayout Spacing="10">
-                    <Label Style="{StaticResource Headline}"
-                           Text="{Binding EventStateMessage}"
-                           LineBreakMode="WordWrap" />
-                    <Button Text="Escanear QR"
-                            Style="{StaticResource SecondaryButton}"
-                            HorizontalOptions="Start"
-                            Padding="14,10"
-                            Command="{Binding OpenProjectScannerCommand}" />
-                    <Label Style="{StaticResource Footnote}"
-                           Text="{Binding ProjectSelectionMessage}"
-                           TextColor="{StaticResource NodusSecondaryLabel}" />
+    <ContentPage.Resources>
+        <toolkit:IsStringNotNullOrWhiteSpaceConverter x:Key="StringNotEmptyConverter" />
+    </ContentPage.Resources>
 
-                    <Border Padding="12"
-                            BackgroundColor="{StaticResource NodusSurface}"
-                            StrokeShape="RoundRectangle 10">
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-                            <Label Grid.Column="0"
-                                   Text="{Binding SyncStateIcon}"
-                                   FontSize="18"
-                                   VerticalTextAlignment="Center" />
-                            <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                <Label Style="{StaticResource Subhead}" Text="{Binding SyncStateLabel}" />
-                                <Label Style="{StaticResource Footnote}"
-                                       Text="{Binding SyncStateHint}"
+    <Grid RowDefinitions="Auto,Auto,*" Padding="0">
+        <!-- Search Bar and Scan Button -->
+        <Grid Grid.Row="0" Margin="16,16,16,8" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <SearchBar Grid.Column="0"
+                       Placeholder="Buscar por nombre o stand..."
+                       Text="{Binding SearchQuery}"
+                       Margin="0" />
+            <Button Grid.Column="1"
+                    Text="📷 Escanear"
+                    Command="{Binding OpenProjectScannerCommand}"
+                    Style="{StaticResource PrimaryButton}"
+                    Padding="16,8"
+                    VerticalOptions="Center" />
+        </Grid>
+
+        <!-- Progress Banner -->
+        <Border Grid.Row="1" 
+                Style="{StaticResource ElevatedCard}" 
+                Margin="16,0,16,16" 
+                Padding="16,12"
+                BackgroundColor="{StaticResource NodusSurface}">
+            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                <Label Text="📊" FontSize="18" VerticalOptions="Center" />
+                <Label Text="{Binding SubmittedCount, StringFormat='{0} proyectos evaluados'}" 
+                       Style="{StaticResource Subhead}"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </Border>
+
+        <!-- Project List -->
+        <CollectionView Grid.Row="2"
+                        ItemsSource="{Binding FilteredProjects}"
+                        SelectionMode="None">
+            <!-- Ensure padding bottom for scrolling -->
+            <CollectionView.Margin>
+                <OnPlatform x:TypeArguments="Thickness">
+                    <On Platform="iOS, Android" Value="16,0,16,32" />
+                    <On Platform="WinUI, MacCatalyst" Value="16,0,16,32" />
+                </OnPlatform>
+            </CollectionView.Margin>
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="12" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:LocalProject">
+                    <Border Style="{StaticResource Card}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer 
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:VotingViewModel}}, Path=SelectProjectCommand}"
+                                CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        
+                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="6">
+                            <Label Grid.Row="0" Grid.Column="0"
+                                   Text="{Binding Name}" 
+                                   Style="{StaticResource Headline}" 
+                                   LineBreakMode="TailTruncation" />
+                            
+                            <!-- Category & Stand -->
+                            <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="8">
+                                <Label Text="{Binding Category}" 
+                                       Style="{StaticResource Caption1}" 
                                        TextColor="{StaticResource NodusSecondaryLabel}" />
-                            </VerticalStackLayout>
+                                
+                                <Border Style="{StaticResource BadgeWarning}" 
+                                        IsVisible="{Binding StandNumber, Converter={StaticResource StringNotEmptyConverter}}"
+                                        Padding="6,2">
+                                    <Label Text="{Binding StandNumber, StringFormat='Stand {0}'}" 
+                                           Style="{StaticResource Caption2}" 
+                                           TextColor="{StaticResource NodusWarning}" 
+                                           FontAttributes="Bold" />
+                                </Border>
+                            </HorizontalStackLayout>
+
+                            <Label Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                                   Text="›" 
+                                   Style="{StaticResource Title1}" 
+                                   TextColor="{StaticResource NodusSeparator}" 
+                                   VerticalOptions="Center" />
                         </Grid>
                     </Border>
-
-                    <Border Padding="10"
-                            BackgroundColor="{StaticResource NodusSuccess}"
-                            StrokeThickness="0"
-                            StrokeShape="RoundRectangle 10"
-                            IsVisible="{Binding IsRelayAssistVisible}">
-                        <Label Text="{Binding RelayAssistMessage}"
-                               TextColor="White"
-                               Style="{StaticResource Footnote}" />
-                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Spacing="16" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,48,0,0">
+                    <Label Text="No se encontraron proyectos" 
+                           Style="{StaticResource Headline}" 
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="Intenta con otros términos de búsqueda" 
+                           Style="{StaticResource Footnote}" 
+                           HorizontalTextAlignment="Center" />
                 </VerticalStackLayout>
-            </Border>
-
-            <Border Style="{StaticResource ElevatedCard}">
-                <Grid ColumnDefinitions="44,*,44" RowDefinitions="Auto,Auto">
-                    <Button Grid.Column="0" Grid.RowSpan="2"
-                            Text="‹"
-                            Style="{StaticResource IconNavButton}"
-                            Command="{Binding PreviousProjectCommand}" />
-
-                    <Label Grid.Column="1" Grid.Row="0"
-                           Style="{StaticResource Headline}"
-                           Text="{Binding CurrentProjectName}"
-                           HorizontalTextAlignment="Center" />
-                    <Label Grid.Column="1" Grid.Row="1"
-                           Style="{StaticResource Caption1}"
-                           TextColor="{StaticResource NodusAccent}"
-                           Text="{Binding CurrentProjectCategory}"
-                           HorizontalTextAlignment="Center" />
-
-                    <Button Grid.Column="2" Grid.RowSpan="2"
-                            Text="›"
-                            Style="{StaticResource IconNavButton}"
-                            Command="{Binding NextProjectCommand}" />
-                </Grid>
-            </Border>
-
-            <Border Style="{StaticResource Card}" IsVisible="{Binding HasCurrentProjectDescription}">
-                <Label Style="{StaticResource Subhead}"
-                       Text="{Binding CurrentProjectDescription}" />
-            </Border>
-
-            <Label Style="{StaticResource Footnote}"
-                   TextColor="{StaticResource NodusError}"
-                   Text="{Binding ErrorMessage}"
-                   IsVisible="{Binding HasError}" />
-
-            <Button Text="Evaluar este proyecto"
-                    Style="{StaticResource PrimaryButton}"
-                    Command="{Binding CloseProjectSelectionCommand}" />
-        </VerticalStackLayout>
-    </ScrollView>
+            </CollectionView.EmptyView>
+        </CollectionView>
+    </Grid>
 </ContentPage>

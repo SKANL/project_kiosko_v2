@@ -42,6 +42,8 @@ public partial class ProjectScannerPage : ContentPage
         ProjectQrScanner.IsDetecting = false;
         _scanBuffer.PendingQr = value;
 
+        HapticFeedback.Default.Perform(HapticFeedbackType.Click);
+
         await MainThread.InvokeOnMainThreadAsync(async () =>
         {
             if (Shell.Current.Navigation.NavigationStack.Count > 1)

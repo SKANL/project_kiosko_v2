@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Nodus.Admin.Application.Interfaces.Persistence;
 using Nodus.Admin.Application.Interfaces.Services;
 using Nodus.Admin.Domain.Entities;
+using Nodus.Admin.Presentation.Views;
 
 namespace Nodus.Admin.Presentation.ViewModels;
 
@@ -44,6 +45,9 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
 
     [ObservableProperty]
     private string _newProjectGithub = string.Empty;
+
+    [ObservableProperty]
+    private string _newProjectVideo = string.Empty;
 
     private Project? _selectedProject;
     public Project? SelectedProject
@@ -92,6 +96,13 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
     {
         get => _editGithub;
         set => SetProperty(ref _editGithub, value);
+    }
+
+    private string _editVideo = string.Empty;
+    public string EditVideo
+    {
+        get => _editVideo;
+        set => SetProperty(ref _editVideo, value);
     }
 
     private bool _isEditing;
@@ -166,6 +177,7 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
         NewProjectCategory = string.Empty;
         NewProjectStand = string.Empty;
         NewProjectGithub = string.Empty;
+        NewProjectVideo = string.Empty;
 
         var result = await _projects.GetByEventAsync(eventId.Value);
         if (result.IsFail)
@@ -199,6 +211,7 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
         EditMembers = project.TeamMembers;
         EditStand = project.StandNumber;
         EditGithub = project.GithubLink;
+        EditVideo = project.VideoLink;
         IsEditing = true;
     }
 
@@ -220,6 +233,7 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
         SelectedProject.TeamMembers = EditMembers.Trim();
         SelectedProject.StandNumber = EditStand.Trim();
         SelectedProject.GithubLink = EditGithub.Trim();
+        SelectedProject.VideoLink = EditVideo.Trim();
 
         var result = await _projects.UpdateAsync(SelectedProject);
         if (result.IsFail)
@@ -246,6 +260,12 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    private async Task GoToScannerAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(ProjectScannerPage));
+    }
+
+    [RelayCommand]
     private void RemoveMember(string name)
     {
         if (TeamMemberList.Contains(name))
@@ -269,6 +289,7 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
             TeamMembers = members,
             StandNumber = NewProjectStand?.Trim() ?? string.Empty,
             GithubLink = NewProjectGithub?.Trim() ?? string.Empty,
+            VideoLink = NewProjectVideo?.Trim() ?? string.Empty,
             ProjectCode = await _projects.GenerateUniqueCodeAsync(_settings.ActiveEventId ?? 0),
             CreatedAt = DateTime.UtcNow.ToString("O")
         };
@@ -287,6 +308,7 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
         NewProjectCategory = string.Empty;
         NewProjectStand = string.Empty;
         NewProjectGithub = string.Empty;
+        NewProjectVideo = string.Empty;
         TeamMemberList.Clear();
 
         IsCreatingProject = false;

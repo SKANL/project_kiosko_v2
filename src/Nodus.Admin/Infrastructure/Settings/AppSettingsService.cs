@@ -24,6 +24,15 @@ public sealed class AppSettingsService : IAppSettingsService
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "Nodus", "nodus_admin.db3");
 
+    // Back4App URL — set once here, used by CloudSyncService and EventQrViewModel
+    public string CloudApiUrl
+    {
+        get => string.IsNullOrEmpty(_data.CloudApiUrl)
+            ? "https://nodusapi-jzz8hqg0.b4a.run"
+            : _data.CloudApiUrl;
+        set => _data.CloudApiUrl = value;
+    }
+
     public void Save()
     {
         string json = JsonSerializer.Serialize(_data, new JsonSerializerOptions { WriteIndented = true });
@@ -50,6 +59,7 @@ public sealed class AppSettingsService : IAppSettingsService
 
     private sealed class AppSettingsData
     {
-        public int? ActiveEventId { get; set; }
+        public int?   ActiveEventId { get; set; }
+        public string? CloudApiUrl  { get; set; }  // null = use default
     }
 }

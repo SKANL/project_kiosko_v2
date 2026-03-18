@@ -24,8 +24,12 @@
                     <Label Text="Añade o elimina proyectos del evento actual." Style="{StaticResource Footnote}" TextColor="{StaticResource NodusSecondaryLabel}" />
                 </VerticalStackLayout>
 
-                <Button Grid.Column="1" Text="Nuevo Proyecto" Command="{Binding ToggleCreateProjectCommand}" 
-                        Style="{StaticResource GhostButton}" VerticalOptions="Center" Padding="16,8" />
+                <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                    <Button Text="Escanear QR" Command="{Binding GoToScannerCommand}" 
+                            Style="{StaticResource GhostButton}" Padding="16,8" />
+                    <Button Text="Nuevo Proyecto" Command="{Binding ToggleCreateProjectCommand}" 
+                            Style="{StaticResource GhostButton}" Padding="16,8" />
+                </HorizontalStackLayout>
             </Grid>
         </Border>
 
@@ -60,14 +64,18 @@
                             Style="{StaticResource FormEntry}" Margin="0" AutoSize="TextChanges" MinimumHeightRequest="80" />
                 </VerticalStackLayout>
 
-                <Grid ColumnDefinitions="*, *" ColumnSpacing="12">
+                <Grid ColumnDefinitions="*, *, *" ColumnSpacing="12">
                     <VerticalStackLayout Spacing="4" Grid.Column="0">
                         <Label Text="Stand" Style="{StaticResource FormLabel}" />
                         <Entry Placeholder="Ej. 42" Text="{Binding NewProjectStand}" Style="{StaticResource FormEntry}" Margin="0" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Spacing="4" Grid.Column="1">
-                        <Label Text="GitHub (Opcional)" Style="{StaticResource FormLabel}" />
+                        <Label Text="GitHub" Style="{StaticResource FormLabel}" />
                         <Entry Placeholder="https://github.com/..." Text="{Binding NewProjectGithub}" Style="{StaticResource FormEntry}" Margin="0" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="4" Grid.Column="2">
+                        <Label Text="Video Link" Style="{StaticResource FormLabel}" />
+                        <Entry Placeholder="https://youtube.com/..." Text="{Binding NewProjectVideo}" Style="{StaticResource FormEntry}" Margin="0" />
                     </VerticalStackLayout>
                 </Grid>
 
@@ -148,8 +156,11 @@
                                         </VerticalStackLayout>
                                         <Label Grid.Column="1" Text="{Binding Project.ProjectCode}" Style="{StaticResource Title3}" TextColor="{StaticResource NodusAccent}" VerticalOptions="Center" />
                                         
-                                        <HorizontalStackLayout Grid.Row="1" Spacing="8" Margin="0,8,0,0" IsVisible="{Binding Project.GithubLink, Converter={StaticResource StringNotEmptyConverter}}">
-                                            <Label Text="GitHub" Style="{StaticResource Caption2}" TextColor="{StaticResource SystemBlue}" />
+                                        <HorizontalStackLayout Grid.Row="1" Spacing="16" Margin="0,8,0,0">
+                                            <Label Text="GitHub" Style="{StaticResource Caption2}" TextColor="{StaticResource SystemBlue}" 
+                                                   IsVisible="{Binding Project.GithubLink, Converter={StaticResource StringNotEmptyConverter}}" />
+                                            <Label Text="Video" Style="{StaticResource Caption2}" TextColor="{StaticResource NodusAccent}" 
+                                                   IsVisible="{Binding Project.VideoLink, Converter={StaticResource StringNotEmptyConverter}}" />
                                         </HorizontalStackLayout>
                                     </Grid>
                                 </Border>

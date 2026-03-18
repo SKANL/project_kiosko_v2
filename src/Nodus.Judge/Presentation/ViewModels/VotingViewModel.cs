@@ -17,8 +17,40 @@ namespace Nodus.Judge.Presentation.ViewModels;
 /// Manages the voting flow: browse projects, score each one, submit signed vote.
 /// Each project gets one vote with a dictionary of scores per criterion.
 /// </summary>
+[QueryProperty(nameof(ProjectId), "ProjectId")]
 public sealed partial class VotingViewModel : BaseViewModel
 {
+    private string _projectIdStr = string.Empty;
+    private int? _targetProjectId;
+
+    public string ProjectId
+    {
+        get => _projectIdStr;
+        set
+        {
+            _projectIdStr = value;
+            if (int.TryParse(value, out var id))
+            {
+                _targetProjectId = id;
+                ApplyTargetProject();
+            }
+        }
+    }
+
+    private void ApplyTargetProject()
+    {
+        if (_targetProjectId.HasValue && Projects.Count > 0)
+        {
+            var idx = Projects.ToList().FindIndex(p => p.RemoteId == _targetProjectId.Value);
+            if (idx >= 0)
+            {
+                CurrentProjectIndex = idx;
+                Task.Run(LoadExistingScoresAsync);
+                VoteSubmitted = false;
+            }
+            _targetProjectId = null;
+        }
+    }
     private readonly SubmitVoteUseCase        _submit;
     private readonly ILocalProjectRepository  _projects;
     private readonly ILocalEventRepository    _localEvents;
@@ -62,6 +94,7 @@ public sealed partial class VotingViewModel : BaseViewModel
         // (SetProperty sees no delta), leaving HasCurrentProject stale in the UI.
         Projects.CollectionChanged += (_, _) =>
         {
+            OnPropertyChanged(nameof(FilteredProjects));
             OnPropertyChanged(nameof(HasCurrentProject));
             OnPropertyChanged(nameof(HasCurrentProjectDescription));
             OnPropertyChanged(nameof(HasNoProjects));
@@ -78,6 +111,21 @@ public sealed partial class VotingViewModel : BaseViewModel
     // ── Projects ──────────────────────────────────────────────────────
 
     public ObservableCollection<LocalProject> Projects { get; } = new();
+
+    [ObservableProperty]
+    private string _searchQuery = string.Empty;
+
+    public IEnumerable<LocalProject> FilteredProjects => 
+        string.IsNullOrWhiteSpace(SearchQuery) 
+            ? Projects 
+            : Projects.Where(p => 
+                p.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) || 
+                p.StandNumber.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase));
+
+    partial void OnSearchQueryChanged(string value)
+    {
+        OnPropertyChanged(nameof(FilteredProjects));
+    }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CurrentProjectName))]
@@ -222,8 +270,18 @@ public sealed partial class VotingViewModel : BaseViewModel
             SubmittedCount = votes.IsOk ? votes.Value!.Count : 0;
             await RefreshSyncStateAsync();
 
-            CurrentProjectIndex = 0;
-            await LoadExistingScoresAsync();
+            if (_targetProjectId.HasValue)
+            {
+                ApplyTargetProject();
+            }
+            else 
+            {
+                if (CurrentProjectIndex < 0 || CurrentProjectIndex >= Projects.Count)
+                {
+                    CurrentProjectIndex = 0;
+                }
+                await LoadExistingScoresAsync();
+            }
         });
 
     // ── Navigation ────────────────────────────────────────────────────
@@ -272,6 +330,17 @@ public sealed partial class VotingViewModel : BaseViewModel
         {
             { "ViewModel", this }
         });
+
+    [RelayCommand]
+    private async Task SelectProjectAsync(LocalProject project)
+    {
+        if (project == null) return;
+        
+        await Shell.Current.GoToAsync(nameof(ProjectDetailsPage), new Dictionary<string, object>
+        {
+            { "Project", project }
+        });
+    }
 
     [RelayCommand]
     private async Task OpenSettingsAsync()

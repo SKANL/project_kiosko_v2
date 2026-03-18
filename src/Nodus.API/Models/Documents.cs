@@ -81,6 +81,10 @@ public sealed class ProjectDocument
     [JsonPropertyName("githubLink")]
     public string? GithubLink { get; set; }
 
+    [BsonElement("videoLink")]
+    [JsonPropertyName("videoLink")]
+    public string? VideoLink { get; set; }
+
     [BsonElement("teamMembers")]
     [JsonPropertyName("teamMembers")]
     public string? TeamMembers { get; set; }
