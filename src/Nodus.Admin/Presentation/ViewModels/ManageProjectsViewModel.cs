@@ -6,6 +6,7 @@ using Nodus.Admin.Application.Interfaces.Persistence;
 using Nodus.Admin.Application.Interfaces.Services;
 using Nodus.Admin.Domain.Entities;
 using Nodus.Admin.Presentation.Views;
+using Nodus.Admin.Application.UseCases.Events;
 
 namespace Nodus.Admin.Presentation.ViewModels;
 
@@ -20,6 +21,7 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
     private readonly IProjectRepository _projects;
     private readonly IEventRepository _events;
     private readonly IAppSettingsService _settings;
+    private readonly BuildBootstrapPayloadUseCase _bootstrap;
 
     public ObservableCollection<ManageProjectItem> Projects { get; } = new();
     public ObservableCollection<string> AvailableCategories { get; } = new();
@@ -36,6 +38,9 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
     private string _newProjectDescription = string.Empty;
 
     [ObservableProperty]
+    private string _newProjectTechStack = string.Empty;
+
+    [ObservableProperty]
     private string _newMemberName = string.Empty;
 
     public ObservableCollection<string> TeamMemberList { get; } = new();
@@ -49,12 +54,8 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
     [ObservableProperty]
     private string _newProjectVideo = string.Empty;
 
-    private Project? _selectedProject;
-    public Project? SelectedProject
-    {
-        get => _selectedProject;
-        set => SetProperty(ref _selectedProject, value);
-    }
+    [ObservableProperty]
+    private ManageProjectItem? _selectedProject;
 
     private string _editName = string.Empty;
     public string EditName
@@ -105,6 +106,13 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
         set => SetProperty(ref _editVideo, value);
     }
 
+    private string _editTechStack = string.Empty;
+    public string EditTechStack
+    {
+        get => _editTechStack;
+        set => SetProperty(ref _editTechStack, value);
+    }
+
     private bool _isEditing;
     public bool IsEditing
     {
@@ -129,11 +137,12 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
         HasProjects = Projects.Count > 0;
     }
 
-    public ManageProjectsViewModel(IProjectRepository projects, IEventRepository events, IAppSettingsService settings)
+    public ManageProjectsViewModel(IProjectRepository projects, IEventRepository events, IAppSettingsService settings, BuildBootstrapPayloadUseCase bootstrap)
     {
         _projects = projects;
         _events = events;
         _settings = settings;
+        _bootstrap = bootstrap;
         Title = "Proyectos";
     }
 
@@ -178,6 +187,7 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
         NewProjectStand = string.Empty;
         NewProjectGithub = string.Empty;
         NewProjectVideo = string.Empty;
+        NewProjectTechStack = string.Empty;
 
         var result = await _projects.GetByEventAsync(eventId.Value);
         if (result.IsFail)
@@ -202,9 +212,10 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private void EditProject(Project project)
+    private void EditProject(ManageProjectItem item)
     {
-        SelectedProject = project;
+        SelectedProject = item;
+        var project = item.Project;
         EditName = project.Name;
         EditCategory = project.Category;
         EditDescription = project.Description;
@@ -212,6 +223,7 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
         EditStand = project.StandNumber;
         EditGithub = project.GithubLink;
         EditVideo = project.VideoLink;
+        EditTechStack = project.TechStack;
         IsEditing = true;
     }
 
@@ -227,15 +239,17 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
     {
         if (SelectedProject == null || string.IsNullOrWhiteSpace(EditName)) return;
 
-        SelectedProject.Name = EditName.Trim();
-        SelectedProject.Category = EditCategory.Trim();
-        SelectedProject.Description = EditDescription.Trim();
-        SelectedProject.TeamMembers = EditMembers.Trim();
-        SelectedProject.StandNumber = EditStand.Trim();
-        SelectedProject.GithubLink = EditGithub.Trim();
-        SelectedProject.VideoLink = EditVideo.Trim();
+        var project = SelectedProject.Project;
+        project.Name = EditName.Trim();
+        project.Category = EditCategory.Trim();
+        project.Description = EditDescription.Trim();
+        project.TeamMembers = EditMembers.Trim();
+        project.StandNumber = EditStand.Trim();
+        project.GithubLink = EditGithub.Trim();
+        project.VideoLink = EditVideo.Trim();
+        project.TechStack = EditTechStack.Trim();
 
-        var result = await _projects.UpdateAsync(SelectedProject);
+        var result = await _projects.UpdateAsync(project);
         if (result.IsFail)
         {
             ErrorMessage = result.Error!;
@@ -245,6 +259,10 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
 
         IsEditing = false;
         SelectedProject = null;
+
+        if (_settings.ActiveEventId.HasValue)
+            await _bootstrap.ExecuteAsync(_settings.ActiveEventId.Value);
+
         await LoadProjectsAsync();
     }
 
@@ -257,6 +275,26 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
             TeamMemberList.Add(name);
         NewMemberName = string.Empty;
         AddProjectCommand.NotifyCanExecuteChanged();
+    }
+
+    [RelayCommand]
+    private async Task SelectProjectAsync(ManageProjectItem item)
+    {
+        if (item?.Project == null) return;
+        
+        try 
+        {
+            await Shell.Current.GoToAsync(nameof(ProjectDetailsPage), new Dictionary<string, object>
+            {
+                { "Project", item.Project }
+            });
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Error de Navegación", ex.Message, "OK");
+        }
+
+        SelectedProject = null;
     }
 
     [RelayCommand]
@@ -290,6 +328,7 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
             StandNumber = NewProjectStand?.Trim() ?? string.Empty,
             GithubLink = NewProjectGithub?.Trim() ?? string.Empty,
             VideoLink = NewProjectVideo?.Trim() ?? string.Empty,
+            TechStack = NewProjectTechStack?.Trim() ?? string.Empty,
             ProjectCode = await _projects.GenerateUniqueCodeAsync(_settings.ActiveEventId ?? 0),
             CreatedAt = DateTime.UtcNow.ToString("O")
         };
@@ -309,9 +348,13 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
         NewProjectStand = string.Empty;
         NewProjectGithub = string.Empty;
         NewProjectVideo = string.Empty;
+        NewProjectTechStack = string.Empty;
         TeamMemberList.Clear();
 
         IsCreatingProject = false;
+
+        if (_settings.ActiveEventId.HasValue)
+            await _bootstrap.ExecuteAsync(_settings.ActiveEventId.Value);
 
         await LoadProjectsAsync();
     }
@@ -335,6 +378,9 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
             HasError = true;
             return;
         }
+
+        if (_settings.ActiveEventId.HasValue)
+            await _bootstrap.ExecuteAsync(_settings.ActiveEventId.Value);
 
         await LoadProjectsAsync();
     }

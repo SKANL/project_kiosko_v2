@@ -14,6 +14,7 @@ public class Project
     public string Name        { get; set; } = string.Empty;
 
     public string Description { get; set; } = string.Empty;
+    public string Objetivos   { get; set; } = string.Empty;
     public string Category    { get; set; } = string.Empty;
     public string TeamMembers { get; set; } = string.Empty;  // Comma-separated
 
@@ -33,6 +34,9 @@ public class Project
 
     /// <summary>Optional link to project source code or repository.</summary>
     public string GithubLink { get; set; } = string.Empty;
+
+    /// <summary>Technologies used in the project (comma-separated, e.g. "C#, .NET, SQLite").</summary>
+    public string TechStack  { get; set; } = string.Empty;
 
     /// <summary>Optional link to a pitch video.</summary>
     public string VideoLink  { get; set; } = string.Empty;

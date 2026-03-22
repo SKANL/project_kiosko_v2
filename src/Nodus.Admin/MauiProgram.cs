@@ -92,6 +92,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ManageProjectsViewModel>();
         builder.Services.AddTransient<ManageJudgesViewModel>();
         builder.Services.AddTransient<ProjectScannerViewModel>();
+        builder.Services.AddTransient<ProjectDetailsViewModel>();
 
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddTransient<EventSetupPage>();
@@ -102,6 +103,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ManageProjectsPage>();
         builder.Services.AddTransient<ManageJudgesPage>();
         builder.Services.AddTransient<ProjectScannerPage>();
+        builder.Services.AddTransient<ProjectDetailsPage>();
         builder.Services.AddSingleton<AppShell>();
 
 #if DEBUG

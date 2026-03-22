@@ -28,7 +28,7 @@ public sealed class AppSettingsService : IAppSettingsService
     public string CloudApiUrl
     {
         get => string.IsNullOrEmpty(_data.CloudApiUrl)
-            ? "https://nodusapi-jzz8hqg0.b4a.run"
+            ? "https://nodusapi-kk2jf5eg.b4a.run"
             : _data.CloudApiUrl;
         set => _data.CloudApiUrl = value;
     }

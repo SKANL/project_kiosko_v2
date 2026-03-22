@@ -54,7 +54,7 @@ public static class PublicEndpoints
                 QrPayload = $"nodus://vote?pid={req.Id}",
                 StandNumber = req.StandNumber,
                 EditToken = req.EditToken,
-                EditUrl = $"https://project-kiosko-v2.vercel.app/edit?token={req.EditToken}&cloudApi=https://nodusapi-nlw0pofa.b4a.run"
+                EditUrl = $"https://project-kiosko-v2.vercel.app/edit?token={req.EditToken}&cloudApi=https://nodusapi-kk2jf5eg.b4a.run"
             });
         });
 

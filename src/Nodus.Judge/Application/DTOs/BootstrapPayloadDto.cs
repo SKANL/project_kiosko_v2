@@ -20,5 +20,5 @@ public sealed record BootstrapPayloadDto(
     string RubricJson = ""
 );
 
-public sealed record ProjectInfoDto(int Id, string Name, string Description, string Category, string TeamMembers, int SortOrder, string ProjectCode = "", int SequenceNumber = 0, string StandNumber = "", string GithubLink = "");
+public sealed record ProjectInfoDto(int Id, string Name, string Description, string Category, string TeamMembers, int SortOrder, string ProjectCode = "", int SequenceNumber = 0, string StandNumber = "", string GithubLink = "", string VideoLink = "", string TechStack = "", string Objetivos = "");
 public sealed record JudgeInfoDto  (int Id, string Name, string PublicKeyBase64);

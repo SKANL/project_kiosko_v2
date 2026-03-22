@@ -67,7 +67,19 @@ public sealed class ProjectRepository : IProjectRepository
 
     public async Task<Result> UpdateAsync(Project project)
     {
-        try { await _db.Connection.UpdateAsync(project).ConfigureAwait(false); return Result.Ok(); }
+        try 
+        { 
+            var maxSequence = await _db.Connection.Table<Project>()
+                .Where(item => item.EventId == project.EventId)
+                .OrderByDescending(item => item.SequenceNumber)
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
+            
+            project.SequenceNumber = (maxSequence?.SequenceNumber ?? 0) + 1;
+
+            await _db.Connection.UpdateAsync(project).ConfigureAwait(false); 
+            return Result.Ok(); 
+        }
         catch (Exception ex) { return Result.Fail(ex.Message); }
     }
 

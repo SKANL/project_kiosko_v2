@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Nodus.Admin.Presentation.Views.ProjectDetailsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Nodus.Admin.Presentation.ViewModels"
+    xmlns:conv="clr-namespace:Nodus.Admin.Presentation.Converters"
+    x:DataType="vm:ProjectDetailsViewModel"
+    Title="{Binding Project.Name}"
+    BackgroundColor="{AppThemeBinding Light={StaticResource NodusBackground}, Dark={StaticResource NodusBackgroundDark}}">
+
+    <ContentPage.Resources>
+        <conv:InverseBooleanConverter x:Key="InvertedBoolConverter" />
+        <conv:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
+    </ContentPage.Resources>
+
+    <Grid>
+        <!-- Main Content -->
+        <ScrollView Padding="24">
+            <VerticalStackLayout Spacing="24" MaximumWidthRequest="800" HorizontalOptions="Center">
+                
+                <!-- Back Button -->
+                <Button Text="← Volver" Command="{Binding BackCommand}" 
+                        Style="{StaticResource GhostButton}" HorizontalOptions="Start" Padding="0" />
+
+                <!-- Header Card -->
+                <Border Style="{StaticResource PremiumCard}">
+                    <Grid ColumnDefinitions="*, Auto">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding Project.Name}" Style="{StaticResource Title1}" />
+                            <Label Text="{Binding Project.ProjectCode}" Style="{StaticResource Headline}" TextColor="{StaticResource NodusAccent}" />
+                        </VerticalStackLayout>
+                        
+                        <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                            <Button Text="QR Registro" Command="{Binding ShowQrDialogCommand}" Style="{StaticResource GhostButton}" />
+                            <Button Text="Editar" Command="{Binding ToggleEditCommand}" Style="{StaticResource GhostButton}" 
+                                    IsVisible="{Binding IsEditing, Converter={StaticResource InvertedBoolConverter}}" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Details View (Non-Editing) -->
+                <VerticalStackLayout Spacing="24" IsVisible="{Binding IsEditing, Converter={StaticResource InvertedBoolConverter}}">
+                    
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="24">
+                        <VerticalStackLayout Spacing="8" Grid.Column="0">
+                            <Label Text="CATEGORÍA" Style="{StaticResource FormLabel}" Opacity="0.6" />
+                            <Label Text="{Binding Project.Category}" Style="{StaticResource Body}" />
+                        </VerticalStackLayout>
+                        
+                        <VerticalStackLayout Spacing="8" Grid.Column="1">
+                            <Label Text="STAND" Style="{StaticResource FormLabel}" Opacity="0.6" />
+                            <Label Text="{Binding Project.StandNumber}" Style="{StaticResource Body}" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="RESUMEN" Style="{StaticResource FormLabel}" Opacity="0.6" />
+                        <Label Text="{Binding Project.Description}" Style="{StaticResource Body}" LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding Project.Objetivos, Converter={StaticResource StringNotEmptyConverter}}">
+                        <Label Text="OBJETIVOS" Style="{StaticResource FormLabel}" Opacity="0.6" />
+                        <Label Text="{Binding Project.Objetivos}" Style="{StaticResource Body}" LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="EQUIPO" Style="{StaticResource FormLabel}" Opacity="0.6" />
+                        <Label Text="{Binding Project.TeamMembers}" Style="{StaticResource Body}" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding Project.TechStack, Converter={StaticResource StringNotEmptyConverter}}">
+                        <Label Text="STACK TECNOLÓGICO" Style="{StaticResource FormLabel}" Opacity="0.6" />
+                        <Label Text="{Binding Project.TechStack}" Style="{StaticResource Body}" />
+                    </VerticalStackLayout>
+
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="24">
+                        <VerticalStackLayout Spacing="8" Grid.Column="0">
+                            <Label Text="GITHUB" Style="{StaticResource FormLabel}" Opacity="0.6" />
+                            <Label Text="{Binding Project.GithubLink}" Style="{StaticResource Body}" TextColor="{StaticResource SystemBlue}" 
+                                   IsVisible="{Binding Project.GithubLink, Converter={StaticResource StringNotEmptyConverter}}" />
+                            <Label Text="—" Style="{StaticResource Body}" IsVisible="{Binding Project.GithubLink, Converter={StaticResource StringNotEmptyConverter}, ConverterParameter='inverse'}" />
+                        </VerticalStackLayout>
+                        
+                        <VerticalStackLayout Spacing="8" Grid.Column="1">
+                            <Label Text="VIDEO" Style="{StaticResource FormLabel}" Opacity="0.6" />
+                            <Label Text="{Binding Project.VideoLink}" Style="{StaticResource Body}" TextColor="{StaticResource NodusAccent}" 
+                                   IsVisible="{Binding Project.VideoLink, Converter={StaticResource StringNotEmptyConverter}}" />
+                            <Label Text="—" Style="{StaticResource Body}" IsVisible="{Binding Project.VideoLink, Converter={StaticResource StringNotEmptyConverter}, ConverterParameter='inverse'}" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <Button Text="Eliminar Proyecto" Command="{Binding DeleteCommand}" 
+                            Style="{StaticResource GhostButton}" TextColor="{StaticResource NodusError}" 
+                            HorizontalOptions="Start" Margin="0,40,0,0" />
+                </VerticalStackLayout>
+
+                <!-- Edit Form -->
+                <VerticalStackLayout Spacing="20" IsVisible="{Binding IsEditing}">
+                    <Label Text="Editando Proyecto" Style="{StaticResource Title3}" />
+
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="12">
+                         <VerticalStackLayout Spacing="4" Grid.Column="0">
+                            <Label Text="Nombre" Style="{StaticResource FormLabel}" />
+                            <Entry Text="{Binding EditName}" Style="{StaticResource FormEntry}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Spacing="4" Grid.Column="1">
+                            <Label Text="Categoría" Style="{StaticResource FormLabel}" />
+                            <Border BackgroundColor="{AppThemeBinding Light={StaticResource NodusGroupedBackground}, Dark={StaticResource NodusGroupedBackgroundDark}}"
+                                    StrokeShape="RoundRectangle 8" StrokeThickness="0.5" HeightRequest="48" Padding="0">
+                                <Picker Title="Categoría" ItemsSource="{Binding AvailableCategories}" SelectedItem="{Binding EditCategory}" Margin="12,0" 
+                                        TextColor="{AppThemeBinding Light={StaticResource NodusLabel}, Dark={StaticResource NodusLabelDark}}" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Descripción" Style="{StaticResource FormLabel}" />
+                        <Editor Text="{Binding EditDescription}" Style="{StaticResource FormEntry}" AutoSize="TextChanges" MinimumHeightRequest="80" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Objetivos" Style="{StaticResource FormLabel}" />
+                        <Editor Text="{Binding EditObjetivos}" Style="{StaticResource FormEntry}" AutoSize="TextChanges" MinimumHeightRequest="80" />
+                    </VerticalStackLayout>
+
+                    <Grid ColumnDefinitions="*, *, *" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="4" Grid.Column="0">
+                            <Label Text="Stand" Style="{StaticResource FormLabel}" />
+                            <Entry Text="{Binding EditStand}" Style="{StaticResource FormEntry}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Spacing="4" Grid.Column="1">
+                            <Label Text="GitHub" Style="{StaticResource FormLabel}" />
+                            <Entry Text="{Binding EditGithub}" Style="{StaticResource FormEntry}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Spacing="4" Grid.Column="2">
+                            <Label Text="Video" Style="{StaticResource FormLabel}" />
+                            <Entry Text="{Binding EditVideo}" Style="{StaticResource FormEntry}" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Integrantes (separados por coma)" Style="{StaticResource FormLabel}" />
+                        <Entry Text="{Binding EditMembers}" Style="{StaticResource FormEntry}" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Stack Tecnológico (ej: C#, .NET, SQLite)" Style="{StaticResource FormLabel}" />
+                        <Entry Text="{Binding EditTechStack}" Style="{StaticResource FormEntry}" Placeholder="Ejemplo: Python, React, Firebase" />
+                    </VerticalStackLayout>
+
+                    <HorizontalStackLayout Spacing="12" HorizontalOptions="End" Margin="0,12,0,0">
+                        <Button Text="Cancelar" Command="{Binding CancelEditCommand}" Style="{StaticResource GhostButton}" WidthRequest="120" />
+                        <Button Text="Guardar Cambios" Command="{Binding SaveCommand}" Style="{StaticResource GradientButton}" WidthRequest="180" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- QR Dialog Overlay -->
+        <Grid IsVisible="{Binding IsQrDialogVisible}" BackgroundColor="#CC000000" InputTransparent="False">
+            <Border Style="{StaticResource PremiumCard}" VerticalOptions="Center" HorizontalOptions="Center" 
+                    WidthRequest="450" Padding="32" StrokeShape="RoundRectangle 24">
+                <VerticalStackLayout Spacing="24" HorizontalOptions="Center">
+                    
+                    <Label Text="Registro del Proyecto" Style="{StaticResource Title2}" HorizontalTextAlignment="Center" />
+                    
+                    <!-- Toggle Offline/Online -->
+                    <Border BackgroundColor="{StaticResource NodusAccentSurface}" Padding="4" StrokeShape="RoundRectangle 20" HorizontalOptions="Center">
+                        <HorizontalStackLayout Spacing="0">
+                            <Button Text="Offline (BLE)" Command="{Binding ToggleQrModeCommand}" 
+                                    Style="{StaticResource GhostButton}" HeightRequest="36" WidthRequest="140"
+                                    BackgroundColor="{Binding ShowOfflineQr, Converter={StaticResource InvertedBoolConverter}, ConverterParameter='transparent'}"
+                                    TextColor="{Binding ShowOfflineQr, Converter={StaticResource InvertedBoolConverter}, ConverterParameter='white'}" />
+                             <!-- Wait, I need a proper localized toggle visual, but this works for now -->
+                             <Button Text="Online (Web)" Command="{Binding ToggleQrModeCommand}" 
+                                    Style="{StaticResource GhostButton}" HeightRequest="36" WidthRequest="140"
+                                    BackgroundColor="{Binding ShowOfflineQr, Converter={StaticResource InvertedBoolConverter}, ConverterParameter='transparent'}" />
+                             <!-- Simplified toggle for now -->
+                        </HorizontalStackLayout>
+                    </Border>
+                    
+                    <!-- QR Display -->
+                    <VerticalStackLayout Spacing="16" IsVisible="{Binding ShowOfflineQr}">
+                        <Label Text="Escanea este código con la app Juez para identificar el proyecto vía BLE (sin internet)." 
+                               Style="{StaticResource Footnote}" HorizontalTextAlignment="Center" Opacity="0.8" />
+                        <Border BackgroundColor="White" Padding="16" StrokeShape="RoundRectangle 16" HorizontalOptions="Center">
+                            <Image Source="{Binding OfflineQrSource}" WidthRequest="220" HeightRequest="220" Aspect="AspectFit" />
+                        </Border>
+                        <Label Text="{Binding OfflineUrl}" Style="{StaticResource Caption2}" HorizontalTextAlignment="Center" Opacity="0.5" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="16" IsVisible="{Binding ShowOfflineQr, Converter={StaticResource InvertedBoolConverter}}">
+                        <Label Text="Escanea este código para acceder a la ficha del proyecto vía Web (requiere internet)." 
+                               Style="{StaticResource Footnote}" HorizontalTextAlignment="Center" Opacity="0.8" />
+                        <Border BackgroundColor="White" Padding="16" StrokeShape="RoundRectangle 16" HorizontalOptions="Center">
+                            <Image Source="{Binding OnlineQrSource}" WidthRequest="220" HeightRequest="220" Aspect="AspectFit" />
+                        </Border>
+                        <Label Text="{Binding OnlineUrl}" Style="{StaticResource Caption2}" HorizontalTextAlignment="Center" Opacity="0.5" />
+                    </VerticalStackLayout>
+
+                    <Button Text="Cerrar" Command="{Binding CloseQrDialogCommand}" Style="{StaticResource PrimaryButton}" 
+                            HorizontalOptions="Center" WidthRequest="150" Margin="0,8,0,0" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Busy Overlay -->
+        <Grid IsVisible="{Binding IsBusy}" BackgroundColor="#66000000">
+            <ActivityIndicator IsRunning="True" Color="{StaticResource NodusAccent}" HorizontalOptions="Center" VerticalOptions="Center" />
+        </Grid>
+    </Grid>
+</ContentPage>

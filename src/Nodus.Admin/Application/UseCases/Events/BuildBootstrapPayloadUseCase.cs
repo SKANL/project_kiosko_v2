@@ -60,7 +60,7 @@ public sealed class BuildBootstrapPayloadUseCase
             evtR.Value!.FinishedAt,
             evtR.Value!.GraceEndsAt,
             sinceSeq,
-            projR.Value!.Select(p => new ProjectInfoDto(p.Id, p.Name, p.Description, p.Category, p.TeamMembers, p.SortOrder, p.ProjectCode, p.SequenceNumber, p.StandNumber, p.GithubLink)).ToList(),
+            projR.Value!.Select(p => new ProjectInfoDto(p.Id, p.Name, p.Description, p.Category, p.TeamMembers, p.SortOrder, p.ProjectCode, p.SequenceNumber, p.StandNumber, p.GithubLink, p.VideoLink, p.TechStack, p.Objetivos)).ToList(),
             judgeR.Value!.Select(j => new JudgeInfoDto(j.Id, j.Name, j.PublicKeyBase64)).ToList(),
             evtR.Value!.RubricVersion,
             evtR.Value!.RubricJson

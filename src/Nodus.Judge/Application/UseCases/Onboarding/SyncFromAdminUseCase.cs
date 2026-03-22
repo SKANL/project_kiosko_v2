@@ -112,12 +112,15 @@ public sealed class SyncFromAdminUseCase
             EventId     = dto.EventId,
             Name        = p.Name,
             Description = p.Description,
+            Objetivos   = p.Objetivos ?? string.Empty,
             Category    = p.Category,
             TeamMembers = p.TeamMembers,
             SortOrder   = p.SortOrder,
             ProjectCode = p.ProjectCode ?? string.Empty,
             StandNumber = p.StandNumber ?? string.Empty,
-            GithubLink = p.GithubLink ?? string.Empty,
+            GithubLink  = p.GithubLink  ?? string.Empty,
+            VideoLink   = p.VideoLink   ?? string.Empty,
+            TechStack   = p.TechStack   ?? string.Empty,
             SequenceNumber = p.SequenceNumber,
             SyncedAt    = DateTime.UtcNow.ToString("O")
         });
@@ -268,18 +271,21 @@ public sealed class SyncFromAdminUseCase
         {
             await _projects.BulkUpsertAsync(dto.Projects.Select(project => new LocalProject
             {
-                RemoteId = project.Id,
-                EventId = dto.EventId,
-                Name = project.Name,
+                RemoteId    = project.Id,
+                EventId     = dto.EventId,
+                Name        = project.Name,
                 Description = project.Description,
-                Category = project.Category,
+                Objetivos   = project.Objetivos ?? string.Empty,
+                Category    = project.Category,
                 TeamMembers = project.TeamMembers,
-                SortOrder = project.SortOrder,
+                SortOrder   = project.SortOrder,
                 ProjectCode = project.ProjectCode ?? string.Empty,
                 StandNumber = project.StandNumber ?? string.Empty,
-                GithubLink = project.GithubLink ?? string.Empty,
+                GithubLink  = project.GithubLink  ?? string.Empty,
+                VideoLink   = project.VideoLink   ?? string.Empty,
+                TechStack   = project.TechStack   ?? string.Empty,
                 SequenceNumber = project.SequenceNumber,
-                SyncedAt = DateTime.UtcNow.ToString("O")
+                SyncedAt    = DateTime.UtcNow.ToString("O")
             }));
         }
     }

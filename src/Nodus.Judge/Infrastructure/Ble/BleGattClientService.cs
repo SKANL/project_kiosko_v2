@@ -456,7 +456,7 @@ public sealed class BleGattClientService : IBleGattClientService, IDisposable
         byte[]? previousChunk = null;
         var consecutiveTimeouts = 0;
 
-        for (var i = 0; i < 14; i++)
+        for (var i = 0; i < 128; i++)
         {
             System.Diagnostics.Debug.WriteLine("[BLE Sync] reading bootstrap characteristic...");
             byte[] chunk;

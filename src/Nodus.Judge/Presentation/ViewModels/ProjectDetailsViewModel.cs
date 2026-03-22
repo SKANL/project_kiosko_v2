@@ -28,10 +28,14 @@ public partial class ProjectDetailsViewModel : BaseViewModel
     [ObservableProperty]
     private string _previousScore = "—";
 
+    /// <summary>True when at least one of GithubLink or VideoLink is set — drives RECURSOS section visibility.</summary>
+    public bool HasLinks => !string.IsNullOrWhiteSpace(Project?.GithubLink) || !string.IsNullOrWhiteSpace(Project?.VideoLink);
+
     partial void OnProjectChanged(LocalProject? value)
     {
         if (value != null)
         {
+            OnPropertyChanged(nameof(HasLinks));
             Task.Run(CheckVoteStatusAsync);
         }
     }

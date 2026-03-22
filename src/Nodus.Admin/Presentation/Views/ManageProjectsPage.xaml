@@ -64,7 +64,7 @@
                             Style="{StaticResource FormEntry}" Margin="0" AutoSize="TextChanges" MinimumHeightRequest="80" />
                 </VerticalStackLayout>
 
-                <Grid ColumnDefinitions="*, *, *" ColumnSpacing="12">
+                <Grid ColumnDefinitions="*, *, *, *" ColumnSpacing="12">
                     <VerticalStackLayout Spacing="4" Grid.Column="0">
                         <Label Text="Stand" Style="{StaticResource FormLabel}" />
                         <Entry Placeholder="Ej. 42" Text="{Binding NewProjectStand}" Style="{StaticResource FormEntry}" Margin="0" />
@@ -76,6 +76,10 @@
                     <VerticalStackLayout Spacing="4" Grid.Column="2">
                         <Label Text="Video Link" Style="{StaticResource FormLabel}" />
                         <Entry Placeholder="https://youtube.com/..." Text="{Binding NewProjectVideo}" Style="{StaticResource FormEntry}" Margin="0" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="4" Grid.Column="3">
+                        <Label Text="Stack" Style="{StaticResource FormLabel}" />
+                        <Entry Placeholder="C#, .NET..." Text="{Binding NewProjectTechStack}" Style="{StaticResource FormEntry}" Margin="0" />
                     </VerticalStackLayout>
                 </Grid>
 
@@ -130,7 +134,10 @@
                     </VerticalStackLayout>
                 </VerticalStackLayout>
 
-                <CollectionView ItemsSource="{Binding Projects}" SelectionMode="None" Margin="16,0"
+                <CollectionView ItemsSource="{Binding Projects}" 
+                                SelectionMode="Single"
+                                SelectedItem="{Binding SelectedProject}"
+                                Margin="16,0"
                                 IsVisible="{Binding HasProjects}">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
@@ -143,25 +150,34 @@
                                         <SwipeItem Text="Eliminar" BackgroundColor="{StaticResource NodusError}" Command="{Binding DeleteCommand}" />
                                     </SwipeItems>
                                 </SwipeView.RightItems>
-                                <Border Style="{StaticResource Card}" Padding="16" Margin="0,0,0,2">
-                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto, Auto">
-                                        <VerticalStackLayout Grid.Column="0" Spacing="4">
-                                            <Label Text="{Binding Project.Name}" Style="{StaticResource Headline}" />
-                                            <HorizontalStackLayout Spacing="12">
-                                                <Label Text="{Binding Project.Category}" Style="{StaticResource Footnote}" TextColor="{StaticResource NodusSecondaryLabel}" />
-                                                <Label Text="•" VerticalOptions="Center" TextColor="{StaticResource NodusSeparator}" />
-                                                <Label Text="{Binding Project.StandNumber, StringFormat='Stand {0}'}" IsVisible="{Binding Project.StandNumber, Converter={StaticResource StringNotEmptyConverter}}"
-                                                       Style="{StaticResource Footnote}" TextColor="{StaticResource NodusSecondaryLabel}" />
-                                            </HorizontalStackLayout>
-                                        </VerticalStackLayout>
-                                        <Label Grid.Column="1" Text="{Binding Project.ProjectCode}" Style="{StaticResource Title3}" TextColor="{StaticResource NodusAccent}" VerticalOptions="Center" />
+                                <Border Style="{StaticResource Card}" Padding="0" Margin="0,0,0,10">
+                                    <Grid>
+                                        <!-- Interactive Layer -->
+                                        <Button BackgroundColor="Transparent" BorderWidth="0" CornerRadius="12"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ManageProjectsViewModel}}, Path=SelectProjectCommand}"
+                                                CommandParameter="{Binding .}"
+                                                ZIndex="1" />
                                         
-                                        <HorizontalStackLayout Grid.Row="1" Spacing="16" Margin="0,8,0,0">
-                                            <Label Text="GitHub" Style="{StaticResource Caption2}" TextColor="{StaticResource SystemBlue}" 
-                                                   IsVisible="{Binding Project.GithubLink, Converter={StaticResource StringNotEmptyConverter}}" />
-                                            <Label Text="Video" Style="{StaticResource Caption2}" TextColor="{StaticResource NodusAccent}" 
-                                                   IsVisible="{Binding Project.VideoLink, Converter={StaticResource StringNotEmptyConverter}}" />
-                                        </HorizontalStackLayout>
+                                        <!-- Visual Layer -->
+                                        <Grid ColumnDefinitions="*,Auto" Padding="20">
+                                            <VerticalStackLayout Grid.Column="0" Spacing="8">
+                                                <Label Text="{Binding Project.Name}" Style="{StaticResource Headline}" FontSize="18" InputTransparent="True" />
+                                                <HorizontalStackLayout Spacing="8" InputTransparent="True">
+                                                    <Border Style="{StaticResource BadgeInfo}" Padding="8,2" StrokeShape="RoundRectangle 4">
+                                                        <Label Text="{Binding Project.Category}" Style="{StaticResource Caption1}" TextColor="{StaticResource NodusAccent}" FontAttributes="Bold" />
+                                                    </Border>
+                                                    <Border Style="{StaticResource BadgeWarning}" Padding="8,2" StrokeShape="RoundRectangle 4"
+                                                            IsVisible="{Binding Project.StandNumber, Converter={StaticResource StringNotEmptyConverter}}">
+                                                        <Label Text="{Binding Project.StandNumber, StringFormat='Stand {0}'}" Style="{StaticResource Caption1}" TextColor="{StaticResource NodusWarning}" FontAttributes="Bold" />
+                                                    </Border>
+                                                </HorizontalStackLayout>
+                                            </VerticalStackLayout>
+                                            
+                                            <HorizontalStackLayout Grid.Column="1" Spacing="16" VerticalOptions="Center" InputTransparent="True">
+                                                <Label Text="{Binding Project.ProjectCode}" Style="{StaticResource Title3}" TextColor="{StaticResource NodusAccent}" VerticalOptions="Center" />
+                                                <Label Text="›" Style="{StaticResource Title1}" Opacity="0.3" VerticalOptions="Center" Margin="0,-4,0,0" />
+                                            </HorizontalStackLayout>
+                                        </Grid>
                                     </Grid>
                                 </Border>
                             </SwipeView>

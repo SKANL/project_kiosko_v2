@@ -56,16 +56,28 @@
                     <Label Text="{Binding Project.Description}" Style="{StaticResource Body}" />
                 </VerticalStackLayout>
 
+                <!-- Objectives -->
+                <VerticalStackLayout Spacing="8" IsVisible="{Binding Project.Objetivos, Converter={StaticResource StringNotEmptyConverter}}">
+                    <Label Text="OBJETIVOS" Style="{StaticResource SectionHeader}" Margin="0" />
+                    <Label Text="{Binding Project.Objetivos}" Style="{StaticResource Body}" />
+                </VerticalStackLayout>
+
                 <!-- Team -->
                 <VerticalStackLayout Spacing="8" IsVisible="{Binding Project.TeamMembers, Converter={StaticResource StringNotEmptyConverter}}">
                     <Label Text="EQUIPO" Style="{StaticResource SectionHeader}" Margin="0" />
                     <Label Text="{Binding Project.TeamMembers}" Style="{StaticResource Body}" />
                 </VerticalStackLayout>
 
+                <!-- Tech Stack -->
+                <VerticalStackLayout Spacing="8" IsVisible="{Binding Project.TechStack, Converter={StaticResource StringNotEmptyConverter}}">
+                    <Label Text="STACK TECNOLÓGICO" Style="{StaticResource SectionHeader}" Margin="0" />
+                    <Label Text="{Binding Project.TechStack}" Style="{StaticResource Body}" />
+                </VerticalStackLayout>
+
                 <!-- Links Section -->
                 <VerticalStackLayout Spacing="12">
                     <Label Text="RECURSOS" Style="{StaticResource SectionHeader}" Margin="0" 
-                           IsVisible="{Binding Project.GithubLink, Converter={StaticResource StringNotEmptyConverter}}" />
+                           IsVisible="{Binding HasLinks}" />
                     
                     <Button Text="Ver Código en GitHub" 
                             IsVisible="{Binding Project.GithubLink, Converter={StaticResource StringNotEmptyConverter}}"
@@ -73,7 +85,7 @@
                             Style="{StaticResource GhostButton}"
                             HorizontalOptions="Start" />
 
-                    <Button Text="Ver Video del Pitch" 
+                    <Button Text="Ver Video" 
                             IsVisible="{Binding Project.VideoLink, Converter={StaticResource StringNotEmptyConverter}}"
                             Command="{Binding OpenVideoCommand}"
                             Style="{StaticResource GhostButton}"

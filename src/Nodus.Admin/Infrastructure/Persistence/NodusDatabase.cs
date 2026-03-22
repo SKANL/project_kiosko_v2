@@ -44,6 +44,10 @@ public sealed class NodusDatabase : IDisposable
         await ApplyMigrationAsync("ALTER TABLE votes   ADD COLUMN RemainingTtl INTEGER NOT NULL DEFAULT 0");
         await ApplyMigrationAsync("ALTER TABLE projects ADD COLUMN ProjectCode TEXT NOT NULL DEFAULT ''");
         await ApplyMigrationAsync("ALTER TABLE projects ADD COLUMN SequenceNumber INTEGER NOT NULL DEFAULT 0");
+        await ApplyMigrationAsync("ALTER TABLE projects ADD COLUMN StandNumber TEXT NOT NULL DEFAULT ''");
+        await ApplyMigrationAsync("ALTER TABLE projects ADD COLUMN GithubLink  TEXT NOT NULL DEFAULT ''");
+        await ApplyMigrationAsync("ALTER TABLE projects ADD COLUMN VideoLink   TEXT NOT NULL DEFAULT ''");
+        await ApplyMigrationAsync("ALTER TABLE projects ADD COLUMN TechStack   TEXT NOT NULL DEFAULT ''");
 
         await RepairSequenceNumbersAsync().ConfigureAwait(false);
     }
