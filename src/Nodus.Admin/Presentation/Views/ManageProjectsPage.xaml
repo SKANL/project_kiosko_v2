@@ -68,7 +68,7 @@
                             Style="{StaticResource FormEntry}" Margin="0" AutoSize="TextChanges" MinimumHeightRequest="80" />
                 </VerticalStackLayout>
 
-                <Grid ColumnDefinitions="*, *, *, *" ColumnSpacing="12">
+                <Grid ColumnDefinitions="*, *, *, *, *" ColumnSpacing="12">
                     <VerticalStackLayout Spacing="4" Grid.Column="0">
                         <Label Text="Stand" Style="{StaticResource FormLabel}" />
                         <Entry Placeholder="Ej. 42" Text="{Binding NewProjectStand}" Style="{StaticResource FormEntry}" Margin="0" />
@@ -82,6 +82,10 @@
                         <Entry Placeholder="https://youtube.com/..." Text="{Binding NewProjectVideo}" Style="{StaticResource FormEntry}" Margin="0" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Spacing="4" Grid.Column="3">
+                        <Label Text="Video Speech" Style="{StaticResource FormLabel}" />
+                        <Entry Placeholder="https://youtube.com/..." Text="{Binding NewProjectSpeechVideo}" Style="{StaticResource FormEntry}" Margin="0" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="4" Grid.Column="4">
                         <Label Text="Stack" Style="{StaticResource FormLabel}" />
                         <Entry Placeholder="C#, .NET..." Text="{Binding NewProjectTechStack}" Style="{StaticResource FormEntry}" Margin="0" />
                     </VerticalStackLayout>

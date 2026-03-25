@@ -57,6 +57,9 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
     private string _newProjectVideo = string.Empty;
 
     [ObservableProperty]
+    private string _newProjectSpeechVideo = string.Empty;
+
+    [ObservableProperty]
     private ManageProjectItem? _selectedProject;
 
     private string _editName = string.Empty;
@@ -106,6 +109,13 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
     {
         get => _editVideo;
         set => SetProperty(ref _editVideo, value);
+    }
+
+    private string _editSpeechVideo = string.Empty;
+    public string EditSpeechVideo
+    {
+        get => _editSpeechVideo;
+        set => SetProperty(ref _editSpeechVideo, value);
     }
 
     private string _editTechStack = string.Empty;
@@ -195,6 +205,7 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
         NewProjectStand = string.Empty;
         NewProjectGithub = string.Empty;
         NewProjectVideo = string.Empty;
+        NewProjectSpeechVideo = string.Empty;
         NewProjectTechStack = string.Empty;
 
         var result = await _projects.GetByEventAsync(eventId.Value);
@@ -231,6 +242,7 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
         EditStand = project.StandNumber;
         EditGithub = project.GithubLink;
         EditVideo = project.VideoLink;
+        EditSpeechVideo = project.SpeechVideoLink;
         EditTechStack = project.TechStack;
         IsEditing = true;
     }
@@ -255,6 +267,7 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
         project.StandNumber = EditStand.Trim();
         project.GithubLink = EditGithub.Trim();
         project.VideoLink = EditVideo.Trim();
+        project.SpeechVideoLink = EditSpeechVideo.Trim();
         project.TechStack = EditTechStack.Trim();
 
         var result = await _projects.UpdateAsync(project);
@@ -477,6 +490,7 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
             StandNumber = NewProjectStand?.Trim() ?? string.Empty,
             GithubLink = NewProjectGithub?.Trim() ?? string.Empty,
             VideoLink = NewProjectVideo?.Trim() ?? string.Empty,
+            SpeechVideoLink = NewProjectSpeechVideo?.Trim() ?? string.Empty,
             TechStack = NewProjectTechStack?.Trim() ?? string.Empty,
             ProjectCode = await _projects.GenerateUniqueCodeAsync(_settings.ActiveEventId ?? 0),
             CreatedAt = DateTime.UtcNow.ToString("O")
@@ -497,6 +511,7 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
         NewProjectStand = string.Empty;
         NewProjectGithub = string.Empty;
         NewProjectVideo = string.Empty;
+        NewProjectSpeechVideo = string.Empty;
         NewProjectTechStack = string.Empty;
         TeamMemberList.Clear();
 

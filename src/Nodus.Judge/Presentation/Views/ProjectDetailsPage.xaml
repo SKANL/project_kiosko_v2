@@ -114,6 +114,12 @@
                             Command="{Binding OpenVideoCommand}"
                             Style="{StaticResource GhostButton}"
                             HorizontalOptions="Start" />
+
+                        <Button Text="Ver Video del Speech" 
+                            IsVisible="{Binding Project.SpeechVideoLink, Converter={StaticResource StringNotEmptyConverter}}"
+                            Command="{Binding OpenSpeechVideoCommand}"
+                            Style="{StaticResource GhostButton}"
+                            HorizontalOptions="Start" />
                 </VerticalStackLayout>
 
                 <!-- AI Outputs -->

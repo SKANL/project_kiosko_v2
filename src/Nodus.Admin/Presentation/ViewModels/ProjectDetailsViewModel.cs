@@ -58,6 +58,9 @@ public partial class ProjectDetailsViewModel : BaseViewModel
     private string _editVideo = string.Empty;
 
     [ObservableProperty]
+    private string _editSpeechVideo = string.Empty;
+
+    [ObservableProperty]
     private string _editMembers = string.Empty;
 
     [ObservableProperty]
@@ -101,6 +104,7 @@ public partial class ProjectDetailsViewModel : BaseViewModel
         EditStand = project.StandNumber;
         EditGithub = project.GithubLink;
         EditVideo = project.VideoLink;
+        EditSpeechVideo = project.SpeechVideoLink;
         EditMembers = project.TeamMembers;
         EditTechStack = project.TechStack;
     }
@@ -143,6 +147,7 @@ public partial class ProjectDetailsViewModel : BaseViewModel
         Project.StandNumber = EditStand.Trim();
         Project.GithubLink = EditGithub.Trim();
         Project.VideoLink = EditVideo.Trim();
+        Project.SpeechVideoLink = EditSpeechVideo.Trim();
         Project.TeamMembers = EditMembers.Trim();
         Project.TechStack = EditTechStack.Trim();
 

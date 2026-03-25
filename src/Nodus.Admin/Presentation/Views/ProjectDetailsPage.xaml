@@ -74,7 +74,7 @@
                         <Label Text="{Binding Project.TechStack}" Style="{StaticResource Body}" />
                     </VerticalStackLayout>
 
-                    <Grid ColumnDefinitions="*, *" ColumnSpacing="24">
+                    <Grid ColumnDefinitions="*, *, *" ColumnSpacing="24">
                         <VerticalStackLayout Spacing="8" Grid.Column="0">
                             <Label Text="GITHUB" Style="{StaticResource FormLabel}" Opacity="0.6" />
                             <Label Text="{Binding Project.GithubLink}" Style="{StaticResource Body}" TextColor="{StaticResource SystemBlue}" 
@@ -87,6 +87,13 @@
                             <Label Text="{Binding Project.VideoLink}" Style="{StaticResource Body}" TextColor="{StaticResource NodusAccent}" 
                                    IsVisible="{Binding Project.VideoLink, Converter={StaticResource StringNotEmptyConverter}}" />
                             <Label Text="—" Style="{StaticResource Body}" IsVisible="{Binding Project.VideoLink, Converter={StaticResource StringNotEmptyConverter}, ConverterParameter='inverse'}" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="8" Grid.Column="2">
+                            <Label Text="VIDEO SPEECH" Style="{StaticResource FormLabel}" Opacity="0.6" />
+                            <Label Text="{Binding Project.SpeechVideoLink}" Style="{StaticResource Body}" TextColor="{StaticResource NodusAccent}" 
+                                   IsVisible="{Binding Project.SpeechVideoLink, Converter={StaticResource StringNotEmptyConverter}}" />
+                            <Label Text="—" Style="{StaticResource Body}" IsVisible="{Binding Project.SpeechVideoLink, Converter={StaticResource StringNotEmptyConverter}, ConverterParameter='inverse'}" />
                         </VerticalStackLayout>
                     </Grid>
 
@@ -124,7 +131,7 @@
                         <Editor Text="{Binding EditObjetivos}" Style="{StaticResource FormEntry}" AutoSize="TextChanges" MinimumHeightRequest="80" />
                     </VerticalStackLayout>
 
-                    <Grid ColumnDefinitions="*, *, *" ColumnSpacing="12">
+                    <Grid ColumnDefinitions="*, *, *, *" ColumnSpacing="12">
                         <VerticalStackLayout Spacing="4" Grid.Column="0">
                             <Label Text="Stand" Style="{StaticResource FormLabel}" />
                             <Entry Text="{Binding EditStand}" Style="{StaticResource FormEntry}" />
@@ -136,6 +143,10 @@
                         <VerticalStackLayout Spacing="4" Grid.Column="2">
                             <Label Text="Video" Style="{StaticResource FormLabel}" />
                             <Entry Text="{Binding EditVideo}" Style="{StaticResource FormEntry}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Spacing="4" Grid.Column="3">
+                            <Label Text="Video Speech" Style="{StaticResource FormLabel}" />
+                            <Entry Text="{Binding EditSpeechVideo}" Style="{StaticResource FormEntry}" />
                         </VerticalStackLayout>
                     </Grid>
 

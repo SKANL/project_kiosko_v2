@@ -28,6 +28,7 @@ public sealed class RegisterProjectRequest
     public string  Category    { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? GithubLink  { get; set; }
+    public string? SpeechVideoLink { get; set; }
     public string? TeamMembers { get; set; }
 }
 
@@ -49,6 +50,7 @@ public sealed class ProjectEditResponse
     public string  Category    { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? GithubLink  { get; set; }
+    public string? SpeechVideoLink { get; set; }
     public string? TeamMembers { get; set; }
     public bool    IsEventOpen { get; set; }
 }
@@ -59,6 +61,7 @@ public sealed class UpdateProjectRequest
     public string  Category    { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? GithubLink  { get; set; }
+    public string? SpeechVideoLink { get; set; }
     public string? TeamMembers { get; set; }
 }
 
@@ -215,6 +218,7 @@ public sealed class LocalHttpServerService : ILocalHttpServerService, IAsyncDisp
                 Category    = req.Category.Trim(),
                 Description = req.Description?.Trim() ?? string.Empty,
                 GithubLink  = req.GithubLink?.Trim() ?? string.Empty,
+                SpeechVideoLink = req.SpeechVideoLink?.Trim() ?? string.Empty,
                 TeamMembers = req.TeamMembers?.Trim() ?? string.Empty,
                 ProjectCode = projectCode,
                 EditToken   = editToken
@@ -264,6 +268,7 @@ public sealed class LocalHttpServerService : ILocalHttpServerService, IAsyncDisp
                 Category    = project.Category,
                 Description = project.Description,
                 GithubLink  = project.GithubLink,
+                SpeechVideoLink = project.SpeechVideoLink,
                 TeamMembers = project.TeamMembers,
                 IsEventOpen = !isClosed
             }, json);
@@ -292,6 +297,7 @@ public sealed class LocalHttpServerService : ILocalHttpServerService, IAsyncDisp
             project.Category    = req.Category.Trim();
             project.Description = req.Description?.Trim() ?? string.Empty;
             project.GithubLink  = req.GithubLink?.Trim() ?? string.Empty;
+            project.SpeechVideoLink = req.SpeechVideoLink?.Trim() ?? string.Empty;
             project.TeamMembers = req.TeamMembers?.Trim() ?? string.Empty;
 
             var updateResult = await _projects.UpdateAsync(project);

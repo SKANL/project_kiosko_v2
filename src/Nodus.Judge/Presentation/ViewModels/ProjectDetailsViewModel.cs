@@ -67,8 +67,10 @@ public partial class ProjectDetailsViewModel : BaseViewModel
     public string TeamToggleText => IsTeamExpanded ? "Ver menos" : "Ver más";
     public string TechToggleText => IsTechExpanded ? "Ver menos" : "Ver más";
 
-    /// <summary>True when at least one of GithubLink or VideoLink is set — drives RECURSOS section visibility.</summary>
-    public bool HasLinks => !string.IsNullOrWhiteSpace(Project?.GithubLink) || !string.IsNullOrWhiteSpace(Project?.VideoLink);
+    /// <summary>True when at least one link is set — drives RECURSOS section visibility.</summary>
+    public bool HasLinks => !string.IsNullOrWhiteSpace(Project?.GithubLink)
+        || !string.IsNullOrWhiteSpace(Project?.VideoLink)
+        || !string.IsNullOrWhiteSpace(Project?.SpeechVideoLink);
 
     partial void OnProjectChanged(LocalProject? value)
     {
@@ -257,6 +259,13 @@ public partial class ProjectDetailsViewModel : BaseViewModel
     {
         if (Project == null || string.IsNullOrWhiteSpace(Project.VideoLink)) return;
         await Launcher.Default.OpenAsync(Project.VideoLink);
+    }
+
+    [RelayCommand]
+    private async Task OpenSpeechVideoAsync()
+    {
+        if (Project == null || string.IsNullOrWhiteSpace(Project.SpeechVideoLink)) return;
+        await Launcher.Default.OpenAsync(Project.SpeechVideoLink);
     }
 
     [RelayCommand]

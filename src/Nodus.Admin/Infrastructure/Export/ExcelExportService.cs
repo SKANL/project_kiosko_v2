@@ -141,15 +141,16 @@ public sealed class ExcelExportService : IExcelExportService
             ws.Cell(1, 5).Value = "StandNumber";
             ws.Cell(1, 6).Value = "GithubLink";
             ws.Cell(1, 7).Value = "VideoLink";
-            ws.Cell(1, 8).Value = "TechStack";
-            ws.Cell(1, 9).Value = "Objetivos";
-            ws.Cell(1, 10).Value = "ProjectCode";
-            ws.Cell(1, 11).Value = "SortOrder";
-            ws.Cell(1, 12).Value = "SequenceNumber";
-            ws.Cell(1, 13).Value = "EditToken";
-            ws.Cell(1, 14).Value = "CreatedAt";
+            ws.Cell(1, 8).Value = "SpeechVideoLink";
+            ws.Cell(1, 9).Value = "TechStack";
+            ws.Cell(1, 10).Value = "Objetivos";
+            ws.Cell(1, 11).Value = "ProjectCode";
+            ws.Cell(1, 12).Value = "SortOrder";
+            ws.Cell(1, 13).Value = "SequenceNumber";
+            ws.Cell(1, 14).Value = "EditToken";
+            ws.Cell(1, 15).Value = "CreatedAt";
 
-            var headerRange = ws.Range(1, 1, 1, 14);
+            var headerRange = ws.Range(1, 1, 1, 15);
             headerRange.Style.Font.Bold = true;
             headerRange.Style.Fill.BackgroundColor = XLColor.FromHtml("#007AFF");
             headerRange.Style.Font.FontColor = XLColor.White;
@@ -167,16 +168,17 @@ public sealed class ExcelExportService : IExcelExportService
                 ws.Cell(row, 5).Value = p.StandNumber;
                 ws.Cell(row, 6).Value = p.GithubLink;
                 ws.Cell(row, 7).Value = p.VideoLink;
-                ws.Cell(row, 8).Value = p.TechStack;
-                ws.Cell(row, 9).Value = p.Objetivos;
-                ws.Cell(row, 10).Value = p.ProjectCode;
-                ws.Cell(row, 11).Value = p.SortOrder;
-                ws.Cell(row, 12).Value = p.SequenceNumber;
-                ws.Cell(row, 13).Value = p.EditToken;
-                ws.Cell(row, 14).Value = p.CreatedAt;
+                ws.Cell(row, 8).Value = p.SpeechVideoLink;
+                ws.Cell(row, 9).Value = p.TechStack;
+                ws.Cell(row, 10).Value = p.Objetivos;
+                ws.Cell(row, 11).Value = p.ProjectCode;
+                ws.Cell(row, 12).Value = p.SortOrder;
+                ws.Cell(row, 13).Value = p.SequenceNumber;
+                ws.Cell(row, 14).Value = p.EditToken;
+                ws.Cell(row, 15).Value = p.CreatedAt;
 
                 if (i % 2 == 0)
-                    ws.Range(row, 1, row, 14).Style.Fill.BackgroundColor = XLColor.FromHtml("#F2F2F7");
+                    ws.Range(row, 1, row, 15).Style.Fill.BackgroundColor = XLColor.FromHtml("#F2F2F7");
             }
 
             ws.Columns().AdjustToContents();
@@ -272,6 +274,7 @@ public sealed class ExcelExportService : IExcelExportService
                     StandNumber = GetValue(row, headers, "StandNumber"),
                     GithubLink = GetValue(row, headers, "GithubLink"),
                     VideoLink = GetValue(row, headers, "VideoLink"),
+                    SpeechVideoLink = GetValue(row, headers, "SpeechVideoLink"),
                     TechStack = GetValue(row, headers, "TechStack"),
                     Objetivos = GetValue(row, headers, "Objetivos"),
                     ProjectCode = code,

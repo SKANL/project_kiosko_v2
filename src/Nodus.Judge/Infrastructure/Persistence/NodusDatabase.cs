@@ -38,6 +38,7 @@ public sealed class NodusDatabase : IDisposable
         await ApplyMigrationAsync("ALTER TABLE local_projects ADD COLUMN StandNumber    TEXT NOT NULL DEFAULT ''");
         await ApplyMigrationAsync("ALTER TABLE local_projects ADD COLUMN GithubLink     TEXT NOT NULL DEFAULT ''");
         await ApplyMigrationAsync("ALTER TABLE local_projects ADD COLUMN VideoLink      TEXT NOT NULL DEFAULT ''");
+        await ApplyMigrationAsync("ALTER TABLE local_projects ADD COLUMN SpeechVideoLink TEXT NOT NULL DEFAULT ''");
         await ApplyMigrationAsync("ALTER TABLE local_projects ADD COLUMN TechStack      TEXT NOT NULL DEFAULT ''");
         await ApplyMigrationAsync("ALTER TABLE local_projects ADD COLUMN SequenceNumber INTEGER NOT NULL DEFAULT 0");
         await ApplyMigrationAsync("ALTER TABLE local_projects ADD COLUMN AiSummaryJson TEXT NOT NULL DEFAULT ''");

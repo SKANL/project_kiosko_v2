@@ -120,6 +120,7 @@ public sealed class SyncFromAdminUseCase
             StandNumber = p.StandNumber ?? string.Empty,
             GithubLink  = p.GithubLink  ?? string.Empty,
             VideoLink   = p.VideoLink   ?? string.Empty,
+            SpeechVideoLink = p.SpeechVideoLink ?? string.Empty,
             TechStack   = p.TechStack   ?? string.Empty,
             SequenceNumber = p.SequenceNumber,
             SyncedAt    = DateTime.UtcNow.ToString("O")
@@ -283,6 +284,7 @@ public sealed class SyncFromAdminUseCase
                 StandNumber = project.StandNumber ?? string.Empty,
                 GithubLink  = project.GithubLink  ?? string.Empty,
                 VideoLink   = project.VideoLink   ?? string.Empty,
+                SpeechVideoLink = project.SpeechVideoLink ?? string.Empty,
                 TechStack   = project.TechStack   ?? string.Empty,
                 SequenceNumber = project.SequenceNumber,
                 SyncedAt    = DateTime.UtcNow.ToString("O")

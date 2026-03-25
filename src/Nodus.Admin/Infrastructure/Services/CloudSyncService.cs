@@ -41,6 +41,7 @@ public sealed class CloudSyncService : ICloudSyncService
         [JsonPropertyName("description")] public string? Description { get; set; }
         [JsonPropertyName("githubLink")] public string? GithubLink { get; set; }
         [JsonPropertyName("videoLink")] public string? VideoLink { get; set; }
+        [JsonPropertyName("speechVideoLink")] public string? SpeechVideoLink { get; set; }
         [JsonPropertyName("teamMembers")] public string? TeamMembers { get; set; }
         [JsonPropertyName("standNumber")] public string? StandNumber { get; set; }
         [JsonPropertyName("sortOrder")] public int SortOrder { get; set; }
@@ -175,6 +176,7 @@ public sealed class CloudSyncService : ICloudSyncService
                     Description = p.Description,
                     GithubLink = p.GithubLink,
                     VideoLink = p.VideoLink,
+                    SpeechVideoLink = p.SpeechVideoLink,
                     TeamMembers = p.TeamMembers,
                     StandNumber = p.StandNumber,
                     SortOrder = p.SortOrder,
@@ -325,6 +327,7 @@ public sealed class CloudSyncService : ICloudSyncService
                     EditToken = cp.EditToken,
                     GithubLink = cp.GithubLink ?? string.Empty,
                     VideoLink = cp.VideoLink ?? string.Empty,
+                    SpeechVideoLink = cp.SpeechVideoLink ?? string.Empty,
                     CreatedAt = cp.SyncedAtUtc.ToString("O")
                 };
 

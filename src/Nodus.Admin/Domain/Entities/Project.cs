@@ -41,6 +41,9 @@ public class Project
     /// <summary>Optional link to a pitch video.</summary>
     public string VideoLink  { get; set; } = string.Empty;
 
+    /// <summary>Optional link to a speech video.</summary>
+    public string SpeechVideoLink { get; set; } = string.Empty;
+
     /// <summary>
     /// System-generated UUID allowing a student to reopen the registration form to correct typos.
     /// Valid until the Admin closes the event (Decision #26, Doc 14 §1, Doc 15 §2).

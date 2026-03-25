@@ -32,6 +32,9 @@ public class LocalProject
     /// <summary>Optional link to a pitch video.</summary>
     public string VideoLink  { get; set; } = string.Empty;
 
+    /// <summary>Optional link to a speech video.</summary>
+    public string SpeechVideoLink { get; set; } = string.Empty;
+
     /// <summary>Technologies used in the project (comma-separated).</summary>
     public string TechStack  { get; set; } = string.Empty;
 

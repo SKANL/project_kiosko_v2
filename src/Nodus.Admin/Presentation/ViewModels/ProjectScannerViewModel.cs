@@ -98,6 +98,7 @@ public partial class ProjectScannerViewModel : BaseViewModel
                     Description = cloudProject.GetProperty("description").GetString() ?? "",
                     GithubLink = cloudProject.GetProperty("githubLink").GetString() ?? "",
                     VideoLink = cloudProject.GetProperty("videoLink").GetString() ?? "", // New field!
+                    SpeechVideoLink = cloudProject.TryGetProperty("speechVideoLink", out var speechVideo) ? speechVideo.GetString() ?? "" : "",
                     TeamMembers = cloudProject.GetProperty("teamMembers").GetString() ?? "",
                     ProjectCode = pid,
                     EditToken = cloudProject.TryGetProperty("editToken", out var et) ? et.GetString() ?? "" : "",
