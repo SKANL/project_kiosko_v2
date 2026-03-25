@@ -9,6 +9,7 @@ using Nodus.Judge.Infrastructure.Ble;
 using Nodus.Judge.Infrastructure.Crypto;
 using Nodus.Judge.Infrastructure.Persistence;
 using Nodus.Judge.Infrastructure.Settings;
+using Nodus.Judge.Infrastructure.Services;
 using Nodus.Judge.Presentation.ViewModels;
 using Nodus.Judge.Presentation.Views;
 using Shiny;
@@ -52,6 +53,14 @@ public static class MauiProgram
         builder.Services.AddSingleton<ILocalVoteRepository, LocalVoteRepository>();
 
         builder.Services.AddSingleton<ICryptoService, CryptoService>();
+
+        // Groq AI service (HTTP client). Expects `GROQ_API_KEY` in SecureStorage.
+        builder.Services.AddSingleton<Nodus.Judge.Application.Interfaces.Services.IGroqService>(sp =>
+        {
+            var client = new System.Net.Http.HttpClient { BaseAddress = new Uri("https://api.groq.com/openai/v1/") };
+            var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Nodus.Judge.Infrastructure.Services.GroqService>>();
+            return new GroqService(client, logger);
+        });
 
         // BleGattClientService is needed both as a concrete type (by BleSwarmService)
         // and via its interface (by use cases). Register concrete first, then alias.

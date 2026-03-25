@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Nodus.Judge.Presentation.Views.RawAiJsonPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Resultado AI">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="18">
+        <Label x:Name="HeaderLabel" Text="Resultado AI" FontAttributes="Bold" FontSize="16" />
+
+        <Editor x:Name="RawEditor" Grid.Row="1" AutoSize="TextChanges" IsReadOnly="True" />
+
+        <HorizontalStackLayout Grid.Row="2" Spacing="12" HorizontalOptions="End">
+            <Button Text="Copiar" Clicked="OnCopyClicked" Style="{StaticResource GhostButton}" />
+            <Button Text="Cerrar" Clicked="OnCloseClicked" Style="{StaticResource PrimaryButton}" />
+        </HorizontalStackLayout>
+    </Grid>
+</ContentPage>

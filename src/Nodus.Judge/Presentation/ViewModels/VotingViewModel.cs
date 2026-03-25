@@ -55,34 +55,36 @@ public sealed partial class VotingViewModel : BaseViewModel
     private readonly ILocalProjectRepository  _projects;
     private readonly ILocalEventRepository    _localEvents;
     private readonly ILocalVoteRepository     _votes;
+    private readonly IGroqService _groq;
     private readonly ILocalJudgeRepository    _judges;
     private readonly ICryptoService           _crypto;
     private readonly IAppSettingsService      _settings;
     private readonly PinValidationService     _pinValidation;
     private readonly IBleSwarmService         _swarm;
     private IDisposable? _swarmStateSubscription;
-
     public VotingViewModel(
-        SubmitVoteUseCase       submit,
+        SubmitVoteUseCase submit,
         ILocalProjectRepository projects,
-        ILocalEventRepository   localEvents,
-        ILocalVoteRepository    votes,
-        ILocalJudgeRepository   judges,
-        ICryptoService          crypto,
-        IAppSettingsService     settings,
-        PinValidationService    pinValidation,
-        IBleSwarmService        swarm)
+        ILocalEventRepository localEvents,
+        ILocalVoteRepository votes,
+        IGroqService groq,
+        ILocalJudgeRepository judges,
+        ICryptoService crypto,
+        IAppSettingsService settings,
+        PinValidationService pinValidation,
+        IBleSwarmService swarm)
     {
-        _submit        = submit;
-        _projects      = projects;
-        _localEvents   = localEvents;
-        _votes         = votes;
-        _judges        = judges;
-        _crypto        = crypto;
-        _settings      = settings;
+        _submit = submit;
+        _projects = projects;
+        _localEvents = localEvents;
+        _votes = votes;
+        _groq = groq;
+        _judges = judges;
+        _crypto = crypto;
+        _settings = settings;
         _pinValidation = pinValidation;
-        _swarm         = swarm;
-        Title     = "Evaluar";
+        _swarm = swarm;
+        Title = "Evaluar";
 
         UpdateSwarmAssist(_swarm.CurrentState);
         _swarmStateSubscription = _swarm.StateChanges.Subscribe(state =>
@@ -353,6 +355,8 @@ public sealed partial class VotingViewModel : BaseViewModel
     [RelayCommand]
     private async Task OpenMyVotesAsync()
         => await Shell.Current.GoToAsync(nameof(MyVotesPage));
+
+    
 
     [RelayCommand]
     private async Task CloseProjectSelectionAsync()

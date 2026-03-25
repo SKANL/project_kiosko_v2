@@ -67,6 +67,16 @@ public sealed class LocalVoteRepository : ILocalVoteRepository
         catch (Exception ex) { return Result<int>.Fail(ex.Message); }
     }
 
+    public async Task<Result<LocalVote?>> GetByIdAsync(int id)
+    {
+        try
+        {
+            var v = await _db.Connection.FindAsync<LocalVote>(id);
+            return Result<LocalVote?>.Ok(v);
+        }
+        catch (Exception ex) { return Result<LocalVote?>.Fail(ex.Message); }
+    }
+
     public async Task<Result> MarkSyncedAsync(IEnumerable<int> ids)
     {
         try

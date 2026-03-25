@@ -7,6 +7,7 @@ using Nodus.Admin.Application.Interfaces.Services;
 using Nodus.Admin.Domain.Entities;
 using Nodus.Admin.Presentation.Views;
 using Nodus.Admin.Application.UseCases.Events;
+using Microsoft.Maui.Storage;
 
 namespace Nodus.Admin.Presentation.ViewModels;
 
@@ -22,6 +23,7 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
     private readonly IEventRepository _events;
     private readonly IAppSettingsService _settings;
     private readonly BuildBootstrapPayloadUseCase _bootstrap;
+    private readonly IExcelExportService _excel;
 
     public ObservableCollection<ManageProjectItem> Projects { get; } = new();
     public ObservableCollection<string> AvailableCategories { get; } = new();
@@ -137,12 +139,18 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
         HasProjects = Projects.Count > 0;
     }
 
-    public ManageProjectsViewModel(IProjectRepository projects, IEventRepository events, IAppSettingsService settings, BuildBootstrapPayloadUseCase bootstrap)
+    public ManageProjectsViewModel(
+        IProjectRepository projects,
+        IEventRepository events,
+        IAppSettingsService settings,
+        BuildBootstrapPayloadUseCase bootstrap,
+        IExcelExportService excel)
     {
         _projects = projects;
         _events = events;
         _settings = settings;
         _bootstrap = bootstrap;
+        _excel = excel;
         Title = "Proyectos";
     }
 
@@ -301,6 +309,147 @@ public sealed partial class ManageProjectsViewModel : BaseViewModel
     private async Task GoToScannerAsync()
     {
         await Shell.Current.GoToAsync(nameof(ProjectScannerPage));
+    }
+
+    [RelayCommand]
+    private async Task ExportProjectsAsync()
+    {
+        await SafeExecuteAsync(async () =>
+        {
+            var eventId = _settings.ActiveEventId;
+            if (!eventId.HasValue || eventId.Value <= 0)
+            {
+                await Shell.Current.DisplayAlertAsync("Exportar", "No hay un evento activo seleccionado.", "OK");
+                return;
+            }
+
+            var outputDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var exportResult = await _excel.ExportProjectsAsync(eventId.Value, outputDir);
+            if (exportResult.IsFail)
+            {
+                await Shell.Current.DisplayAlertAsync("Exportar", exportResult.Error ?? "No se pudo exportar.", "OK");
+                return;
+            }
+
+            var filePath = exportResult.Value!;
+            await Shell.Current.DisplayAlertAsync("Exportación completada", $"Archivo generado:\n{filePath}", "OK");
+            if (File.Exists(filePath))
+                await Launcher.TryOpenAsync(new Uri($"file:///{filePath.Replace('\\', '/')}"));
+        });
+    }
+
+    [RelayCommand]
+    private async Task ImportProjectsAsync()
+    {
+        await SafeExecuteAsync(async () =>
+        {
+            var targetEventId = await SelectTargetEventAsync();
+            if (!targetEventId.HasValue) return;
+
+            var mode = await Shell.Current.DisplayActionSheetAsync(
+                "Modo de importación",
+                "Cancelar",
+                null,
+                "Reemplazar proyectos del evento",
+                "Agregar sin borrar");
+
+            if (string.IsNullOrWhiteSpace(mode) || string.Equals(mode, "Cancelar", StringComparison.OrdinalIgnoreCase))
+                return;
+
+            bool replaceExisting = string.Equals(mode, "Reemplazar proyectos del evento", StringComparison.OrdinalIgnoreCase);
+
+            var pickOptions = new PickOptions
+            {
+                PickerTitle = "Selecciona archivo de proyectos (.xlsx)",
+                FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
+                {
+                    { DevicePlatform.WinUI, new[] { ".xlsx" } },
+                    { DevicePlatform.Android, new[] { "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" } },
+                    { DevicePlatform.iOS, new[] { "org.openxmlformats.spreadsheetml.sheet" } },
+                    { DevicePlatform.MacCatalyst, new[] { "org.openxmlformats.spreadsheetml.sheet" } }
+                })
+            };
+
+            var file = await FilePicker.Default.PickAsync(pickOptions);
+            if (file is null) return;
+
+            var localPath = await EnsureLocalPathAsync(file);
+            try
+            {
+                var importResult = await _excel.ImportProjectsAsync(localPath, targetEventId.Value, replaceExisting);
+                if (importResult.IsFail)
+                {
+                    await Shell.Current.DisplayAlertAsync("Importar", importResult.Error ?? "No se pudo importar.", "OK");
+                    return;
+                }
+
+                var data = importResult.Value!;
+                await Shell.Current.DisplayAlertAsync(
+                    "Importación completada",
+                    $"Evento destino: {data.TargetEventId}\nImportados: {data.ImportedCount}\nOmitidos: {data.SkippedCount}",
+                    "OK");
+
+                if (_settings.ActiveEventId == targetEventId.Value)
+                    await LoadProjectsAsync();
+
+                await _bootstrap.ExecuteAsync(targetEventId.Value);
+            }
+            finally
+            {
+                if (!string.Equals(localPath, file.FullPath, StringComparison.OrdinalIgnoreCase) && File.Exists(localPath))
+                {
+                    try { File.Delete(localPath); } catch { }
+                }
+            }
+        });
+    }
+
+    private async Task<int?> SelectTargetEventAsync()
+    {
+        var eventsResult = await _events.GetAllAsync();
+        if (eventsResult.IsFail)
+        {
+            await Shell.Current.DisplayAlertAsync("Importar", eventsResult.Error ?? "No se pudieron cargar los eventos.", "OK");
+            return null;
+        }
+
+        var allEvents = eventsResult.Value?
+            .OrderByDescending(e => e.Id)
+            .ToList() ?? new List<NodusEvent>();
+
+        if (allEvents.Count == 0)
+        {
+            await Shell.Current.DisplayAlertAsync("Importar", "No hay eventos disponibles.", "OK");
+            return null;
+        }
+
+        var labels = allEvents
+            .Select(e => $"#{e.Id} - {e.Name} ({e.Status})")
+            .ToArray();
+
+        var selected = await Shell.Current.DisplayActionSheetAsync(
+            "Selecciona el evento destino",
+            "Cancelar",
+            null,
+            labels);
+
+        if (string.IsNullOrWhiteSpace(selected) || string.Equals(selected, "Cancelar", StringComparison.OrdinalIgnoreCase))
+            return null;
+
+        var target = allEvents.FirstOrDefault(e => $"#{e.Id} - {e.Name} ({e.Status})" == selected);
+        return target?.Id;
+    }
+
+    private static async Task<string> EnsureLocalPathAsync(FileResult file)
+    {
+        if (!string.IsNullOrWhiteSpace(file.FullPath) && File.Exists(file.FullPath))
+            return file.FullPath;
+
+        var tempPath = Path.Combine(FileSystem.CacheDirectory, $"import_projects_{Guid.NewGuid():N}.xlsx");
+        await using var source = await file.OpenReadAsync();
+        await using var target = File.Create(tempPath);
+        await source.CopyToAsync(target);
+        return tempPath;
     }
 
     [RelayCommand]

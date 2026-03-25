@@ -17,7 +17,6 @@ public partial class App : global::Microsoft.Maui.Controls.Application
 		// Start BLE EventChanged listener — shows alert when Admin switches active event.
 		services.GetRequiredService<EventChangeListenerService>().Start();
 		services.GetRequiredService<RelayForwardingService>().Start();
-		services.GetRequiredService<Application.UseCases.Onboarding.SyncFromAdminUseCase>().StartAutoPolling();
 
 		var shell = services.GetRequiredService<AppShell>();
 		MainPage = shell;

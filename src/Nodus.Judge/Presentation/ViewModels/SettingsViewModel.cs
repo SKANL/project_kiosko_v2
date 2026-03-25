@@ -104,6 +104,8 @@ public sealed partial class SettingsViewModel : BaseViewModel
 
     [ObservableProperty]
     private int _votesSentCount;
+    [ObservableProperty]
+    private string _groqApiKey = string.Empty;
 
     public string AppVersion =>
         AppInfo.VersionString is { Length: > 0 } v ? v : "2.0";
@@ -112,7 +114,17 @@ public sealed partial class SettingsViewModel : BaseViewModel
 
     [RelayCommand]
     public async Task AppearingAsync()
-        => await SafeExecuteAsync(LoadSummaryAsync);
+        => await SafeExecuteAsync(async () =>
+        {
+            await LoadSummaryAsync();
+            // Load saved Groq API key from secure storage if present
+            try
+            {
+                var key = await Microsoft.Maui.Storage.SecureStorage.Default.GetAsync("GROQ_API_KEY");
+                GroqApiKey = key ?? string.Empty;
+            }
+            catch { GroqApiKey = string.Empty; }
+        });
 
     private async Task LoadSummaryAsync()
     {
@@ -270,7 +282,7 @@ public sealed partial class SettingsViewModel : BaseViewModel
     private async Task ClearLocalDataAsync()
     {
         bool confirm = await Shell.Current
-            .DisplayAlert(
+            .DisplayAlertAsync(
                 "Borrar datos",
                 "¿Eliminar todos los datos locales? Esta acción no se puede deshacer.",
                 "Borrar",
@@ -294,6 +306,25 @@ public sealed partial class SettingsViewModel : BaseViewModel
 
         // Return to onboarding
         await Shell.Current.GoToAsync("OnboardingPage").ConfigureAwait(false);
+    }
+
+    [RelayCommand]
+    private async Task SaveGroqApiKeyAsync()
+    {
+        if (string.IsNullOrWhiteSpace(GroqApiKey))
+        {
+            await Shell.Current.DisplayAlertAsync("Clave API", "Introduce una clave válida.", "OK");
+            return;
+        }
+        try
+        {
+            await Microsoft.Maui.Storage.SecureStorage.Default.SetAsync("GROQ_API_KEY", GroqApiKey);
+            await Shell.Current.DisplayAlertAsync("Clave API", "Clave guardada en almacenamiento seguro.", "OK");
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlertAsync("Error", $"No se pudo guardar la clave: {ex.Message}", "OK");
+        }
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

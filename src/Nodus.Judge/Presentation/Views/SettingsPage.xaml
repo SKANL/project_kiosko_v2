@@ -265,6 +265,11 @@
                                 FontAttributes="Bold" />
                         </Grid>
 
+                        <!-- Groq API Key -->
+                        <Label Style="{StaticResource Caption1}" Text="Proveedor AI (Groq)" FontAttributes="Bold" />
+                        <Entry Placeholder="Pega la GROQ API Key aquí" Text="{Binding GroqApiKey}" IsPassword="True" />
+                        <Button Text="Guardar clave Groq" Style="{StaticResource SecondaryButton}" Command="{Binding SaveGroqApiKeyCommand}" />
+
                         <!-- Votos enviados -->
                         <Grid ColumnDefinitions="Auto,*">
                             <Label

@@ -36,4 +36,9 @@ public class LocalProject
     public string TechStack  { get; set; } = string.Empty;
 
     public string SyncedAt    { get; set; } = DateTime.UtcNow.ToString("O");
+    
+    /// <summary>AI-generated summary JSON stored locally.</summary>
+    public string AiSummaryJson { get; set; } = string.Empty;
+    /// <summary>ISO timestamp (UTC) when the AI summary was generated locally.</summary>
+    public string AiGeneratedAt { get; set; } = string.Empty;
 }

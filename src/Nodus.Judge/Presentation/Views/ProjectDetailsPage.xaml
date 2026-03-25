@@ -13,9 +13,9 @@
         <toolkit:IsStringNotNullOrWhiteSpaceConverter x:Key="StringNotEmptyConverter" />
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="*,Auto" Padding="24">
+    <Grid RowDefinitions="*,Auto" RowSpacing="12" Padding="24,20,24,12">
         <ScrollView Grid.Row="0">
-            <VerticalStackLayout Spacing="24">
+            <VerticalStackLayout Spacing="20">
                 
                 <!-- Header Section -->
                 <VerticalStackLayout Spacing="8">
@@ -53,25 +53,49 @@
                 <!-- Description -->
                 <VerticalStackLayout Spacing="8">
                     <Label Text="SOBRE EL PROYECTO" Style="{StaticResource SectionHeader}" Margin="0" />
-                    <Label Text="{Binding Project.Description}" Style="{StaticResource Body}" />
+                    <Label x:Name="DescriptionBodyLabel" Text="{Binding DescriptionText}" Style="{StaticResource Body}" LineBreakMode="WordWrap" />
+                    <Button
+                        Text="{Binding DescriptionToggleText}"
+                        Command="{Binding ToggleDescriptionCommand}"
+                        Style="{StaticResource GhostButton}"
+                        HorizontalOptions="Start"
+                        IsVisible="{Binding CanExpandDescription}" />
                 </VerticalStackLayout>
 
                 <!-- Objectives -->
                 <VerticalStackLayout Spacing="8" IsVisible="{Binding Project.Objetivos, Converter={StaticResource StringNotEmptyConverter}}">
                     <Label Text="OBJETIVOS" Style="{StaticResource SectionHeader}" Margin="0" />
-                    <Label Text="{Binding Project.Objetivos}" Style="{StaticResource Body}" />
+                    <Label x:Name="ObjectivesBodyLabel" Text="{Binding ObjectivesText}" Style="{StaticResource Body}" LineBreakMode="WordWrap" />
+                    <Button
+                        Text="{Binding ObjectivesToggleText}"
+                        Command="{Binding ToggleObjectivesCommand}"
+                        Style="{StaticResource GhostButton}"
+                        HorizontalOptions="Start"
+                        IsVisible="{Binding CanExpandObjectives}" />
                 </VerticalStackLayout>
 
                 <!-- Team -->
                 <VerticalStackLayout Spacing="8" IsVisible="{Binding Project.TeamMembers, Converter={StaticResource StringNotEmptyConverter}}">
                     <Label Text="EQUIPO" Style="{StaticResource SectionHeader}" Margin="0" />
-                    <Label Text="{Binding Project.TeamMembers}" Style="{StaticResource Body}" />
+                    <Label x:Name="TeamBodyLabel" Text="{Binding TeamText}" Style="{StaticResource Body}" LineBreakMode="WordWrap" />
+                    <Button
+                        Text="{Binding TeamToggleText}"
+                        Command="{Binding ToggleTeamCommand}"
+                        Style="{StaticResource GhostButton}"
+                        HorizontalOptions="Start"
+                        IsVisible="{Binding CanExpandTeam}" />
                 </VerticalStackLayout>
 
                 <!-- Tech Stack -->
                 <VerticalStackLayout Spacing="8" IsVisible="{Binding Project.TechStack, Converter={StaticResource StringNotEmptyConverter}}">
                     <Label Text="STACK TECNOLÓGICO" Style="{StaticResource SectionHeader}" Margin="0" />
-                    <Label Text="{Binding Project.TechStack}" Style="{StaticResource Body}" />
+                    <Label x:Name="TechBodyLabel" Text="{Binding TechText}" Style="{StaticResource Body}" LineBreakMode="WordWrap" />
+                    <Button
+                        Text="{Binding TechToggleText}"
+                        Command="{Binding ToggleTechCommand}"
+                        Style="{StaticResource GhostButton}"
+                        HorizontalOptions="Start"
+                        IsVisible="{Binding CanExpandTech}" />
                 </VerticalStackLayout>
 
                 <!-- Links Section -->
@@ -92,17 +116,64 @@
                             HorizontalOptions="Start" />
                 </VerticalStackLayout>
 
+                <!-- AI Outputs -->
+                <Border
+                    x:Name="AiSummaryCard"
+                    Style="{StaticResource ElevatedCard}"
+                    IsVisible="{Binding AiSummary, Converter={StaticResource StringNotEmptyConverter}}"
+                    Stroke="{StaticResource NodusAccent}"
+                    StrokeThickness="1">
+                    <VerticalStackLayout Spacing="12">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                            <Label Text="RESUMEN (AI)" Style="{StaticResource SectionHeader}" Margin="0" />
+                            <Label Grid.Column="1" Text="{Binding AiGeneratedAt}" Style="{StaticResource Caption1}" HorizontalOptions="End" VerticalOptions="Center" IsVisible="{Binding AiGeneratedAt, Converter={StaticResource StringNotEmptyConverter}}" />
+                        </Grid>
+
+                        <Label
+                            Text="{Binding AiSummary}"
+                            Style="{StaticResource Body}"
+                            LineBreakMode="WordWrap"
+                            LineHeight="1.25" />
+
+                        <HorizontalStackLayout Spacing="8">
+                            <Button Text="Copiar" Style="{StaticResource GhostButton}" Command="{Binding CopyAiSummaryCommand}" IsEnabled="{Binding IsNotBusy}" />
+                            <Button Text="Ver completo" Style="{StaticResource GhostButton}" IsVisible="{Binding IsAiTruncated}" Command="{Binding ShowFullAiCommand}" IsEnabled="{Binding IsNotBusy}" />
+                            <Button Text="Ver JSON" Style="{StaticResource GhostButton}" IsVisible="{Binding IsRawAvailable}" Command="{Binding ShowRawAiCommand}" IsEnabled="{Binding IsNotBusy}" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                
+
             </VerticalStackLayout>
         </ScrollView>
 
         <!-- Action Button -->
-        <VerticalStackLayout Grid.Row="1" Padding="0,16,0,0" Spacing="12">
-            <Button Text="Evaluar Proyecto" 
-                    Style="{StaticResource PrimaryButton}" 
-                    Command="{Binding EvaluateCommand}" />
-            <Button Text="Volver a la lista" 
-                    Style="{StaticResource GhostButton}" 
-                    Command="{Binding BackCommand}" />
-        </VerticalStackLayout>
+        <Border Grid.Row="1" Style="{StaticResource Card}" Padding="0" StrokeThickness="0">
+            <VerticalStackLayout Padding="0,10,0,0" Spacing="8">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" IsVisible="{Binding IsBusy}" Padding="4,0">
+                    <ActivityIndicator IsRunning="{Binding IsBusy}" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="Generando resumen AI..." Style="{StaticResource Footnote}" VerticalOptions="Center" />
+                </Grid>
+
+                <Button
+                    Text="{Binding AiActionText}"
+                    Style="{StaticResource GhostButton}"
+                    Command="{Binding GenerateAiSummaryCommand}"
+                    IsEnabled="{Binding IsNotBusy}" />
+
+                <Button
+                    Text="{Binding EvaluateButtonText}"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding EvaluateCommand}"
+                    IsEnabled="{Binding IsNotBusy}" />
+
+                <Button
+                    Text="Volver a la lista"
+                    Style="{StaticResource GhostButton}"
+                    Command="{Binding BackCommand}"
+                    IsEnabled="{Binding IsNotBusy}" />
+            </VerticalStackLayout>
+        </Border>
     </Grid>
 </ContentPage>

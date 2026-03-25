@@ -76,7 +76,7 @@ public sealed partial class MyVotesViewModel : BaseViewModel
             {
                 Vote = vote,
                 ProjectName = proj?.Name ?? $"Proyecto #{vote.ProjectId}",
-                ProjectCategory = proj?.Category ?? ""
+                ProjectCategory = proj?.Category ?? "",
             });
         }
 

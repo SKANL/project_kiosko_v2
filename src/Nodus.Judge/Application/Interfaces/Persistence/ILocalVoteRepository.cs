@@ -12,4 +12,7 @@ public interface ILocalVoteRepository
     Task<Result<int>>                     UpsertAsync(LocalVote vote);
     Task<Result>                          MarkSyncedAsync(IEnumerable<int> ids);
     Task<Result>                          DeleteAllAsync();
+
+    // Get a vote by its local Id
+    Task<Result<LocalVote?>>              GetByIdAsync(int id);
 }

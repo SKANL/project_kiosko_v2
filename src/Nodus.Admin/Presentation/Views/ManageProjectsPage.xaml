@@ -25,6 +25,10 @@
                 </VerticalStackLayout>
 
                 <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                    <Button Text="Exportar Excel" Command="{Binding ExportProjectsCommand}" 
+                        Style="{StaticResource GhostButton}" Padding="16,8" />
+                    <Button Text="Importar Excel" Command="{Binding ImportProjectsCommand}" 
+                        Style="{StaticResource GhostButton}" Padding="16,8" />
                     <Button Text="Escanear QR" Command="{Binding GoToScannerCommand}" 
                             Style="{StaticResource GhostButton}" Padding="16,8" />
                     <Button Text="Nuevo Proyecto" Command="{Binding ToggleCreateProjectCommand}" 
