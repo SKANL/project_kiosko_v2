@@ -26,4 +26,6 @@ public static class NodusPrefix
     public const byte Ack          = 0xA1;   // ACK                  Admin→Judge via Notify
     public const byte Nack         = 0xA2;   // NACK (Reject)        Admin→Judge via Notify
     public const byte ChunkedPayload = 0x09; // L2CAP-like chunked data
+    public const byte EventDiscoveryRequest = 0x0A; // Discover onboarding events Judge→Admin
+    public const byte EventDiscovery        = 0x0B; // Discover onboarding events Admin→Judge
 }

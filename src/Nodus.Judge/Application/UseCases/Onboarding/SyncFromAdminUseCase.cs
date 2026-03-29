@@ -52,6 +52,70 @@ public sealed class SyncFromAdminUseCase
     public async Task<Result> EnsureAdminConnectionAsync(int timeoutSeconds = 15)
         => await _client.EnsureConnectedAsync(timeoutSeconds);
 
+    public async Task<Result<IReadOnlyList<DiscoveredAccessEventDto>>> DiscoverAccessEventsAsync(int timeoutSeconds = 15)
+    {
+        var connectResult = await _client.EnsureConnectedAsync(timeoutSeconds);
+        if (connectResult.IsFail)
+            return Result<IReadOnlyList<DiscoveredAccessEventDto>>.Fail(connectResult.Error!);
+
+        Result<byte[]> discoverResult = Result<byte[]>.Fail("Discovery did not start");
+        for (int attempt = 0; attempt < 2; attempt++)
+        {
+            discoverResult = await _client.SyncFromAdminAsync([NodusPrefix.EventDiscoveryRequest]);
+            if (discoverResult.IsOk)
+                break;
+
+            // Version mismatch / unsupported-command errors are deterministic:
+            // retrying adds latency but does not improve success.
+            if (LooksLikeUnsupportedDiscovery(discoverResult.Error))
+                break;
+
+            await _client.DisconnectAsync();
+            await Task.Delay(350);
+
+            var reconnect = await _client.EnsureConnectedAsync(timeoutSeconds);
+            if (reconnect.IsFail)
+                return Result<IReadOnlyList<DiscoveredAccessEventDto>>.Fail(reconnect.Error!);
+        }
+
+        if (discoverResult.IsFail)
+            return Result<IReadOnlyList<DiscoveredAccessEventDto>>.Fail(discoverResult.Error!);
+
+        var raw = discoverResult.Value!;
+        if (raw.Length < 2 || raw[0] != NodusPrefix.EventDiscovery)
+            return Result<IReadOnlyList<DiscoveredAccessEventDto>>.Fail(
+                "La app Admin cercana no soporta descubrimiento sin QR (comando BLE 0x0A). Actualiza Admin y vuelve a intentar.");
+
+        try
+        {
+            var events = JsonSerializer.Deserialize<List<DiscoveredAccessEventDto>>(
+                Encoding.UTF8.GetString(raw[1..]),
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                ?? [];
+
+            var valid = events
+                .Where(evt => evt.EventId > 0 && !string.IsNullOrWhiteSpace(evt.AccessQrRaw))
+                .ToList();
+
+            return Result<IReadOnlyList<DiscoveredAccessEventDto>>.Ok(valid);
+        }
+        catch (Exception ex)
+        {
+            return Result<IReadOnlyList<DiscoveredAccessEventDto>>.Fail($"No se pudo leer la lista de eventos: {ex.Message}");
+        }
+    }
+
+    private static bool LooksLikeUnsupportedDiscovery(string? error)
+    {
+        if (string.IsNullOrWhiteSpace(error))
+            return false;
+
+        return error.Contains("0x0A", StringComparison.OrdinalIgnoreCase)
+            || error.Contains("descubrimiento", StringComparison.OrdinalIgnoreCase)
+            || error.Contains("misma versión", StringComparison.OrdinalIgnoreCase)
+            || error.Contains("no soporta", StringComparison.OrdinalIgnoreCase);
+    }
+
     public async Task<Result<BootstrapPayloadDto>> ExecuteAsync(RegistrationContext? registration = null)
     {
         // If not already connected, scan for the Admin device and connect automatically.

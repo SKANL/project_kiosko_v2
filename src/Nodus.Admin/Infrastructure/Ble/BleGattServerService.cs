@@ -214,7 +214,10 @@ public sealed class BleGattServerService : IBleGattServerService, IDisposable
         // -- CHUNK PROCESSING END --
 
         // A new pre-read command starts a new bootstrap transfer session.
-        if (data.Length > 0 && (data[0] == NodusPrefix.JudgeRegister || data[0] == NodusPrefix.SyncRequest))
+        if (data.Length > 0
+            && (data[0] == NodusPrefix.JudgeRegister
+                || data[0] == NodusPrefix.SyncRequest
+                || data[0] == NodusPrefix.EventDiscoveryRequest))
         {
             lock (_bootstrapLock)
                 ResetBootstrapStream();

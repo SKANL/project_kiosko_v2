@@ -1,6 +1,8 @@
 using System.Text.Json;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Nodus.Judge.Application.DTOs;
 using Nodus.Judge.Application.Interfaces.Persistence;
 using Nodus.Judge.Application.Interfaces.Services;
 using Nodus.Judge.Application.UseCases.Onboarding;
@@ -54,11 +56,18 @@ public sealed partial class OnboardingViewModel : BaseViewModel
     [ObservableProperty] private string _connectionStatusMessage = "Aún no hay conexión confirmada con la app Admin.";
     [ObservableProperty] private bool _isConnectionConfirmed;
     [ObservableProperty] private bool _isConnecting;
+    [ObservableProperty] private bool _isDiscoveringEvents;
     [ObservableProperty] private bool _isNavigatingToVoting;
     [ObservableProperty] private bool   _syncSucceeded;
     [ObservableProperty] private string _syncEventName   = string.Empty;
     [ObservableProperty] private int    _syncProjectCount;
     [ObservableProperty] private int    _syncJudgeCount;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasDiscoveredEvents))]
+    private ObservableCollection<DiscoveredAccessEventDto> _discoveredEvents = [];
+    [ObservableProperty] private DiscoveredAccessEventDto? _selectedDiscoveredEvent;
+
+    public bool HasDiscoveredEvents => DiscoveredEvents.Count > 0;
 
     [RelayCommand]
     private void AcceptAccessQr(string qrText)
@@ -71,6 +80,64 @@ public sealed partial class OnboardingViewModel : BaseViewModel
         HasError = false;
         ErrorMessage = string.Empty;
     }
+
+    partial void OnSelectedDiscoveredEventChanged(DiscoveredAccessEventDto? value)
+    {
+        if (value is null)
+            return;
+
+        AccessQrRaw = value.AccessQrRaw;
+        AccessStatusMessage = $"Evento seleccionado: {value.EventName}.";
+        ConnectionStatusMessage = "Conexión BLE lista. Completa tu nombre y la clave del evento.";
+        IsConnectionConfirmed = true;
+        HasError = false;
+        ErrorMessage = string.Empty;
+    }
+
+    [RelayCommand]
+    private async Task DiscoverServerAndEventsAsync()
+        => await SafeExecuteAsync(async () =>
+        {
+            IsDiscoveringEvents = true;
+            IsConnecting = true;
+            ConnectionStatusMessage = "Buscando Admin por BLE y consultando eventos...";
+
+            // Keep BLE discovery orchestration off the UI thread on slower Android devices.
+            var discovered = await Task.Run(async () =>
+                await _sync.DiscoverAccessEventsAsync(timeoutSeconds: 12));
+
+            IsDiscoveringEvents = false;
+            IsConnecting = false;
+
+            if (discovered.IsFail)
+            {
+                ConnectionStatusMessage = "No se pudo descubrir eventos por BLE.";
+                ErrorMessage = discovered.Error?.Contains("no soporta descubrimiento", StringComparison.OrdinalIgnoreCase) == true
+                    ? discovered.Error!
+                    : $"{discovered.Error} Si el QR sí funciona, usa QR temporalmente y actualiza la app Admin a la misma versión.";
+                HasError = true;
+                return;
+            }
+
+            DiscoveredEvents.Clear();
+            foreach (var evt in discovered.Value!)
+                DiscoveredEvents.Add(evt);
+
+            OnPropertyChanged(nameof(HasDiscoveredEvents));
+
+            if (DiscoveredEvents.Count == 0)
+            {
+                ConnectionStatusMessage = "Admin detectado, pero no hay eventos disponibles para ingresar.";
+                ErrorMessage = string.Empty;
+                HasError = false;
+                return;
+            }
+
+            SelectedDiscoveredEvent = DiscoveredEvents[0];
+            ConnectionStatusMessage = "Admin detectado. Selecciona el evento para continuar.";
+            HasError = false;
+            ErrorMessage = string.Empty;
+        });
 
     [RelayCommand]
     private async Task ConfirmConnectionAsync()

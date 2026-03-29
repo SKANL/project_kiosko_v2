@@ -29,8 +29,25 @@
                       Text="Entrar al evento" />
                 <Label HorizontalOptions="Center"
                        Style="{StaticResource Subhead}"
-                      Text="Escanea el QR de acceso, escribe la clave del evento y la app hará el resto por ti."
+                      Text="Descubre el Admin por BLE o escanea el QR de acceso. Luego escribe la clave del evento y la app hará el resto por ti."
                        HorizontalTextAlignment="Center" />
+
+                <Button Style="{StaticResource SecondaryButton}"
+                        Text="Descubrir Admin y eventos"
+                        Command="{Binding DiscoverServerAndEventsCommand}"
+                        IsEnabled="{Binding IsNotBusy}"
+                        SemanticProperties.Description="Busca por BLE la app Admin cercana y muestra los eventos disponibles sin usar cámara." />
+
+                <Border Style="{StaticResource Card}"
+                        IsVisible="{Binding HasDiscoveredEvents}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Style="{StaticResource Caption1}" Text="Evento disponible" />
+                        <Picker Title="Selecciona evento"
+                                ItemsSource="{Binding DiscoveredEvents}"
+                                ItemDisplayBinding="{Binding DisplayName}"
+                                SelectedItem="{Binding SelectedDiscoveredEvent}" />
+                    </VerticalStackLayout>
+                </Border>
 
                 <Border Style="{StaticResource ElevatedCard}">
                     <VerticalStackLayout Spacing="16">
@@ -38,6 +55,9 @@
                                                        HeightRequest="260"
                                                        BarcodesDetected="OnBarcodesDetected"
                                                        SemanticProperties.Description="Cámara para leer el QR de acceso mostrado por la organización." />
+                        <Label Style="{StaticResource Caption1}"
+                               HorizontalTextAlignment="Center"
+                               Text="Alternativa: escanea el QR si prefieres usar cámara." />
                         <Label Style="{StaticResource Footnote}"
                                HorizontalTextAlignment="Center"
                                Text="{Binding AccessStatusMessage}" />

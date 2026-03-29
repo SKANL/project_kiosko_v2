@@ -236,6 +236,7 @@ public sealed class BleGattClientService : IBleGattClientService, IDisposable
                 return Result<byte[]>.Fail(readyResult.Error!);
 
             Task<Result>? ackWaitTask = null;
+            Result? discoveryAckResult = null;
 
             if (preReadPayload is not null && preReadPayload.Length > 0)
             {
@@ -258,6 +259,12 @@ public sealed class BleGattClientService : IBleGattClientService, IDisposable
                         // payload may have already reached the peripheral. Continue polling flow.
                         System.Diagnostics.Debug.WriteLine("[BLE Sync] pre-read write timeout for sync request, continuing");
                     }
+                    else if (preReadPayload[0] == NodusPrefix.EventDiscoveryRequest)
+                    {
+                        // Android vendors occasionally time out WriteWithoutResponse even when
+                        // bytes were accepted by the controller. Keep going and verify via read.
+                        System.Diagnostics.Debug.WriteLine("[BLE Sync] pre-read write timeout for discovery request, continuing");
+                    }
                     else
                     {
                         System.Diagnostics.Debug.WriteLine("[BLE Sync] pre-read write timeout");
@@ -265,7 +272,8 @@ public sealed class BleGattClientService : IBleGattClientService, IDisposable
                     }
                 }
 
-                if (preReadPayload[0] != NodusPrefix.SyncRequest)
+                if (preReadPayload[0] != NodusPrefix.SyncRequest
+                    && preReadPayload[0] != NodusPrefix.EventDiscoveryRequest)
                 {
                     var ackResult = await ackWaitTask.ConfigureAwait(false);
                     if (ackResult.IsFail)
@@ -285,9 +293,34 @@ public sealed class BleGattClientService : IBleGattClientService, IDisposable
                 await ObserveOptionalSyncAckAsync(ackWaitTask).ConfigureAwait(false);
             }
 
-            var readResult = await ReadBootstrapAggregateAsync().ConfigureAwait(false);
+            if (ackWaitTask is not null && preReadPayload is not null && preReadPayload[0] == NodusPrefix.EventDiscoveryRequest)
+            {
+                // Discovery should ACK with 0xA1,0x0A, but we keep this optional for
+                // unstable Android BLE stacks and validate via read payload prefix instead.
+                discoveryAckResult = await ObserveOptionalDiscoveryAckAsync(ackWaitTask).ConfigureAwait(false);
+            }
+
+            var isDiscoveryRequest = preReadPayload is not null
+                                     && preReadPayload.Length > 0
+                                     && preReadPayload[0] == NodusPrefix.EventDiscoveryRequest;
+
+            // Discovery payload is very small (JSON list) and should arrive immediately.
+            // Keep this path short to avoid long UI hangs when Admin doesn't support 0x0A.
+            var readResult = await ReadBootstrapAggregateAsync(
+                maxReads: isDiscoveryRequest ? 2 : 128,
+                maxConsecutiveTimeouts: isDiscoveryRequest ? 1 : 4,
+                perReadTimeout: isDiscoveryRequest ? TimeSpan.FromSeconds(3) : TimeSpan.FromSeconds(5))
+                .ConfigureAwait(false);
             if (readResult.IsFail)
+            {
+                if (isDiscoveryRequest && discoveryAckResult is { IsFail: true })
+                {
+                    return Result<byte[]>.Fail(
+                        "Admin no respondió al comando de descubrimiento BLE (0x0A). Verifica que Admin y Judge estén en la misma versión.");
+                }
+
                 return Result<byte[]>.Fail(readResult.Error!);
+            }
 
             return Result<byte[]>.Ok(readResult.Value!);
         }
@@ -347,6 +380,7 @@ public sealed class BleGattClientService : IBleGattClientService, IDisposable
         {
             NodusPrefix.JudgeRegister => NodusPrefix.JudgeRegister,
             NodusPrefix.SyncRequest   => NodusPrefix.SyncRequest,
+            NodusPrefix.EventDiscoveryRequest => NodusPrefix.EventDiscoveryRequest,
             _                         => (byte)0x00
         };
 
@@ -450,13 +484,13 @@ public sealed class BleGattClientService : IBleGattClientService, IDisposable
         return Result.Ok();
     }
 
-    private async Task<Result<byte[]>> ReadBootstrapAggregateAsync()
+    private async Task<Result<byte[]>> ReadBootstrapAggregateAsync(int maxReads, int maxConsecutiveTimeouts, TimeSpan perReadTimeout)
     {
         var aggregate = new List<byte>(1024);
         byte[]? previousChunk = null;
         var consecutiveTimeouts = 0;
 
-        for (var i = 0; i < 128; i++)
+        for (var i = 0; i < maxReads; i++)
         {
             System.Diagnostics.Debug.WriteLine("[BLE Sync] reading bootstrap characteristic...");
             byte[] chunk;
@@ -464,7 +498,7 @@ public sealed class BleGattClientService : IBleGattClientService, IDisposable
             {
                 var read = await _peripheral!
                     .ReadCharacteristic(NodusGatt.MainServiceUuid, NodusGatt.BootstrapReadCharUuid)
-                    .Timeout(TimeSpan.FromSeconds(5))
+                    .Timeout(perReadTimeout)
                     .FirstAsync();
                 chunk = read.Data ?? Array.Empty<byte>();
                 consecutiveTimeouts = 0;
@@ -474,7 +508,7 @@ public sealed class BleGattClientService : IBleGattClientService, IDisposable
                 consecutiveTimeouts++;
                 if (aggregate.Count > 0 && consecutiveTimeouts >= 2)
                     break;
-                if (consecutiveTimeouts >= 4)
+                if (consecutiveTimeouts >= maxConsecutiveTimeouts)
                     return Result<byte[]>.Fail("Bootstrap read timed out repeatedly");
 
                 await Task.Delay(250).ConfigureAwait(false);
@@ -517,6 +551,25 @@ public sealed class BleGattClientService : IBleGattClientService, IDisposable
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[BLE Sync] optional sync ACK observer failed: {ex.Message}");
+        }
+    }
+
+    private static async Task<Result> ObserveOptionalDiscoveryAckAsync(Task<Result> ackWaitTask)
+    {
+        try
+        {
+            var ackResult = await ackWaitTask.ConfigureAwait(false);
+            if (ackResult.IsOk)
+                System.Diagnostics.Debug.WriteLine("[BLE Sync] pre-read ACK received (discovery request)");
+            else
+                System.Diagnostics.Debug.WriteLine($"[BLE Sync] pre-read ACK missing for discovery request, continuing to read: {ackResult.Error}");
+
+            return ackResult;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[BLE Sync] optional discovery ACK observer failed: {ex.Message}");
+            return Result.Fail($"Discovery ACK observer failed: {ex.Message}");
         }
     }
 }

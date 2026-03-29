@@ -22,6 +22,7 @@ public sealed class ProcessVoteUseCase
     private readonly IJudgeRepository  _judges;
     private readonly IEventRepository  _events;
     private readonly ICryptoService    _crypto;
+    private readonly IBleGattServerService _gatt;
     private readonly BuildBootstrapPayloadUseCase _bootstrap;
 
     public ProcessVoteUseCase(
@@ -29,22 +30,28 @@ public sealed class ProcessVoteUseCase
         IJudgeRepository judges,
         IEventRepository events,
         ICryptoService   crypto,
+        IBleGattServerService gatt,
         BuildBootstrapPayloadUseCase bootstrap)
     {
         _votes     = votes;
         _judges    = judges;
         _events    = events;
         _crypto    = crypto;
+        _gatt      = gatt;
         _bootstrap = bootstrap;
     }
 
     /// <returns>Byte array starting with 0xA1 (ACK) to notify sender.</returns>
     public async Task<Result<byte[]>> ExecuteAsync(byte[] rawPayload)
     {
-        if (rawPayload is null || rawPayload.Length < 2)
+        if (rawPayload is null || rawPayload.Length == 0)
             return Result<byte[]>.Fail("Payload too short");
 
         byte prefix = rawPayload[0];
+        if (rawPayload.Length < 2 && prefix != NodusPrefix.EventDiscoveryRequest)
+            return Result<byte[]>.Fail("Payload too short");
+
+        System.Diagnostics.Debug.WriteLine($"[Admin BLE] Incoming prefix=0x{prefix:X2}, bytes={rawPayload.Length}");
 
         return prefix switch
         {
@@ -52,8 +59,41 @@ public sealed class ProcessVoteUseCase
             NodusPrefix.JudgeRegister => await ProcessJudgeRegisterAsync(rawPayload[1..]),
             NodusPrefix.MediaChunk    => await ProcessLegacyRegisterOrMediaAsync(rawPayload[1..]),
             NodusPrefix.SyncRequest   => await ProcessSyncRequestAsync(rawPayload[1..]),
+            NodusPrefix.EventDiscoveryRequest => await ProcessEventDiscoveryAsync(),
             _    => Result<byte[]>.Fail($"Unknown prefix: 0x{prefix:X2}")
         };
+    }
+
+    private async Task<Result<byte[]>> ProcessEventDiscoveryAsync()
+    {
+        System.Diagnostics.Debug.WriteLine("[Admin BLE] Processing event discovery request (0x0A)");
+
+        var eventsResult = await _events.GetAllAsync();
+        if (eventsResult.IsFail)
+            return Result<byte[]>.Fail(eventsResult.Error!);
+
+        var available = eventsResult.Value!
+            .Where(evt => evt.Status != EventStatus.Finished
+                          && !string.IsNullOrWhiteSpace(evt.AccessQrPayload))
+            .OrderByDescending(evt => evt.Status == EventStatus.Active)
+            .ThenByDescending(evt => evt.Id)
+            .Select(evt => new EventDiscoveryDto(
+                evt.Id,
+                evt.Name,
+                evt.Institution,
+                evt.AccessQrPayload))
+            .ToList();
+
+        byte[] json = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(available));
+        byte[] payload = new byte[json.Length + 1];
+        payload[0] = NodusPrefix.EventDiscovery;
+        json.CopyTo(payload, 1);
+
+        _gatt.UpdateBootstrapPayload(payload);
+        System.Diagnostics.Debug.WriteLine($"[Admin BLE] Discovery payload ready. events={available.Count}, bytes={payload.Length}");
+
+        // Keep ACK contract: caller writes pre-read request, then waits for ACK before reading.
+        return Result<byte[]>.Ok([NodusPrefix.Ack, NodusPrefix.EventDiscoveryRequest]);
     }
 
     private async Task<Result<byte[]>> ProcessLegacyRegisterOrMediaAsync(byte[] data)
@@ -410,6 +450,8 @@ public sealed class ProcessVoteUseCase
         public string Id     { get; set; } = string.Empty;
         public double Weight { get; set; } = 1.0;
     }
+
+    private sealed record EventDiscoveryDto(int EventId, string EventName, string Institution, string AccessQrRaw);
 
     private static bool CanAcceptVote(NodusEvent evt)
     {

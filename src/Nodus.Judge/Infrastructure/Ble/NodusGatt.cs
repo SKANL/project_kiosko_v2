@@ -26,4 +26,6 @@ public static class NodusPrefix
     public const byte Ack           = 0xA1;
     public const byte Nack          = 0xA2;
     public const byte ChunkedPayload = 0x09;
+    public const byte EventDiscoveryRequest = 0x0A;
+    public const byte EventDiscovery        = 0x0B;
 }
